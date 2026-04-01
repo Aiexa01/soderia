@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Cambiar estado{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'orders_detail' pedido.id %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>Cambiar estado del pedido #{{ pedido.id }}</h1>
+      <p>Actualiza el estado operativo del pedido.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.estado.id_for_label }}">Estado</label>
+        {{ form.estado }}
+        {{ form.estado.errors }}
+
+        <label for="{{ form.motivo.id_for_label }}">Motivo (opcional)</label>
+        {{ form.motivo }}
+        {{ form.motivo.errors }}
+
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

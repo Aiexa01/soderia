@@ -1,0 +1,453 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soda y Agua Tres Cerritos — Salta Capital</title>
+  <meta name="description"
+    content="Soda y Agua Tres Cerritos: distribución de soda y agua mineral en Salta Capital. Más de 30 años de experiencia, entrega a domicilio. Pedidos: 4393920." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+
+<body class="landing-page">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="landing-nav" id="landing-nav">
+    <a href="#inicio" class="landing-nav-brand">
+      <img src="{% static 'images/436361333_759549986161676_5672207418491690292_n.jpg' %}" alt="Tres Cerritos Logo"
+        class="landing-nav-logo" />
+      <div>
+        <div class="landing-nav-name">Tres Cerritos</div>
+        <div class="landing-nav-sub">Soda y Agua</div>
+      </div>
+    </a>
+
+    <ul class="landing-nav-links" id="nav-links">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#productos">Productos</a></li>
+      <li><a href="#por-que">¿Por qué elegirnos?</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+      <li><a href="{% url 'login' %}" class="landing-nav-login">Iniciar Sesión</a></li>
+    </ul>
+
+    <button class="landing-hamburger" id="hamburger-btn" type="button" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+  <div class="landing-mobile-backdrop" id="mobile-backdrop"></div>
+
+  <!-- ==================== HERO ==================== -->
+  <section class="landing-hero" id="inicio">
+    <div class="landing-hero-bg"
+      style="background-image: url('{% static 'images/127445322_114296440499974_6806529610518562486_n.jpg' %}')"></div>
+    <div class="landing-hero-overlay"></div>
+
+    <div class="landing-hero-content landing-animate">
+      <span class="landing-hero-tag">Distribución de Soda y Agua</span>
+      <h1>
+        Tu soda y agua,<br>
+        <em>siempre en tu mesa</em>
+      </h1>
+      <p>
+        Con una flota propia y logística optimizada, garantizamos la entrega
+        de soda y agua de la más alta calidad en toda Salta Capital y alrededores.
+      </p>
+      <div class="landing-hero-ctas">
+        <a href="#productos" class="landing-btn-primary">Nuestros Productos</a>
+        <a href="#contacto" class="landing-btn-outline">Contactanos</a>
+      </div>
+    </div>
+
+    <div class="landing-hero-social">
+      <a href="https://www.facebook.com/sodayaguatrescerritos" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M9 8H6v4h3v12h5V12h3.6L18 8h-4V6.3c0-1 .2-1.3 1.1-1.3H18V0h-3.5C11 0 9 1.9 9 5.5V8z" />
+        </svg>
+      </a>
+      <a href="https://www.instagram.com/trescerritos.srl/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2M12 0C8.7 0 8.3 0 7 .1 5.7.1 4.8.3 4 .6c-.8.3-1.5.7-2.1 1.3C1.3 2.5.9 3.2.6 4 .3 4.8.1 5.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.1 1.3.2 2.2.5 3 .3.8.7 1.5 1.3 2.1.7.7 1.3 1 2.1 1.3.8.3 1.7.5 3 .5 1.3.1 1.7.1 5 .1s3.7 0 5-.1c1.3-.1 2.2-.2 3-.5.8-.3 1.5-.7 2.1-1.3.7-.7 1-1.3 1.3-2.1.3-.8.5-1.7.5-3 .1-1.3.1-1.7.1-5s0-3.7-.1-5c-.1-1.3-.2-2.2-.5-3-.3-.8-.7-1.5-1.3-2.1C21.5 1.3 20.8.9 20 .6 19.2.3 18.3.1 17 .1 15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zm0 10.2a4 4 0 110-8 4 4 0 010 8zm6.4-10.5a1.4 1.4 0 11-2.8 0 1.4 1.4 0 012.8 0z" />
+        </svg>
+      </a>
+      <a href="https://wa.me/5493874393920" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z" />
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== STATS ==================== -->
+  <section class="landing-stats" id="estadisticas">
+    <div class="landing-stats-grid">
+      <div class="landing-stat-item landing-animate landing-delay-1">
+        <div class="landing-stat-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+        </div>
+        <div class="landing-stat-number">30+</div>
+        <div class="landing-stat-label">Años de Experiencia</div>
+      </div>
+      <div class="landing-stat-item landing-animate landing-delay-2">
+        <div class="landing-stat-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8" />
+          </svg>
+        </div>
+        <div class="landing-stat-number">1000+</div>
+        <div class="landing-stat-label">Clientes Satisfechos</div>
+      </div>
+      <div class="landing-stat-item landing-animate landing-delay-3">
+        <div class="landing-stat-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="1" y="3" width="15" height="13" rx="2" />
+            <path d="M16 8h4l3 3v5h-7V8z" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
+          </svg>
+        </div>
+        <div class="landing-stat-number">5</div>
+        <div class="landing-stat-label">Camionetas en Reparto</div>
+      </div>
+      <div class="landing-stat-item landing-animate landing-delay-4">
+        <div class="landing-stat-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+        </div>
+        <div class="landing-stat-number">98%</div>
+        <div class="landing-stat-label">Entregas a Tiempo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ABOUT ==================== -->
+  <section class="landing-about" id="nosotros">
+    <h2 class="landing-section-title">Sobre Nosotros</h2>
+    <div class="landing-section-bar"></div>
+    <div class="landing-about-wrapper">
+      <div class="landing-about-text">
+        <h2>Somos una Empresa Salteña de<br>Distribución de Soda y Agua</h2>
+        <div class="landing-about-text-bar"></div>
+        <p>
+          Nos destacamos en la producción y distribución de <strong>soda sifón</strong> y
+          <strong>agua mineral</strong>. Nos dedicamos a ofrecer productos de la más alta
+          calidad, cumpliendo con los estándares de higiene y seguridad alimentaria vigentes.
+        </p>
+        <p>
+          Con base en <strong>Salta Capital</strong> y operaciones en toda la provincia,
+          llevamos más de <strong>30 años</strong> llevando frescura a hogares,
+          comercios y empresas con compromiso y excelencia.
+        </p>
+        <a href="#contacto" class="landing-btn-primary">+ info</a>
+      </div>
+      <div class="landing-about-img">
+        <img src="{% static 'images/empresa.png' %}" alt="Soda Tres Cerritos" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRODUCTS ==================== -->
+  <section class="landing-products" id="productos">
+    <div class="landing-products-wrapper">
+      <div class="landing-products-info">
+        <h2 class="landing-products-title">Nuestros productos</h2>
+        <p class="landing-products-desc">
+          Descubre nuestra amplia variedad de productos, elaborados con
+          agua purificada de la más alta calidad y con el compromiso de
+          brindarte lo mejor de Salta.
+        </p>
+      </div>
+      <div class="landing-products-grid">
+        <div class="landing-product-item">
+          <div class="landing-product-check">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="landing-product-name">Bidón azul x 10 y 20 L</span>
+        </div>
+        <div class="landing-product-item">
+          <div class="landing-product-check">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="landing-product-name">Línea Baja en Sodio x 10 y 20 L</span>
+        </div>
+        <div class="landing-product-item">
+          <div class="landing-product-check">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="landing-product-name">Sifón 650 cc Retornable</span>
+        </div>
+        <div class="landing-product-item">
+          <div class="landing-product-check">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="landing-product-name">Cajón de Soda x 1.5 L (6 sifones)</span>
+        </div>
+        <div class="landing-product-item">
+          <div class="landing-product-check">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="landing-product-name">No retornables</span>
+        </div>
+        <div class="landing-product-item">
+          <div class="landing-product-check">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="landing-product-name">Dispenser común / Frío Calor</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VALUES ==================== -->
+  <section class="landing-values">
+    <h2 class="landing-section-title">Nuestros Valores</h2>
+    <div class="landing-section-bar"></div>
+    <div class="landing-values-grid">
+      <div class="landing-value-card">
+        <div class="landing-value-icon">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <h3>Calidad</h3>
+        <p>A través de la mejora continua, buscamos la <strong>excelencia</strong> en cada producto y servicio que
+          brindamos a nuestros clientes.</p>
+      </div>
+      <div class="landing-value-card">
+        <div class="landing-value-icon">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
+        <h3>Puntualidad</h3>
+        <p>Nuestro compromiso es garantizar la <strong>entrega puntual</strong> en cada reparto y en cada proceso
+          operativo.</p>
+      </div>
+      <div class="landing-value-card">
+        <div class="landing-value-icon">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M20.8 14.4c.6-.3 1.2-.3 1.2.4v3.2c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h10" />
+            <path d="M18 2l4 4-10 10H8v-4L18 2z" />
+          </svg>
+        </div>
+        <h3>Confianza</h3>
+        <p>Contamos con un equipo comprometido y <strong>confiable</strong>, que atiende cada pedido con dedicación y
+          responsabilidad.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== WHY US ==================== -->
+  <section class="landing-why" id="por-que">
+    <h2 class="landing-section-title">¿Por qué elegirnos?</h2>
+    <div class="landing-section-bar"></div>
+
+    <div class="landing-why-top">
+      <div class="landing-why-info">
+        <span class="landing-why-info-tag">1990 - 2026</span>
+        <h3>Experiencia y Trayectoria:</h3>
+        <h4>Más de 30 años en el sector</h4>
+        <div class="landing-why-bar">
+          <div class="landing-why-bar-fill" style="width: 85%"></div>
+        </div>
+        <small>Rumbo a los 35 años</small>
+      </div>
+      <div class="landing-why-info">
+        <span class="landing-why-info-tag">Flota y operaciones</span>
+        <h3>Compromiso con la Calidad:</h3>
+        <h4>Agua pura como prioridad</h4>
+        <div class="landing-why-bar">
+          <div class="landing-why-bar-fill" style="width: 100%"></div>
+        </div>
+        <small>en cada momento, en todos los procesos</small>
+      </div>
+    </div>
+
+    <div class="landing-why-cards">
+      <div class="landing-why-card">
+        <img class="landing-why-card-img"
+          src="{% static 'images/130189342_118537676742517_1606908697333165506_n.jpg' %}"
+          alt="Logística de distribución" />
+        <div class="landing-why-card-body">
+          <h4>Logística Eficiente:</h4>
+          <p>Distribución optimizada y reparto diario en toda Salta Capital</p>
+        </div>
+      </div>
+      <div class="landing-why-card">
+        <img class="landing-why-card-img"
+          src="{% static 'images/475803748_1064066872189588_3743603014355378180_n.jpg' %}"
+          alt="Producción de agua y soda" />
+        <div class="landing-why-card-body">
+          <h4>Producción Segura:</h4>
+          <p>Planta con normas sanitarias y procesos de calidad certificados</p>
+        </div>
+      </div>
+      <div class="landing-why-card">
+        <img class="landing-why-card-img"
+          src="{% static 'images/133525594_128189709110647_8994533442473526113_n.jpg' %}"
+          alt="Dispenser Tres Cerritos" />
+        <div class="landing-why-card-body">
+          <h4>Variedad de Productos:</h4>
+          <p>Soda sifón, bidones de agua y dispensers para hogar y oficina</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACT ==================== -->
+  <section class="landing-contact" id="contacto">
+    <div class="landing-contact-wrapper">
+      <h2 class="landing-section-title">Contacto</h2>
+      <div class="landing-section-bar"></div>
+      <p class="landing-contact-subtitle">
+        ¿Necesitás soda o agua? Contactanos y te asesoramos sin compromiso.
+      </p>
+      <div class="landing-contact-grid">
+        <div class="landing-contact-info">
+          <div class="landing-contact-item">
+            <div class="landing-contact-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <div>
+              <div class="landing-contact-item-label">Ubicación</div>
+              <div class="landing-contact-item-value">Las Heras 1443, Salta Capital, Argentina</div>
+            </div>
+          </div>
+          <div class="landing-contact-item">
+            <div class="landing-contact-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.1 2 2 0 014 2h3a2 2 0 012 1.7c.1.9.4 1.8.7 2.7a2 2 0 01-.4 2.1l-1.3 1.3a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.8.3 1.7.5 2.7.7A2 2 0 0122 16.9z" />
+              </svg>
+            </div>
+            <div>
+              <div class="landing-contact-item-label">Teléfono</div>
+              <div class="landing-contact-item-value">4393920</div>
+            </div>
+          </div>
+          <div class="landing-contact-item">
+            <div class="landing-contact-icon">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z" />
+              </svg>
+            </div>
+            <div>
+              <div class="landing-contact-item-label">WhatsApp</div>
+              <div class="landing-contact-item-value">+54 9 387 439-3920</div>
+            </div>
+          </div>
+
+          <div class="landing-contact-social">
+            <a href="https://www.facebook.com/sodayaguatrescerritos" target="_blank" rel="noopener"
+              aria-label="Facebook">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 8H6v4h3v12h5V12h3.6L18 8h-4V6.3c0-1 .2-1.3 1.1-1.3H18V0h-3.5C11 0 9 1.9 9 5.5V8z" />
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/trescerritos.srl/" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2M12 0C8.7 0 8.3 0 7 .1 5.7.1 4.8.3 4 .6c-.8.3-1.5.7-2.1 1.3C1.3 2.5.9 3.2.6 4 .3 4.8.1 5.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.1 1.3.2 2.2.5 3 .3.8.7 1.5 1.3 2.1.7.7 1.3 1 2.1 1.3.8.3 1.7.5 3 .5 1.3.1 1.7.1 5 .1s3.7 0 5-.1c1.3-.1 2.2-.2 3-.5.8-.3 1.5-.7 2.1-1.3.7-.7 1-1.3 1.3-2.1.3-.8.5-1.7.5-3 .1-1.3.1-1.7.1-5s0-3.7-.1-5c-.1-1.3-.2-2.2-.5-3-.3-.8-.7-1.5-1.3-2.1C21.5 1.3 20.8.9 20 .6 19.2.3 18.3.1 17 .1 15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zm0 10.2a4 4 0 110-8 4 4 0 010 8zm6.4-10.5a1.4 1.4 0 11-2.8 0 1.4 1.4 0 012.8 0z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <form class="landing-contact-form" onsubmit="return false;">
+          <input type="text" placeholder="Tu nombre completo" />
+          <input type="email" placeholder="Tu email" />
+          <input type="tel" placeholder="Tu teléfono" />
+          <textarea rows="4" placeholder="Describí lo que necesitás..."></textarea>
+          <button type="submit">✈ Enviar Consulta</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="landing-footer">
+    <div class="landing-footer-left">
+      © 2026 Soda y Agua Tres Cerritos — Todos los derechos reservados
+    </div>
+    <div class="landing-footer-right">
+      Diseñado por Nodo Dev
+    </div>
+  </footer>
+
+  <!-- ==================== FLOATING BUTTONS ==================== -->
+  <a href="#inicio" class="landing-scroll-top" aria-label="Volver arriba">↑</a>
+  <a href="https://wa.me/5493874393920" target="_blank" rel="noopener" class="landing-whatsapp" aria-label="WhatsApp">
+    <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
+      <path
+        d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z" />
+    </svg>
+  </a>
+
+  <!-- ==================== JS ==================== -->
+  <script>
+    (function () {
+      var hamburger = document.getElementById('hamburger-btn');
+      var navLinks = document.getElementById('nav-links');
+      var backdrop = document.getElementById('mobile-backdrop');
+
+      function toggleMenu() {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('open');
+        backdrop.classList.toggle('open');
+      }
+
+      function closeMenu() {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('open');
+        backdrop.classList.remove('open');
+      }
+
+      hamburger.addEventListener('click', toggleMenu);
+      backdrop.addEventListener('click', closeMenu);
+
+      // Close menu on link click
+      navLinks.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+      });
+
+      // Navbar scroll effect
+      var nav = document.getElementById('landing-nav');
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 60) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>

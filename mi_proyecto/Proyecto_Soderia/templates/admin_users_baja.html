@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios dados de baja{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/admin_users.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+<a class="cta" href="{% url 'admin_users' %}">Volver a lista de usuarios</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid users-grid">
+    <section class="users-panel">
+        <div class="users-header">
+            <div class="header-content">
+                <h1>Usuarios dados de baja</h1>
+                <p>Historial de usuarios eliminados lógicamente.</p>
+            </div>
+        </div>
+
+        <div class="user-list-grid">
+            {% for user in users %}
+            <article class="user-card-premium" style="opacity: 0.8; background: #f8f9fa;">
+                <div class="user-card-header">
+                    <div class="user-avatar-placeholder" style="background: #e2e8f0; color: #64748b;">
+                        {% if user.first_name %}
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                        {% else %}
+                        {{ user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <h3 class="user-name-display">{{ user.first_name }} {{ user.last_name }}</h3>
+                        <span class="user-username-handle">@{{ user.username }}</span>
+                    </div>
+                    <div class="user-status-indicator">
+                        <span class="status-badge status-deleted">Baja</span>
+                    </div>
+                </div>
+
+                <div class="user-card-body">
+                    <div class="user-meta-info" style="display: block;">
+                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">
+                            <strong>Estado actual:</strong> Inactivo
+                        </p>
+                    </div>
+                </div>
+
+                <div class="user-card-footer">
+                    <a class="cta-primary" href="{% url 'reactivar_usuario' user.id %}"
+                        onclick="return confirm('¿Estás seguro de reactivar este usuario?');"
+                        style="width: 100%; text-align: center; background-color: #10b981; border: none;">
+                        Reactivar Usuario
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state-premium">
+                <h3>No hay usuarios dados de baja</h3>
+                <p>Todos los usuarios están activos o suspendidos.</p>
+                <a class="cta-primary" href="{% url 'admin_users' %}">Volver al listado</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

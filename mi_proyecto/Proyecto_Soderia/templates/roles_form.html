@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/roles.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'roles_list' %}">Volver a roles</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>{{ title }}</h1>
+      <p>Define el nombre, descripcion y estado del rol.</p>
+      <form method="post" class="role-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="form-columns">
+          <div>
+            <label for="{{ form.name.id_for_label }}">Nombre</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+          </div>
+          <div>
+            <label for="{{ form.code.id_for_label }}">Codigo</label>
+            {{ form.code }}
+            {{ form.code.errors }}
+          </div>
+          <div class="full-width">
+            <label for="{{ form.description.id_for_label }}">Descripcion</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+          </div>
+        </div>
+
+        <div class="checkbox-row">
+          {{ form.active }}
+          <label for="{{ form.active.id_for_label }}">Rol activo</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'roles_list' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

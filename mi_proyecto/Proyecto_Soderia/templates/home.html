@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block header_action %}
+  <a class="cta ghost" href="{% url 'logout' %}">Cerrar sesión</a>
+{% endblock %}
+
+{% block content %}
+<div class="home-welcome">
+  <div class="home-greeting">
+    <h1 class="home-title">
+      Buen día, <span class="home-name">{{ request.user.first_name|default:request.user.username }}</span> 👋
+    </h1>
+    <p class="home-subtitle">Bienvenido al panel de gestión de <strong>Tres Cerritos — Soda y Agua</strong></p>
+  </div>
+
+  <div class="home-quicklinks">
+    {% if is_admin or is_eac %}
+    <a class="quicklink-card" href="{% url 'clients_list' %}">
+      <span class="quicklink-icon">👥</span>
+      <span class="quicklink-label">Clientes</span>
+      <span class="quicklink-desc">Gestión de clientes</span>
+    </a>
+    <a class="quicklink-card" href="{% url 'orders_list' %}">
+      <span class="quicklink-icon">💰</span>
+      <span class="quicklink-label">Ventas</span>
+      <span class="quicklink-desc">Pedidos y facturación</span>
+    </a>
+    {% endif %}
+    {% if is_admin %}
+    <a class="quicklink-card" href="{% url 'stock_general' %}">
+      <span class="quicklink-icon">📦</span>
+      <span class="quicklink-label">Stock</span>
+      <span class="quicklink-desc">Control de inventario</span>
+    </a>
+    <a class="quicklink-card" href="{% url 'logistica_panel' %}">
+      <span class="quicklink-icon">🚚</span>
+      <span class="quicklink-label">Logística</span>
+      <span class="quicklink-desc">Rutas y camionetas</span>
+    </a>
+    <a class="quicklink-card" href="{% url 'admin_users' %}">
+      <span class="quicklink-icon">👤</span>
+      <span class="quicklink-label">Usuarios</span>
+      <span class="quicklink-desc">Accesos y roles</span>
+    </a>
+    {% endif %}
+    {% if is_repartidor %}
+    <a class="quicklink-card" href="{% url 'mis_entregas' %}">
+      <span class="quicklink-icon">📍</span>
+      <span class="quicklink-label">Mis entregas</span>
+      <span class="quicklink-desc">Pedidos del día</span>
+    </a>
+    <a class="quicklink-card" href="{% url 'mi_camioneta' %}">
+      <span class="quicklink-icon">🚐</span>
+      <span class="quicklink-label">Mi camioneta</span>
+      <span class="quicklink-desc">Stock y capacidad</span>
+    </a>
+    <a class="quicklink-card" href="{% url 'mi_stock' %}">
+      <span class="quicklink-icon">📦</span>
+      <span class="quicklink-label">Mi stock</span>
+      <span class="quicklink-desc">Inventario asignado</span>
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

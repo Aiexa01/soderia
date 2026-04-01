@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Stock general{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card stock-header">
+      <div>
+        <h1>Stock general</h1>
+        <p>Vista operativa del depósito central y camionetas activas.</p>
+      </div>
+      <div class="stock-legend">
+        <span class="pill status-ok">Stock OK</span>
+        <span class="pill status-low">Stock bajo</span>
+        <span class="pill status-critical">Crítico</span>
+      </div>
+    </section>
+
+    <section class="card deposito-card">
+      <div class="deposito-head">
+        <div>
+          <h2>Depósito Central</h2>
+          {% if deposito %}
+            <p class="hint">{{ deposito.direccion|default:"Sin direccion cargada" }}</p>
+          {% endif %}
+        </div>
+        <span class="chip">Stock general</span>
+      </div>
+      <div class="deposito-grid">
+        {% for row in deposito_stock %}
+          <div class="deposito-item {{ row.status }}">
+            <div class="deposito-name">{{ row.item.producto.nombre }}</div>
+            <div class="deposito-qty">{{ row.item.cantidad_actual }}</div>
+            <div class="deposito-meta">
+              <span class="badge">{% if row.item.producto.retornable %}Retornable{% else %}No retornable{% endif %}</span>
+              <span class="badge">{{ row.item.producto.get_tipo_envase_display }}</span>
+            </div>
+          </div>
+        {% empty %}
+          <p class="hint">Sin stock cargado en depósito.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card camionetas-section">
+      <div class="camionetas-head">
+        <h2>Camionetas</h2>
+        <p class="hint">Resumen de carga y estado de cada unidad.</p>
+      </div>
+      <div class="camionetas-grid">
+        {% for card in camioneta_cards %}
+          <article class="camioneta-stock-card {{ card.status }}">
+            <div class="camioneta-card-head">
+              <div>
+                <strong>{{ card.camioneta.nombre }}</strong>
+                <div class="hint">{{ card.camioneta.patente }}</div>
+              </div>
+              <span class="badge">{{ card.camioneta.get_estado_display }}</span>
+            </div>
+            <div class="camioneta-card-meta">
+              <span>{{ card.count }} productos cargados</span>
+              <span>{{ card.total_unidades }} unidades</span>
+              <span>{% if card.camioneta.repartidor %}{{ card.camioneta.repartidor.username }}{% else %}Sin repartidor{% endif %}</span>
+            </div>
+            <div class="camioneta-card-actions">
+              <a class="cta ghost" href="{% url 'stock_camioneta' card.camioneta.id %}">Ver stock</a>
+              <a class="cta ghost" href="{% url 'orders_list' %}?camioneta={{ card.camioneta.id }}">Ver pedidos</a>
+              <button class="cta ghost js-open-carga" type="button" data-camioneta="{{ card.camioneta.id }}" data-nombre="{{ card.camioneta.nombre }}">Cargar</button>
+            </div>
+          </article>
+        {% empty %}
+          <p class="hint">No hay camionetas cargadas.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <div class="modal-backdrop" id="carga-backdrop"></div>
+    <div class="modal" id="carga-modal" role="dialog" aria-modal="true" aria-labelledby="carga-title">
+      <form method="post" id="carga-form" data-action-base="{% url 'stock_cargar' 0 %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <div>
+            <h2 id="carga-title">Cargar camioneta</h2>
+            <p class="hint" id="carga-subtitle">Selecciona productos del depósito.</p>
+          </div>
+          <button class="icon-action" type="button" id="carga-close" aria-label="Cerrar">
+            ✕
+          </button>
+        </div>
+
+        <div class="capacidad-panel">
+          <div>
+            <span class="meta-label">Peso estimado</span>
+            <div class="progress"><div class="progress-bar" id="peso-bar"></div></div>
+            <div class="hint" id="peso-text">0 kg</div>
+          </div>
+          <div>
+            <span class="meta-label">Volumen estimado</span>
+            <div class="progress"><div class="progress-bar" id="volumen-bar"></div></div>
+            <div class="hint" id="volumen-text">0 m³</div>
+          </div>
+        </div>
+
+        <div class="carga-list">
+          {% for row in deposito_stock %}
+            <div class="carga-row" data-litros="{{ row.item.producto.capacidad_litros }}" data-max="{{ row.item.producto.max_por_camioneta|default:0 }}">
+              <div>
+                <strong>{{ row.item.producto.nombre }}</strong>
+                <div class="hint">Disponible: {{ row.item.cantidad_actual }} · Max: {{ row.item.producto.max_por_camioneta|default:"-" }}</div>
+              </div>
+              <div class="carga-input">
+                <input type="number" step="1" min="0" max="{{ row.item.cantidad_actual }}" name="qty_{{ row.item.producto.id }}" value="0" />
+                <span class="hint impacto">+0 kg · +0 m³</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="cta">Confirmar carga</button>
+          <button type="button" class="cta ghost" id="carga-cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    (function () {
+      var modal = document.getElementById("carga-modal");
+      var backdrop = document.getElementById("carga-backdrop");
+      var closeBtn = document.getElementById("carga-close");
+      var cancelBtn = document.getElementById("carga-cancel");
+      var form = document.getElementById("carga-form");
+      var subtitle = document.getElementById("carga-subtitle");
+      var pesoBar = document.getElementById("peso-bar");
+      var volumenBar = document.getElementById("volumen-bar");
+      var pesoText = document.getElementById("peso-text");
+      var volumenText = document.getElementById("volumen-text");
+
+      function openModal(camionetaId, nombre) {
+        if (!form) return;
+        var base = form.getAttribute("data-action-base") || "";
+        form.action = base.replace("0", camionetaId);
+        subtitle.textContent = "Camioneta: " + nombre;
+        modal.classList.add("open");
+        backdrop.classList.add("open");
+        updateTotals();
+      }
+
+      function closeModal() {
+        modal.classList.remove("open");
+        backdrop.classList.remove("open");
+      }
+
+      function updateTotals() {
+        var rows = Array.prototype.slice.call(document.querySelectorAll(".carga-row"));
+        var totalKg = 0;
+        var totalM3 = 0;
+        rows.forEach(function (row) {
+          var litros = parseFloat(row.getAttribute("data-litros") || "0");
+          var input = row.querySelector("input");
+          var qty = parseInt(input.value || "0", 10);
+          var kg = qty * litros;
+          var m3 = (qty * litros) / 1000;
+          totalKg += kg;
+          totalM3 += m3;
+          var impacto = row.querySelector(".impacto");
+          if (impacto) {
+            impacto.textContent = "+" + kg.toFixed(0) + " kg · +" + m3.toFixed(2) + " m³";
+          }
+        });
+        pesoText.textContent = totalKg.toFixed(0) + " kg";
+        volumenText.textContent = totalM3.toFixed(2) + " m³";
+        var pesoPct = Math.min(100, (totalKg / 900) * 100);
+        var volPct = Math.min(100, (totalM3 / 5) * 100);
+        pesoBar.style.width = pesoPct + "%";
+        volumenBar.style.width = volPct + "%";
+        pesoBar.className = "progress-bar " + (pesoPct > 85 ? "critico" : (pesoPct > 65 ? "bajo" : "ok"));
+        volumenBar.className = "progress-bar " + (volPct > 85 ? "critico" : (volPct > 65 ? "bajo" : "ok"));
+      }
+
+      document.querySelectorAll(".js-open-carga").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          openModal(btn.getAttribute("data-camioneta"), btn.getAttribute("data-nombre"));
+        });
+      });
+
+      if (closeBtn) closeBtn.addEventListener("click", closeModal);
+      if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+      if (backdrop) backdrop.addEventListener("click", closeModal);
+      if (form) form.addEventListener("input", updateTotals);
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Roles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/roles.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+<a class="cta" href="{% url 'home' %}">Volver al panel</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid roles-grid">
+  <section class="roles-panel">
+    <div class="roles-header">
+      <div class="header-content">
+        <h1>Roles</h1>
+        <p>Roles y permisos definidos en el sistema.</p>
+      </div>
+    </div>
+
+    <div class="role-list-grid">
+      {% for role in roles %}
+      <article class="role-card">
+        <div class="role-card-header">
+          <div class="role-badge-big">ROL</div>
+          <div class="role-info">
+            <h3>{{ role.name }}</h3>
+            <span class="role-sub">Grupo de sistema</span>
+          </div>
+        </div>
+        <div class="role-meta">
+          <div>
+            <span class="meta-label">Usuarios</span>
+            <span>{{ role.user_set.count }}</span>
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <div class="empty-state-premium">
+        <h3>No hay roles registrados</h3>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

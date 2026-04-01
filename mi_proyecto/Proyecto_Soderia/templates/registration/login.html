@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar Sesión — Tres Cerritos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body class="login-body">
+    <div class="layout-center">
+      <div class="shell">
+        <section class="brand-panel">
+          <a href="/" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <img src="{% static 'images/436361333_759549986161676_5672207418491690292_n.jpg' %}" alt="Logo" style="height: 36px; width: auto; border-radius: 6px;" />
+            <span class="brand-badge">Soda y Agua — Tres Cerritos</span>
+          </a>
+          <h1>Tu soda y agua, siempre en tu mesa.</h1>
+          <p>Distribución de soda sifón y agua mineral en toda Salta Capital. Accedé al panel para gestionar tus pedidos.</p>
+          <div class="stats">
+            <div class="stat">
+              <strong>30+</strong>
+              Años
+            </div>
+            <div class="stat">
+              <strong>1000+</strong>
+              Clientes
+            </div>
+            <div class="stat">
+              <strong>98%</strong>
+              Entregas
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <span class="chip">Acceso de operadores</span>
+          <h2>Iniciar sesión</h2>
+          <p>Ingresá con tu usuario para gestionar ventas, clientes y rutas.</p>
+          <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label for="id_username">Usuario</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+
+            <label for="id_password">Contraseña</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+
+            <button type="submit">Entrar al panel</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

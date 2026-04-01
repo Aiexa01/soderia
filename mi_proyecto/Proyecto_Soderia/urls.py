@@ -1,0 +1,59 @@
+from django.contrib.auth import views as auth_views
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('', views.landing, name='landing'),
+    path(
+        'login/',
+        auth_views.LoginView.as_view(
+            template_name='registration/login.html',
+            redirect_authenticated_user=True,
+        ),
+        name='login',
+    ),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('home/', views.home, name='home'),
+    path('admin-panel/usuarios/', views.admin_users, name='admin_users'),
+    path('admin-panel/usuarios/nuevo/', views.admin_user_create, name='admin_user_create'),
+    path('admin-panel/usuarios/<int:user_id>/editar/', views.admin_user_edit, name='admin_user_edit'),
+    path('admin-panel/usuarios/<int:user_id>/estado/', views.admin_user_toggle, name='admin_user_toggle'),
+    path('admin-panel/usuarios/<int:user_id>/password/', views.admin_user_password, name='admin_user_password'),
+    path('clientes/', views.clients_list, name='clients_list'),
+    path('clientes/nuevo/', views.clients_create, name='clients_create'),
+    path('clientes/<int:client_id>/editar/', views.clients_edit, name='clients_edit'),
+    path('clientes/<int:client_id>/estado/', views.clients_toggle, name='clients_toggle'),
+    path('ventas/', views.orders_list, name='orders_list'),
+    path('ventas/nuevo/', views.orders_create, name='orders_create'),
+    path('ventas/<int:order_id>/', views.orders_detail, name='orders_detail'),
+    path('ventas/<int:order_id>/asignar/', views.orders_assign, name='orders_assign'),
+    path('ventas/<int:order_id>/estado/', views.orders_status, name='orders_status'),
+    path('ventas/<int:order_id>/pago/', views.orders_pay, name='orders_pay'),
+    path('logistica/', views.logistica_panel, name='logistica_panel'),
+    path('stock/', views.stock_general, name='stock_general'),
+    path('stock/cargar/<int:camioneta_id>/', views.stock_cargar, name='stock_cargar'),
+    path('stock/camioneta/<int:camioneta_id>/', views.stock_camioneta, name='stock_camioneta'),
+    path('mis-entregas/', views.mis_entregas, name='mis_entregas'),
+    path('mis-entregas/<int:order_id>/', views.entrega_operacion, name='entrega_operacion'),
+    path('mi-stock/', views.mi_stock, name='mi_stock'),
+    path('mi-camioneta/', views.mi_camioneta, name='mi_camioneta'),
+    path('admin-panel/roles/', views.roles_list, name='roles_list'),
+
+    path('admin-panel/usuarios/bajas/', views.usuarios_baja, name='usuarios_baja'),
+    path('admin-panel/usuarios/<int:user_id>/baja/', views.dar_baja_usuario, name='dar_baja_usuario'),
+    path('admin-panel/usuarios/<int:user_id>/reactivar/', views.reactivar_usuario, name='reactivar_usuario'),
+
+    path('admin-panel/camionetas/', views.camionetas_list, name='camionetas_list'),
+    path('admin-panel/camionetas/nuevo/', views.camionetas_create, name='camionetas_create'),
+    path('admin-panel/camionetas/<int:camioneta_id>/editar/', views.camionetas_edit, name='camionetas_edit'),
+    path('admin-panel/camionetas/<int:camioneta_id>/estado/', views.camionetas_toggle, name='camionetas_toggle'),
+    path('admin-panel/productos/', views.productos_list, name='productos_list'),
+    path('admin-panel/productos/nuevo/', views.productos_create, name='productos_create'),
+    path('admin-panel/productos/<int:producto_id>/editar/', views.productos_edit, name='productos_edit'),
+    path('admin-panel/productos/<int:producto_id>/estado/', views.productos_toggle, name='productos_toggle'),
+    path('admin-panel/barrios/', views.barrios_list, name='barrios_list'),
+    path('admin-panel/barrios/nuevo/', views.barrios_create, name='barrios_create'),
+    path('admin-panel/barrios/<int:barrio_id>/editar/', views.barrios_edit, name='barrios_edit'),
+    path('admin-panel/barrios/<int:barrio_id>/estado/', views.barrios_toggle, name='barrios_toggle'),
+]

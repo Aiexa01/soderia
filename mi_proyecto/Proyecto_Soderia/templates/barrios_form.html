@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'barrios_list' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>{{ title }}</h1>
+      <p>Define un barrio y su zona operativa.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.nombre.id_for_label }}">Barrio</label>
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+
+        <label for="{{ form.zona.id_for_label }}">Zona</label>
+        {{ form.zona }}
+        {{ form.zona.errors }}
+
+        <div class="checkbox-row">
+          {{ form.active }}
+          <label for="{{ form.active.id_for_label }}">Barrio activo</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'barrios_list' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

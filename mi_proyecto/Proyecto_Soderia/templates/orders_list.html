@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedidos{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'orders_create' %}">Nuevo pedido</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid orders-grid">
+    <section class="orders-panel">
+      <div class="orders-header">
+        <div class="header-content">
+          <h1>Pedidos</h1>
+          <p>Seguimiento operativo del ciclo completo.</p>
+        </div>
+        <a class="cta-primary" href="{% url 'orders_create' %}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Crear pedido
+        </a>
+      </div>
+
+      <form class="client-filters" method="get">
+        {% if camioneta_id %}
+          <input type="hidden" name="camioneta" value="{{ camioneta_id }}" />
+        {% endif %}
+        <div class="filter-field">
+          <label for="id_status">Estado</label>
+          <select id="id_status" name="status">
+            <option value="all" {% if status == 'all' %}selected{% endif %}>Todos</option>
+            {% for value,label in estado_choices %}
+              <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="id_cliente">Cliente</label>
+          <select id="id_cliente" name="cliente">
+            <option value="">Todos</option>
+            {% for c in clientes %}
+              <option value="{{ c.id }}" {% if cliente_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="id_from">Desde</label>
+          <input id="id_from" type="date" name="from" value="{{ date_from }}" />
+        </div>
+        <div class="filter-field">
+          <label for="id_to">Hasta</label>
+          <input id="id_to" type="date" name="to" value="{{ date_to }}" />
+        </div>
+        <div class="filter-actions">
+          <button type="submit">Filtrar</button>
+        </div>
+      </form>
+
+      <div class="order-list">
+        {% for pedido in orders %}
+          <article class="order-card">
+            <div class="order-main">
+              <div class="order-id">Pedido #{{ pedido.id }}</div>
+              <div class="order-client">{{ pedido.cliente.name }}</div>
+              <div class="order-meta">
+                <span>Estado: {{ pedido.get_estado_display }}</span>
+                <span>Total: ${{ pedido.total }}</span>
+                <span>Camioneta: {{ pedido.camioneta|default:"Sin asignar" }}</span>
+              </div>
+            </div>
+            <div class="order-actions">
+              <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Ver</a>
+              <a class="cta ghost" href="{% url 'orders_assign' pedido.id %}">Asignar</a>
+            </div>
+          </article>
+        {% empty %}
+          <div class="empty-state-premium">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3>No hay pedidos</h3>
+            <p>Registra el primer pedido para comenzar.</p>
+            <a class="cta-primary" href="{% url 'orders_create' %}">Crear pedido</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <aside class="sidebar-summary">
+      <section class="card summary-card">
+        <h2>Resumen</h2>
+        <div class="kpi-list">
+          <div class="kpi-item">
+            <span class="kpi-label">Total</span>
+            <strong class="kpi-value">{{ total_orders }}</strong>
+          </div>
+          <div class="kpi-item active-kpi">
+            <span class="kpi-label">Asignados</span>
+            <strong class="kpi-value">{{ assigned_orders }}</strong>
+          </div>
+          <div class="kpi-item inactive-kpi">
+            <span class="kpi-label">Entregados</span>
+            <strong class="kpi-value">{{ delivered_orders }}</strong>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

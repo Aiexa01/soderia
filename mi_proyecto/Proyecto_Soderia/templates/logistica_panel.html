@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Logistica{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="grid logistica-grid">
+    <section class="card">
+      <h1>Logistica diaria</h1>
+      <p>Resumen por camioneta y estado de ruta.</p>
+      <div class="logistica-list">
+        {% for item in resumen %}
+          <article class="logistica-card">
+            <div>
+              <strong>{{ item.camioneta.nombre }}</strong>
+              <div class="hint">Patente: {{ item.camioneta.patente }}</div>
+              <div class="hint">Repartidor: {% if item.camioneta.repartidor %}{{ item.camioneta.repartidor.username }}{% else %}-{% endif %}</div>
+            </div>
+            <div class="logistica-meta">
+              <span>Pedidos: {{ item.cantidad }}</span>
+              <span>En reparto: {{ item.en_ruta }}</span>
+              <span>Estado: {{ item.camioneta.get_estado_display }}</span>
+            </div>
+            <div class="logistica-actions">
+              <a class="cta ghost" href="{% url 'camionetas_edit' item.camioneta.id %}">Editar</a>
+              <a class="cta ghost" href="{% url 'orders_list' %}?camioneta={{ item.camioneta.id }}">Ver pedidos</a>
+            </div>
+          </article>
+        {% empty %}
+          <div class="empty-state-premium">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3>No hay camionetas cargadas</h3>
+            <p>Agrega una camioneta para organizar la logistica.</p>
+            <a class="cta-primary" href="{% url 'camionetas_create' %}">Crear camioneta</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

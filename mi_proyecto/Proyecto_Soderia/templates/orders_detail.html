@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedido #{{ pedido.id }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'orders_list' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid orders-detail-grid">
+    <section class="card">
+      <h1>Pedido #{{ pedido.id }}</h1>
+      <div class="order-detail">
+        <div>
+          <span class="meta-label">Cliente</span>
+          <span>{{ pedido.cliente.name }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Direccion</span>
+          <span>{{ pedido.cliente.direccion|default:"-" }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Estado</span>
+          <span>{{ pedido.get_estado_display }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Total</span>
+          <span>${{ pedido.total }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Camioneta</span>
+          <span>{{ pedido.camioneta|default:"Sin asignar" }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Repartidor</span>
+          <span>{% if pedido.repartidor %}{{ pedido.repartidor.username }}{% else %}-{% endif %}</span>
+        </div>
+        <div>
+          <span class="meta-label">Forma de pago</span>
+          <span>{{ pedido.forma_pago|default:"-" }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Pago</span>
+          <span>{% if pedido.pago_monto %}${{ pedido.pago_monto }}{% else %}-{% endif %}</span>
+        </div>
+      </div>
+
+      <div class="order-lines">
+        <h3>Productos</h3>
+        <div class="order-lines-grid">
+          {% for detalle in detalles %}
+            <div class="order-line">
+              <span>{{ detalle.producto.nombre }}</span>
+              <span>Cant: {{ detalle.cantidad }}</span>
+              <span>$ {{ detalle.precio_unitario }}</span>
+            </div>
+          {% empty %}
+            <p class="hint">Sin productos cargados.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="order-actions-row">
+        <a class="cta ghost" href="{% url 'orders_assign' pedido.id %}">Asignar camioneta</a>
+        <a class="cta ghost" href="{% url 'orders_status' pedido.id %}">Cambiar estado</a>
+        <a class="cta ghost" href="{% url 'orders_pay' pedido.id %}">Registrar pago</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Historial</h2>
+      <div class="timeline">
+        {% for item in historial %}
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">{{ item.get_estado_display }}</div>
+              <div class="timeline-meta">
+                {{ item.created_at|date:"d/m/Y H:i" }} · {% if item.usuario %}{{ item.usuario.username }}{% else %}-{% endif %}
+              </div>
+              {% if item.motivo %}
+                <div class="timeline-note">{{ item.motivo }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <p class="hint">Sin cambios registrados.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Asignar pedido{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'orders_detail' pedido.id %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>Asignar pedido #{{ pedido.id }}</h1>
+      <p>Selecciona la camioneta responsable del reparto.</p>
+      {% if cliente_zona %}
+        <p><strong>Zona del cliente:</strong> {{ cliente_zona.nombre }}</p>
+      {% endif %}
+      {% if suggested_camionetas %}
+        <p><strong>Sugeridas:</strong>
+          {% for cam in suggested_camionetas %}
+            {{ cam.nombre }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </p>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.camioneta.id_for_label }}">Camioneta</label>
+        {{ form.camioneta }}
+        {{ form.camioneta.errors }}
+
+        <div class="form-actions">
+          <button type="submit">Asignar</button>
+          <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

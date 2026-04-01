@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/clients.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'home' %}">Volver al panel</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid clients-grid">
+    <section class="clients-panel">
+      <div class="clients-header">
+        <div class="header-content">
+          <h1>Clientes</h1>
+          <p>Gestion de cuentas, domicilios y estado de servicio.</p>
+        </div>
+        <a class="cta-primary" href="{% url 'clients_create' %}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nuevo cliente
+        </a>
+      </div>
+
+      <form class="client-filters" method="get">
+        <div class="filter-field">
+          <label for="id_q">Buscar</label>
+          <input id="id_q" type="text" name="q" placeholder="Nombre, telefono, barrio" value="{{ query }}" />
+        </div>
+        <div class="filter-field">
+          <label for="id_status">Estado</label>
+          <select id="id_status" name="status">
+            <option value="all" {% if status == 'all' %}selected{% endif %}>Todos</option>
+            <option value="active" {% if status == 'active' %}selected{% endif %}>Activos</option>
+            <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactivos</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button type="submit">Filtrar</button>
+        </div>
+      </form>
+
+      <div class="client-list-grid">
+        {% for client in clients %}
+          <article class="client-card-premium">
+            <div class="client-card-header">
+              <div class="client-avatar">
+                {{ client.name|first|upper }}
+              </div>
+              <div class="client-info">
+                <h3 class="client-name">{{ client.name }}</h3>
+                <span class="client-sub">{{ client.zona.nombre|default:"Zona no definida" }} - {{ client.barrio.nombre|default:"Barrio no definido" }}</span>
+              </div>
+              <div class="client-status">
+                <span class="status-dot {% if client.activo %}active{% else %}inactive{% endif %}"></span>
+              </div>
+            </div>
+            <div class="client-meta id-block">
+              <div>
+                <span class="meta-label">Documento</span>
+                <span class="meta-value subtle">{{ client.tipo_documento }} {{ client.numero_documento|default:"-" }}</span>
+              </div>
+              <div>
+                <span class="meta-label">Email</span>
+                <span class="meta-value subtle">{{ client.email|default:"-" }}</span>
+              </div>
+            </div>
+            <div class="client-meta contact-block">
+              <div>
+                <span class="meta-label">Telefono</span>
+                <span class="meta-value">{{ client.telefono|default:"-" }}</span>
+              </div>
+              <div>
+                <span class="meta-label">Direccion</span>
+                <span class="meta-value">
+                  {{ client.direccion|default:"-" }}
+                  {% if client.direccion %}
+                    <br>
+                    <div class="logo_maps">
+                    <svg fill="#000000" width="34px" height="64px" viewBox="0 0 24 24" id="maps-location" data-name="Line Color" xmlns="http://www.w3.org/2000/svg" class="icon line-color"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path id="primary" d="M16,9h2.33a1,1,0,0,1,1,.84l1.67,10A1,1,0,0,1,20,21H4a1,1,0,0,1-1-1.16l1.67-10a1,1,0,0,1,1-.84H8" style="fill: none; stroke: #000000; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path><path id="secondary" d="M16,7A4,4,0,0,0,8,7c0,4,4,8,4,8S16,11,16,7Z" style="fill: none; stroke: #016293; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></g></svg>
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ client.direccion|urlencode }}+Salta"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       style="font-size:13px; color:#2b7de9;">
+                       Ver en Maps
+                    </a>
+                    </div>
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+            <div class="client-actions">
+              <a class="cta ghost" href="{% url 'clients_edit' client.id %}" title="Editar">Editar</a>
+              <a class="cta ghost danger" href="{% url 'clients_toggle' client.id %}" title="{% if client.activo %}Desactivar{% else %}Activar{% endif %}">
+                {% if client.activo %}Desactivar{% else %}Activar{% endif %}
+              </a>
+            </div>
+          </article>
+        {% empty %}
+          <div class="empty-state-premium">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3>No hay clientes registrados</h3>
+            <p>Carga el primer cliente para comenzar a operar.</p>
+            <a class="cta-primary" href="{% url 'clients_create' %}">Crear cliente</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <aside class="sidebar-summary">
+      <section class="card summary-card">
+        <h2>Resumen</h2>
+        <div class="kpi-list">
+          <div class="kpi-item">
+            <span class="kpi-label">Total</span>
+            <strong class="kpi-value">{{ total_clients }}</strong>
+          </div>
+          <div class="kpi-item active-kpi">
+            <span class="kpi-label">Activos</span>
+            <strong class="kpi-value">{{ active_clients }}</strong>
+          </div>
+          <div class="kpi-item inactive-kpi">
+            <span class="kpi-label">Inactivos</span>
+            <strong class="kpi-value">{{ inactive_clients }}</strong>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Mi stock{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>Mi stock</h1>
+      {% if camioneta %}
+        <p>Camioneta: {{ camioneta.nombre }} ({{ camioneta.patente }})</p>
+        <div class="stock-list">
+          {% for item in stock %}
+            <div class="stock-row">
+              <span>{{ item.producto.nombre }}</span>
+              <span>Cantidad: {{ item.cantidad_actual }}</span>
+              <span>{% if item.producto.retornable %}Retornable{% else %}No retornable{% endif %}</span>
+            </div>
+          {% empty %}
+            <p class="hint">Sin stock cargado.</p>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="hint">No tenes camioneta asignada.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'productos_list' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>{{ title }}</h1>
+      <p>Configura el producto y su precio.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+
+        <label for="{{ form.capacidad_litros.id_for_label }}">Capacidad (litros)</label>
+        {{ form.capacidad_litros }}
+        {{ form.capacidad_litros.errors }}
+
+        <label for="{{ form.tipo_envase.id_for_label }}">Tipo de envase</label>
+        {{ form.tipo_envase }}
+        {{ form.tipo_envase.errors }}
+
+        <label for="{{ form.precio.id_for_label }}">Precio</label>
+        {{ form.precio }}
+        {{ form.precio.errors }}
+
+        <div class="checkbox-row">
+          {{ form.retornable }}
+          <label for="{{ form.retornable.id_for_label }}">Retornable</label>
+        </div>
+
+        <label for="{{ form.max_por_camioneta.id_for_label }}">Maximo por camioneta</label>
+        {{ form.max_por_camioneta }}
+        {{ form.max_por_camioneta.errors }}
+
+        <label for="{{ form.unidad_venta.id_for_label }}">Unidad de venta</label>
+        {{ form.unidad_venta }}
+        {{ form.unidad_venta.errors }}
+
+        <div class="checkbox-row">
+          {{ form.requiere_envase }}
+          <label for="{{ form.requiere_envase.id_for_label }}">Requiere envase</label>
+        </div>
+
+        <label for="{{ form.deposito_envase.id_for_label }}">Deposito de envase</label>
+        {{ form.deposito_envase }}
+        {{ form.deposito_envase.errors }}
+
+        <div class="checkbox-row">
+          {{ form.active }}
+          <label for="{{ form.active.id_for_label }}">Producto activo</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'productos_list' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

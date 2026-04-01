@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mis entregas{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>Mis entregas</h1>
+      {% if camioneta %}
+        <p>Camioneta asignada: {{ camioneta.nombre }} ({{ camioneta.patente }})</p>
+        <h3>Pedidos actuales</h3>
+        <div class="order-list">
+          {% for pedido in pedidos %}
+            <article class="order-card">
+              <div class="order-main">
+                <div class="order-id">Pedido #{{ pedido.id }}</div>
+                <div class="order-client">{{ pedido.cliente.name }}</div>
+                <div class="order-meta">
+                  <span>Estado: {{ pedido.get_estado_display }}</span>
+                  <span>Direccion: {{ pedido.cliente.direccion|default:"-" }}</span>
+                </div>
+              </div>
+              <div class="order-actions">
+                <a class="cta ghost" href="{% url 'entrega_operacion' pedido.id %}">Operar</a>
+              </div>
+            </article>
+          {% empty %}
+            <p class="hint">No hay entregas asignadas.</p>
+          {% endfor %}
+        </div>
+        <h3>Historial (ultimos 7 dias)</h3>
+        <div class="order-list">
+          {% for pedido in historial %}
+            <article class="order-card">
+              <div class="order-main">
+                <div class="order-id">Pedido #{{ pedido.id }}</div>
+                <div class="order-client">{{ pedido.cliente.name }}</div>
+                <div class="order-meta">
+                  <span>Estado: {{ pedido.get_estado_display }}</span>
+                  <span>Direccion: {{ pedido.cliente.direccion|default:"-" }}</span>
+                </div>
+              </div>
+              <div class="order-actions">
+                <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Ver</a>
+              </div>
+            </article>
+          {% empty %}
+            <p class="hint">Sin historial reciente.</p>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="hint">No tenes camioneta asignada.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

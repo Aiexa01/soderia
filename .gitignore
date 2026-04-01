@@ -1,0 +1,5 @@
+mi_proyecto/nul
+mi_proyecto/__pycache__/
+*.pyc
+mi_proyecto/db.sqlite3
+.env

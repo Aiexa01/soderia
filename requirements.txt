@@ -1,0 +1,6 @@
+Django==3.2.2
+mysqlclient
+matplotlib
+reportlab
+qrcode
+pillow

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'orders_list' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>{{ title }}</h1>
+      <p>Registra el pedido y su primer detalle. El precio se toma automaticamente desde el producto.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+        {{ form.cliente }}
+        {{ form.cliente.errors }}
+
+        <label for="{{ form.producto.id_for_label }}">Producto</label>
+        {{ form.producto }}
+        {{ form.producto.errors }}
+
+        <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+        {{ form.cantidad }}
+        {{ form.cantidad.errors }}
+
+        <label for="{{ form.precio_unitario.id_for_label }}">Precio unitario</label>
+        {{ form.precio_unitario }}
+        {{ form.precio_unitario.errors }}
+
+        <label for="id_subtotal">Subtotal</label>
+        <input type="text" id="id_subtotal" readonly>
+
+        <label for="{{ form.forma_pago.id_for_label }}">Forma de pago</label>
+        {{ form.forma_pago }}
+        {{ form.forma_pago.errors }}
+
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'orders_list' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+  <script>
+    (function () {
+      var producto = document.getElementById("id_producto");
+      var precio = document.getElementById("id_precio_unitario");
+      var cantidad = document.getElementById("id_cantidad");
+      var subtotal = document.getElementById("id_subtotal");
+      if (!producto || !precio || !cantidad || !subtotal) return;
+
+      function updateSubtotal() {
+        var precioValue = parseFloat(precio.value || "0");
+        var cantidadValue = parseInt(cantidad.value || "0", 10);
+        var total = precioValue * cantidadValue;
+        subtotal.value = total.toFixed(2);
+      }
+
+      function updatePrice() {
+        var option = producto.options[producto.selectedIndex];
+        precio.value = option ? (option.getAttribute("data-precio") || "") : "";
+        updateSubtotal();
+      }
+
+      Array.prototype.forEach.call(producto.options, function (option) {
+        if (!option.value) return;
+        if (!option.getAttribute("data-precio") && option.textContent.indexOf(" - $") > -1) {
+          option.setAttribute("data-precio", option.textContent.split(" - $").pop().trim());
+        }
+      });
+
+      producto.addEventListener("change", updatePrice);
+      cantidad.addEventListener("input", updateSubtotal);
+      updatePrice();
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block header_action %}
+<a class="cta" href="{% url 'admin_users' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid">
+  <section class="card">
+    <h1>{{ title }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="form-block">
+        <div class="form-block-title">Datos basicos</div>
+
+        <label for="{{ form.username.id_for_label }}">Usuario</label>
+        {{ form.username }}
+        {{ form.username.errors }}
+
+        <label for="{{ form.first_name.id_for_label }}">Nombre</label>
+        {{ form.first_name }}
+        {{ form.first_name.errors }}
+
+        <label for="{{ form.last_name.id_for_label }}">Apellido</label>
+        {{ form.last_name }}
+        {{ form.last_name.errors }}
+
+        <label for="{{ form.dni.id_for_label }}">DNI</label>
+        {{ form.dni }}
+        {{ form.dni.errors }}
+
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+
+
+      </div>
+
+      {% if is_create %}
+      <div class="form-block">
+        <div class="form-block-title">Seguridad</div>
+        <label for="{{ form.password1.id_for_label }}">Contrasena</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+
+        <label for="{{ form.password2.id_for_label }}">Repetir contrasena</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+      </div>
+      {% endif %}
+
+      <div class="form-block">
+        <div class="form-block-title">Acceso al sistema</div>
+        <div class="hint subtle">Staff: puede acceder al panel interno. Estado: determina si el usuario puede operar.
+        </div>
+        <label for="{{ form.is_staff.id_for_label }}">Staff</label>
+        {{ form.is_staff }}
+        {{ form.is_staff.errors }}
+
+        <label for="{{ form.estado.id_for_label }}">Estado</label>
+        {{ form.estado }}
+        {{ form.estado.errors }}
+      </div>
+
+      <div class="form-block">
+        <div class="form-block-title">Roles</div>
+        <div class="role-grid">
+          {% for checkbox in form.roles %}
+          {% if checkbox.choice_label == "Administrador" %}
+          <label class="role-card" data-role="Administrador">
+            {{ checkbox.tag }}
+            <span class="role-badge">ADM</span>
+            <span class="role-name">Administrador</span>
+            <span class="role-desc">{{ role_meta.Administrador.desc }}</span>
+            <span class="role-warn">{{ role_meta.Administrador.warn }}</span>
+          </label>
+          {% elif checkbox.choice_label == "Encargado de Atencion al Cliente" %}
+          <label class="role-card" data-role="Encargado de Atencion al Cliente">
+            {{ checkbox.tag }}
+            <span class="role-badge">EAC</span>
+            <span class="role-name">Encargado de Atencion al Cliente</span>
+            <span class="role-desc">{{ role_meta.eac_desc }}</span>
+            <span class="role-warn">{{ role_meta.eac_warn }}</span>
+          </label>
+          {% elif checkbox.choice_label == "Tecnico" %}
+          <label class="role-card" data-role="Tecnico">
+            {{ checkbox.tag }}
+            <span class="role-badge">TEC</span>
+            <span class="role-name">Tecnico</span>
+            <span class="role-desc">{{ role_meta.Tecnico.desc }}</span>
+            <span class="role-warn">{{ role_meta.Tecnico.warn }}</span>
+          </label>
+          {% elif checkbox.choice_label == "Repartidor" %}
+          <label class="role-card" data-role="Repartidor">
+            {{ checkbox.tag }}
+            <span class="role-badge">REP</span>
+            <span class="role-name">Repartidor</span>
+            <span class="role-desc">{{ role_meta.Repartidor.desc }}</span>
+            <span class="role-warn">{{ role_meta.Repartidor.warn }}</span>
+          </label>
+          {% else %}
+          <label class="role-card" data-role="{{ checkbox.choice_label }}">
+            {{ checkbox.tag }}
+            <span class="role-badge">ROL</span>
+            <span class="role-name">{{ checkbox.choice_label }}</span>
+            <span class="role-desc">Sin descripcion.</span>
+          </label>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {{ form.roles.errors }}
+      </div>
+
+      <button type="submit" id="save-btn">Guardar</button>
+      <div class="hint" id="save-hint"></div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h1>Resumen del usuario</h1>
+    <div class="summary-list">
+      <div>
+        <span class="summary-label">Usuario</span>
+        <span class="summary-value" id="sum-username">
+          {% if target_user %}{{ target_user.username }}{% else %}-{% endif %}
+        </span>
+      </div>
+      <div>
+        <span class="summary-label">Estado</span>
+        <span class="summary-value" id="sum-active">
+          {% if target_user %}{% if target_user.is_active %}Activo{% else %}Inactivo{% endif %}{% else %}-{% endif %}
+        </span>
+      </div>
+      <div>
+        <span class="summary-label">Staff</span>
+        <span class="summary-value" id="sum-staff">
+          {% if target_user %}{% if target_user.is_staff %}Si{% else %}No{% endif %}{% else %}-{% endif %}
+        </span>
+      </div>
+      <div>
+        <span class="summary-label">Ultimo acceso</span>
+        <span class="summary-value">
+          {% if target_user %}{{ target_user.last_login|default:"-" }}{% else %}-{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <h2 class="summary-title">Roles actuales</h2>
+    <div class="role-chips" id="sum-roles">
+      <span class="chip">Sin roles asignados</span>
+    </div>
+
+    <h2 class="summary-title">Advertencias</h2>
+    <div class="warn-box" id="side-warnings">Sin advertencias.</div>
+  </section>
+</div>
+
+<script>
+  (function () {
+    var roleInputs = Array.prototype.slice.call(document.querySelectorAll(".role-card input"));
+    var sideWarnings = document.getElementById("side-warnings");
+    var sumRoles = document.getElementById("sum-roles");
+    var username = document.getElementById("id_username");
+    var isStaff = document.getElementById("id_is_staff");
+    var estado = document.getElementById("id_estado");
+    var sumUsername = document.getElementById("sum-username");
+    var sumStaff = document.getElementById("sum-staff");
+    var sumActive = document.getElementById("sum-active");
+    var saveBtn = document.getElementById("save-btn");
+    var saveHint = document.getElementById("save-hint");
+    var form = document.querySelector("form");
+    var initialState = form ? formToState(form) : "";
+
+    function selectedRoles() {
+      return roleInputs
+        .filter(function (el) { return el.checked; })
+        .map(function (el) {
+          var card = el.closest(".role-card");
+          return card ? card.getAttribute("data-role") : el.value;
+        });
+    }
+
+    function updateSummary() {
+      if (sumUsername && username) {
+        sumUsername.textContent = username.value || "-";
+      }
+      if (sumStaff && isStaff) {
+        sumStaff.textContent = isStaff.checked ? "Si" : "No";
+      }
+      if (sumActive && estado) {
+        sumActive.textContent = estado.value === "habilitado" ? "Activo" : "Inactivo";
+      }
+      if (sumRoles) {
+        var roles = selectedRoles();
+        if (!roles.length) {
+          sumRoles.innerHTML = '<span class="chip">Sin roles asignados</span>';
+        } else {
+          sumRoles.innerHTML = roles
+            .map(function (r) { return '<span class="chip">' + r + '</span>'; })
+            .join("");
+        }
+      }
+    }
+
+    function updateWarnings() {
+      var roles = selectedRoles();
+      var warnings = [];
+      if (roles.indexOf("Administrador") !== -1 && roles.indexOf("Repartidor") !== -1) {
+        warnings.push("Administrador y Repartidor no deberian combinarse.");
+      }
+      if (roles.indexOf("Tecnico") !== -1 && roles.indexOf("Encargado de Atencion al Cliente") !== -1) {
+        warnings.push("Tecnico y Encargado de Atencion al Cliente no deberian combinarse.");
+      }
+      var text = warnings.length ? warnings.join(" ") : "Sin advertencias.";
+      sideWarnings.textContent = text;
+    }
+
+    roleInputs.forEach(function (el) {
+      el.addEventListener("change", function () {
+        updateSummary();
+        updateWarnings();
+      });
+    });
+
+    if (username) username.addEventListener("input", updateSummary);
+    if (isStaff) isStaff.addEventListener("change", updateSummary);
+    if (estado) estado.addEventListener("change", updateSummary);
+
+    function formToState(formEl) {
+      var data = [];
+      Array.prototype.slice.call(formEl.elements).forEach(function (el) {
+        if (!el.name) return;
+        if (el.type === "checkbox" || el.type === "radio") {
+          data.push(el.name + ":" + (el.checked ? "1" : "0"));
+        } else {
+          data.push(el.name + ":" + el.value);
+        }
+      });
+      return data.join("|");
+    }
+
+    function updateSaveState() {
+      if (!form || !saveBtn) return;
+      var current = formToState(form);
+      var changed = current !== initialState;
+      saveBtn.disabled = !changed;
+      saveHint.textContent = changed ? "Cambios listos para guardar." : "Sin cambios pendientes.";
+    }
+
+    if (form) {
+      form.addEventListener("change", updateSaveState);
+      form.addEventListener("input", updateSaveState);
+      form.addEventListener("submit", function () {
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Guardando...";
+        }
+        if (saveHint) {
+          saveHint.textContent = "Actualizando usuario...";
+        }
+      });
+    }
+
+    updateSummary();
+    updateWarnings();
+    updateSaveState();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Panel{% endblock %} — Tres Cerritos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="home-body">
+  <div class="app-shell">
+    <aside class="side-menu" id="side-menu">
+      <div class="side-brand">
+        <span class="drop"></span>
+        <div>
+          <div class="side-title">Tres Cerritos</div>
+          <div class="side-subtitle">Soda y Agua</div>
+        </div>
+      </div>
+      <div class="side-user">
+        <div class="side-user-name">{{ request.user.username }}</div>
+        <div class="side-user-role">{{ role_label }}</div>
+      </div>
+      <div class="side-section">Menu principal</div>
+      <nav class="side-nav">
+        <a class="side-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+          href="{% url 'home' %}">
+          <span class="side-icon">🏠</span> Inicio
+        </a>
+        {% if is_admin or is_eac %}
+        <a class="side-link {% if request.resolver_match.url_name == 'clients_list' %}active{% endif %}"
+          href="{% url 'clients_list' %}">
+          <span class="side-icon">👥</span> Clientes
+        </a>
+        {% endif %}
+        {% if is_admin or is_eac %}
+        <a class="side-link {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}"
+          href="{% url 'orders_list' %}">
+          <span class="side-icon">💰</span> Ventas
+        </a>
+        {% endif %}
+        {% if is_admin %}
+        <a class="side-link {% if request.resolver_match.url_name == 'stock_general' %}active{% endif %}"
+          href="{% url 'stock_general' %}">
+          <span class="side-icon">📦</span> Stock
+        </a>
+        {% endif %}
+        {% if is_admin %}
+        <a class="side-link {% if request.resolver_match.url_name == 'logistica_panel' %}active{% endif %}"
+          href="{% url 'logistica_panel' %}">
+          <span class="side-icon">🚚</span> Logistica
+        </a>
+        {% endif %}
+        {% if is_admin or is_eac %}
+        <a class="side-link" href="/instalaciones/"><span class="side-icon">🛠</span> Servicios / Instalaciones</a>
+        {% endif %}
+        {% if is_tecnico %}
+        <a class="side-link" href="/servicios/"><span class="side-icon">🧰</span> Servicios tecnicos</a>
+        {% endif %}
+        {% if is_repartidor %}
+        <a class="side-link {% if request.resolver_match.url_name == 'mis_entregas' %}active{% endif %}"
+          href="{% url 'mis_entregas' %}">
+          <span class="side-icon">📍</span> Mis entregas
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'mi_camioneta' %}active{% endif %}"
+          href="{% url 'mi_camioneta' %}">
+          <span class="side-icon">🚐</span> Mi camioneta
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'mi_stock' %}active{% endif %}"
+          href="{% url 'mi_stock' %}">
+          <span class="side-icon">📦</span> Mi stock
+        </a>
+        <a class="side-link" href="/servicios-asignados/"><span class="side-icon">🧾</span> Servicios asignados</a>
+        {% endif %}
+        {% if is_admin %}
+        <div class="side-section">Administracion</div>
+        <a class="side-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"
+          href="{% url 'admin_users' %}">
+          <span class="side-icon">👤</span> Usuarios
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'roles_list' %}active{% endif %}"
+          href="{% url 'roles_list' %}">
+          <span class="side-icon">🔐</span> Roles
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'camionetas_list' %}active{% endif %}"
+          href="{% url 'camionetas_list' %}">
+          <span class="side-icon">🚚</span> Camionetas
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'productos_list' %}active{% endif %}"
+          href="{% url 'productos_list' %}">
+          <span class="side-icon">🧴</span> Productos
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'barrios_list' %}active{% endif %}"
+          href="{% url 'barrios_list' %}">
+          <span class="side-icon">🗺️</span> Barrios
+        </a>
+        <a class="side-link" href="/configuracion/"><span class="side-icon">⚙️</span> Configuracion</a>
+        {% endif %}
+      </nav>
+      <div class="side-footer">
+        <a class="side-link" href="{% url 'logout' %}"><span class="side-icon">⎋</span> Cerrar sesion</a>
+      </div>
+    </aside>
+
+    <div class="content-area">
+      <header class="top-bar top-bar-fixed">
+        <div class="top-bar-left">
+          <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-controls="side-menu"
+            aria-expanded="false" id="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <div class="logo"><span class="drop"></span> Tres Cerritos - Soda y Agua</div>
+            <div class="pill">Operador: {{ request.user.username }} ({{ role_label }})</div>
+          </div>
+        </div>
+        <div class="top-bar-actions">
+          {% block header_action %}
+          <button class="cta ghost" type="button"
+            onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{% url 'home' %}'; }">
+            Volver
+          </button>
+          {% endblock %}
+        </div>
+      </header>
+
+      <main class="content-offset">
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="app-footer">
+        Diseñado por Nodo Dev - 2026
+      </footer>
+    </div>
+  </div>
+
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <script>
+    (function () {
+      var body = document.body;
+      var toggle = document.getElementById("menu-toggle");
+      var backdrop = document.getElementById("sidebar-backdrop");
+      if (!toggle || !backdrop) return;
+
+      function setOpen(open) {
+        if (open) {
+          body.classList.add("sidebar-open");
+          toggle.setAttribute("aria-expanded", "true");
+        } else {
+          body.classList.remove("sidebar-open");
+          toggle.setAttribute("aria-expanded", "false");
+        }
+      }
+
+      toggle.addEventListener("click", function () {
+        setOpen(!body.classList.contains("sidebar-open"));
+      });
+
+      backdrop.addEventListener("click", function () {
+        setOpen(false);
+      });
+    })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

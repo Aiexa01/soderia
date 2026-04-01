@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi camioneta{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>Mi camioneta</h1>
+      {% if camioneta %}
+        <div class="order-detail">
+          <div>
+            <span class="meta-label">Nombre</span>
+            <span>{{ camioneta.nombre }}</span>
+          </div>
+          <div>
+            <span class="meta-label">Patente</span>
+            <span>{{ camioneta.patente }}</span>
+          </div>
+          <div>
+            <span class="meta-label">Estado</span>
+            <span>{{ camioneta.get_estado_display }}</span>
+          </div>
+          <div>
+            <span class="meta-label">Activo</span>
+            <span>{% if camioneta.active %}Si{% else %}No{% endif %}</span>
+          </div>
+        </div>
+
+        <h3>Historial (ultimos 7 dias)</h3>
+        <div class="order-list">
+          {% for pedido in pedidos %}
+            <article class="order-card">
+              <div class="order-main">
+                <div class="order-id">Pedido #{{ pedido.id }}</div>
+                <div class="order-client">{{ pedido.cliente.name }}</div>
+                <div class="order-meta">
+                  <span>Estado: {{ pedido.get_estado_display }}</span>
+                  <span>Total: ${{ pedido.total }}</span>
+                </div>
+              </div>
+              <div class="order-actions">
+                <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Ver</a>
+              </div>
+            </article>
+          {% empty %}
+            <p class="hint">No hay pedidos recientes.</p>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="hint">No tenes camioneta asignada.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

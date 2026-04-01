@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'camionetas_list' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>{{ title }}</h1>
+      <p>Registra la camioneta y el repartidor responsable.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+
+        <label for="{{ form.patente.id_for_label }}">Patente</label>
+        {{ form.patente }}
+        {{ form.patente.errors }}
+
+        <label for="{{ form.repartidor.id_for_label }}">Repartidor</label>
+        {{ form.repartidor }}
+        {{ form.repartidor.errors }}
+
+        <label for="{{ form.estado.id_for_label }}">Estado</label>
+        {{ form.estado }}
+        {{ form.estado.errors }}
+
+        <label for="{{ form.zonas.id_for_label }}">Zonas asignadas</label>
+        {{ form.zonas }}
+        {{ form.zonas.errors }}
+
+        <div class="checkbox-row">
+          {{ form.active }}
+          <label for="{{ form.active.id_for_label }}">Camioneta activa</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'camionetas_list' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

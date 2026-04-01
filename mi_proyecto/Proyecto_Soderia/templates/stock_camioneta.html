@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Stock camioneta{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>Stock de {{ camioneta.nombre }}</h1>
+      <p class="hint">Patente: {{ camioneta.patente }}</p>
+      <p class="hint">Estado: {{ camioneta.get_estado_display }}</p>
+      <p class="hint">Conductor: {% if camioneta.repartidor %}{{ camioneta.repartidor.username }}{% else %}Sin asignar{% endif %}</p>
+      <div class="stock-list">
+        {% for item in stock %}
+          <div class="stock-row">
+            <span>{{ item.producto.nombre }}</span>
+            <span>Cantidad: {{ item.cantidad_actual }}</span>
+            <span>{% if item.producto.retornable %}Retornable{% else %}No retornable{% endif %}</span>
+          </div>
+        {% empty %}
+          <p class="hint">Sin stock cargado.</p>
+        {% endfor %}
+      </div>
+      <div class="form-actions">
+        <a class="cta ghost" href="{% url 'stock_general' %}">Volver</a>
+      </div>
+    </section>
+  </div>
+{% endblock %}

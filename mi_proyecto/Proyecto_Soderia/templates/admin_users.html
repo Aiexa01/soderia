@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/admin_users.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+<a class="cta" href="{% url 'home' %}">Volver al panel</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid users-grid">
+  <section class="users-panel">
+    <div class="users-header">
+      <div class="header-content">
+        <h1>Usuarios</h1>
+        <p>Gestion de acceso y roles del sistema.</p>
+      </div>
+      <div class="header-actions">
+        <a class="cta-secondary" href="{% url 'usuarios_baja' %}" style="margin-right: 10px;">Ver dados de baja</a>
+        <a class="cta-primary" href="{% url 'admin_user_create' %}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nuevo Usuario
+        </a>
+      </div>
+    </div>
+
+    <div class="user-list-grid">
+      {% for user in users %}
+      <article class="user-card-premium">
+        <div class="user-card-header">
+          <div class="user-avatar-placeholder">
+            {% if user.first_name %}
+            {{ user.first_name|first }}{{ user.last_name|first }}
+            {% else %}
+            {{ user.username|first|upper }}
+            {% endif %}
+          </div>
+          <div class="user-info">
+            <h3 class="user-name-display">
+              {% if user.first_name or user.last_name %}
+              {{ user.first_name }} {{ user.last_name }}
+              {% else %}
+              {{ user.username }}
+              {% endif %}
+            </h3>
+            <span class="user-username-handle">@{{ user.username }}</span>
+          </div>
+          <div class="user-status-indicator">
+            {% if user.is_active %}
+            <span class="status-badge status-enabled">Habilitado</span>
+            {% else %}
+            <span class="status-badge status-suspended">Suspendido</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="user-card-body">
+          <div class="role-tags">
+            {% if user.is_staff %}
+            <span class="premium-badge badge-admin">Admin</span>
+            {% endif %}
+            {% for group in user.groups.all %}
+            {% if group.name == "Repartidor" %}
+            <span class="premium-badge badge-rep">Repartidor</span>
+            {% elif group.name == "Encargado de Atencion al Cliente" %}
+            <span class="premium-badge badge-eac">EAC</span>
+            {% elif group.name == "Tecnico" %}
+            <span class="premium-badge badge-tec">Tecnico</span>
+            {% else %}
+            <span class="premium-badge badge-default">{{ group.name }}</span>
+            {% endif %}
+            {% endfor %}
+            {% if not user.is_staff and not user.groups.all %}
+            <span class="premium-badge badge-neutral">Usuario</span>
+            {% endif %}
+          </div>
+
+          <div class="user-meta-info">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              {{ user.last_login|default:"Nunca"|date:"d M, Y" }}
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              {% if user.is_active %}Activo{% else %}Inactivo{% endif %}
+            </span>
+          </div>
+        </div>
+
+        <div class="user-card-footer">
+          <a class="icon-action" href="{% url 'admin_user_edit' user.id %}" title="Editar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </a>
+          <a class="icon-action" href="{% url 'admin_user_password' user.id %}" title="Cambiar contrasena">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </a>
+          <a class="icon-action danger" href="{% url 'dar_baja_usuario' user.id %}"
+            onclick="return confirm('¿Estás seguro de dar de baja a este usuario?');" title="Dar de baja">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </a>
+        </div>
+      </article>
+      {% empty %}
+      <div class="empty-state-premium">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <h3>No hay usuarios registrados</h3>
+        <p>Comienza creando el primer usuario del sistema.</p>
+        <a class="cta-primary" href="{% url 'admin_user_create' %}">Crear usuario</a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <aside class="sidebar-summary">
+    <section class="card summary-card">
+      <h2>Resumen</h2>
+      <div class="kpi-list">
+        <div class="kpi-item">
+          <span class="kpi-label">Total</span>
+          <strong class="kpi-value">{{ total_users }}</strong>
+        </div>
+        <div class="kpi-item active-kpi">
+          <span class="kpi-label">Activos</span>
+          <strong class="kpi-value">{{ active_users }}</strong>
+        </div>
+        <div class="kpi-item inactive-kpi">
+          <span class="kpi-label">Inactivos</span>
+          <strong class="kpi-value">{{ inactive_users }}</strong>
+        </div>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

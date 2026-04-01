@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/clients.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'clients_list' %}">Volver a clientes</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid form-grid">
+    <section class="card form-card">
+      <h1>{{ title }}</h1>
+      <p>Completa la ficha del cliente para crear o actualizar la cuenta.</p>
+      <form method="post" class="client-form">
+        {% csrf_token %}
+        <div class="form-block">
+          <div class="form-block-title">Datos del cliente</div>
+          <div class="form-columns">
+            <div>
+              <label for="{{ form.tipo_cliente.id_for_label }}">Tipo de cliente</label>
+              {{ form.tipo_cliente }}
+              {{ form.tipo_cliente.errors }}
+            </div>
+            <div>
+              <label for="{{ form.name.id_for_label }}">Nombre / Razon social</label>
+              {{ form.name }}
+              {{ form.name.errors }}
+            </div>
+            <div>
+              <label for="{{ form.tipo_documento.id_for_label }}">Tipo de documento</label>
+              {{ form.tipo_documento }}
+              {{ form.tipo_documento.errors }}
+            </div>
+            <div>
+              <label for="{{ form.numero_documento.id_for_label }}">Numero de documento</label>
+              {{ form.numero_documento }}
+              {{ form.numero_documento.errors }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <div class="form-block-title">Contacto</div>
+          <div class="form-columns">
+            <div>
+              <label for="{{ form.telefono.id_for_label }}">Telefono</label>
+              {{ form.telefono }}
+              {{ form.telefono.errors }}
+            </div>
+            <div>
+              <label for="{{ form.email.id_for_label }}">Email</label>
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <div class="form-block-title">Direccion</div>
+          <div class="form-columns">
+            <div>
+              <label for="{{ form.direccion.id_for_label }}">Direccion (calle y numero)</label>
+              {{ form.direccion }}
+              {{ form.direccion.errors }}
+            </div>
+            <div>
+              <label for="{{ form.barrio.id_for_label }}">Barrio</label>
+              {{ form.barrio }}
+              {{ form.barrio.errors }}
+              <datalist id="barrios_list">
+              </datalist>
+            </div>
+            <div>
+              <label for="{{ form.zona.id_for_label }}">Zona</label>
+              {{ form.zona }}
+              {{ form.zona.errors }}
+            </div>
+            <div class="full-width">
+              <label for="{{ form.referencias.id_for_label }}">Referencias</label>
+              {{ form.referencias }}
+              {{ form.referencias.errors }}
+            </div>
+          </div>
+        </div>
+        <div class="form-block">
+          <div class="form-block-title">Estado</div>
+          <div class="checkbox-row">
+            {{ form.activo }}
+            <label for="{{ form.activo.id_for_label }}">Cliente activo</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit">Guardar</button>
+          <a class="cta ghost" href="{% url 'clients_list' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+  {{ barrios_autocomplete|json_script:"barrios-data" }}
+  <script>
+    const barriosData = JSON.parse(document.getElementById('barrios-data').textContent);
+    const zonaSelect = document.getElementById('id_zona');
+    const barrioInput = document.getElementById('id_barrio');
+    const datalist = document.getElementById('barrios_list');
+
+    function renderBarrios() {
+      const zonaId = zonaSelect.value;
+      datalist.innerHTML = '';
+      if (!zonaId) {
+        return;
+      }
+      const seen = new Set();
+      barriosData.forEach((barrio) => {
+        if (String(barrio.zona_id) !== String(zonaId)) {
+          return;
+        }
+        const key = barrio.nombre.toLowerCase();
+        if (seen.has(key)) {
+          return;
+        }
+        seen.add(key);
+        const option = document.createElement('option');
+        option.value = barrio.nombre;
+        datalist.appendChild(option);
+      });
+    }
+
+    function syncBarrioWithZona() {
+      const value = barrioInput.value.trim();
+      if (!value || !zonaSelect.value) {
+        return;
+      }
+      const match = barriosData.some(
+        (barrio) =>
+          String(barrio.zona_id) === String(zonaSelect.value)
+          && barrio.nombre.toLowerCase() === value.toLowerCase()
+      );
+      if (!match) {
+        barrioInput.value = '';
+      }
+    }
+
+    zonaSelect.addEventListener('change', () => {
+      renderBarrios();
+      syncBarrioWithZona();
+    });
+
+    renderBarrios();
+  </script>
+{% endblock %}
