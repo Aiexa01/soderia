@@ -213,6 +213,11 @@ Panel principal con accesos rápidos según el rol del usuario.
 - Flujo de estados: Creado → Asignado → En Reparto → Entregado → Pagado
 - Asignación a camioneta
 - Registro de pagos (efectivo, transferencia, tarjeta, Mercado Pago)
+- Acceso rápido al historial de pedidos entregados
+- **Bloqueo automático de acciones según estado:**
+  - ENTREGADO → se ocultan botones de asignar y cambiar estado; solo permite registrar pago
+  - PAGADO → se ocultan todos los botones de acción
+- Validación server-side para evitar acciones no permitidas por URL directa
 
 ### 🚚 Logística (`/logistica/`)
 - Panel de control de repartos
@@ -220,10 +225,18 @@ Panel principal con accesos rápidos según el rol del usuario.
 - Seguimiento en tiempo real del estado de entregas
 
 ### 📦 Stock (`/stock/`)
-- Stock general por camioneta
-- Carga de productos a camionetas
-- Movimientos de stock (entrega, devolución, ajuste)
-- Stock por depósito
+- **Stock general**: vista operativa del depósito central y camionetas activas
+- **Depósito Central**: visualización del inventario almacenado con indicadores de nivel (OK / Bajo / Crítico)
+- **Carga de mercadería al depósito** (`/stock/deposito/cargar/`): ingreso de productos al depósito central
+- **Carga de camionetas**: transferencia de productos desde el depósito a cada camioneta
+- **Descuento automático de stock**: al entregar o pagar un pedido, el stock de la camioneta se descuenta automáticamente
+- **Historial de movimientos** (`/stock/movimientos/`): registro completo de entregas, devoluciones y ajustes con filtros por:
+  - Tipo de movimiento
+  - Camioneta
+  - Usuario
+  - Producto
+  - Rango de fechas
+- Detección de doble descuento para evitar inconsistencias
 
 ### 🚛 Gestión de Camionetas (`/admin-panel/camionetas/`)
 - Alta, edición y baja de camionetas
@@ -255,11 +268,18 @@ Panel principal con accesos rápidos según el rol del usuario.
 
 El sistema utiliza **grupos de Django** para gestionar permisos:
 
-| Rol              | Acceso                                                    |
-|------------------|-----------------------------------------------------------|
-| **Administrador** | Acceso total: usuarios, productos, camionetas, barrios, pedidos, stock |
-| **Operador**     | Gestión de clientes, pedidos, stock y logística            |
-| **Repartidor**   | Mis entregas, mi stock, mi camioneta                      |
+| Rol | Código | Acceso |
+|-----|--------|--------|
+| **Administrador** | ADM | Acceso total: usuarios, productos, camionetas, barrios, pedidos, stock, logística |
+| **Encargado de Atencion al Cliente** | EAC | Gestión de clientes, pedidos y ventas |
+| **Encargado de Stock** | EST | Gestión de stock: cargar depósito, transferir a camionetas, ver movimientos |
+| **Tecnico** | TEC | Reparaciones y mantenimiento |
+| **Repartidor** | REP | Mis entregas, mi stock, mi camioneta, operar entregas |
+
+> **Nota sobre permisos de stock:**
+> - El Administrador y el Encargado de Stock pueden ver y gestionar el stock
+> - Ambos roles pueden cargar mercadería al depósito y transferir a camionetas
+> - Los movimientos de stock quedan registrados con usuario, fecha y hora
 
 ---
 
@@ -311,6 +331,8 @@ cd /opt/back_end/mi_proyecto
 | Ventas/Pedidos   | `http://localhost:8004/ventas/`               |
 | Logística        | `http://localhost:8004/logistica/`            |
 | Stock            | `http://localhost:8004/stock/`                |
+| Cargar Depósito  | `http://localhost:8004/stock/deposito/cargar/`|
+| Movimientos Stock| `http://localhost:8004/stock/movimientos/`    |
 | Mis Entregas     | `http://localhost:8004/mis-entregas/`         |
 | Admin Usuarios   | `http://localhost:8004/admin-panel/usuarios/` |
 | Admin Camionetas | `http://localhost:8004/admin-panel/camionetas/` |
@@ -326,6 +348,9 @@ cd /opt/back_end/mi_proyecto
 - El puerto de acceso externo es **8004** (mapeado al 8000 interno del contenedor).
 - La base de datos se gestiona de forma **externa al contenedor** (MySQL local).
 - El código fuente se monta como volumen, por lo que los cambios en archivos se reflejan inmediatamente.
+- **Timezone**: configurado en `America/Argentina/Buenos_Aires` — todas las fechas y horas se muestran en hora de Argentina.
+- **Idioma**: configurado en `es-ar` (español argentino).
+- **Navegación**: todas las páginas incluyen botón "Volver" que lleva al destino correcto según el contexto.
 
 ---
 
