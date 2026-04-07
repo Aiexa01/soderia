@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Movimientos de stock{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders.css' %}" />
+<style>
+  .movimientos-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; }
+  .movimientos-header .header-content h1 { margin:0; }
+  .movimientos-header .header-content p { margin:.25rem 0 0; color:#64748b; }
+  .movimientos-filters { display:flex; flex-wrap:wrap; gap:.75rem; align-items:flex-end; padding:1rem 0; }
+  .movimientos-filters .filter-field { display:flex; flex-direction:column; gap:.25rem; }
+  .movimientos-filters .filter-field label { font-size:.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:.03em; }
+  .movimientos-filters .filter-field select,
+  .movimientos-filters .filter-field input { padding:.5rem .75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:.875rem; background:#fff; min-width:140px; }
+  .movimientos-filters .filter-actions { display:flex; gap:.5rem; align-items:flex-end; }
+  .movimientos-filters .filter-actions button { padding:.5rem 1.25rem; }
+  .movimientos-table { width:100%; border-collapse:separate; border-spacing:0; margin-top:1rem; }
+  .movimientos-table th { text-align:left; padding:.75rem 1rem; font-size:.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:.03em; border-bottom:2px solid #e2e8f0; }
+  .movimientos-table td { padding:.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:.875rem; vertical-align:middle; }
+  .movimientos-table tr:hover td { background:#f8fafc; }
+  .tipo-badge { display:inline-block; padding:.2rem .6rem; border-radius:6px; font-size:.75rem; font-weight:600; }
+  .tipo-ENTREGA { background:rgba(239,68,68,.1); color:#dc2626; }
+  .tipo-DEVOLUCION { background:rgba(34,197,94,.1); color:#16a34a; }
+  .tipo-AJUSTE { background:rgba(59,130,246,.1); color:#2563eb; }
+  .mov-fecha { white-space:nowrap; color:#64748b; font-size:.8rem; }
+  .mov-cantidad { font-weight:700; font-size:1rem; }
+  .kpi-bar { display:flex; gap:1.5rem; margin:1rem 0; flex-wrap:wrap; }
+  .kpi-bar .kpi-chip { padding:.5rem 1rem; border-radius:8px; background:#f1f5f9; font-size:.875rem; font-weight:600; }
+
+  @media (max-width: 768px) {
+    .movimientos-table, .movimientos-table thead, .movimientos-table tbody, .movimientos-table tr, .movimientos-table th, .movimientos-table td {
+      display: block;
+    }
+    .movimientos-table thead { display:none; }
+    .movimientos-table tr { margin-bottom:1rem; border:1px solid #e2e8f0; border-radius:8px; padding:.5rem; }
+    .movimientos-table td { padding:.4rem .75rem; border:none; }
+    .movimientos-table td:before { content:attr(data-label); font-weight:600; font-size:.75rem; color:#64748b; display:block; margin-bottom:.15rem; }
+  }
+</style>
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'stock_general' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid">
+  <section class="card">
+    <div class="movimientos-header">
+      <div class="header-content">
+        <h1>Movimientos de stock</h1>
+        <p>Historial de entregas, devoluciones y ajustes de inventario.</p>
+      </div>
+      <div class="kpi-bar">
+        <span class="kpi-chip">{{ total_movimientos }} movimientos</span>
+      </div>
+    </div>
+
+    <form class="movimientos-filters" method="get">
+      <div class="filter-field">
+        <label for="id_tipo">Tipo</label>
+        <select id="id_tipo" name="tipo">
+          <option value="">Todos</option>
+          {% for value, label in tipo_choices %}
+            <option value="{{ value }}" {% if tipo == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="id_camioneta">Camioneta</label>
+        <select id="id_camioneta" name="camioneta">
+          <option value="">Todas</option>
+          {% for c in camionetas %}
+            <option value="{{ c.id }}" {% if camioneta_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="id_usuario">Usuario</label>
+        <select id="id_usuario" name="usuario">
+          <option value="">Todos</option>
+          {% for u in usuarios %}
+            <option value="{{ u.id }}" {% if usuario_id == u.id|stringformat:"s" %}selected{% endif %}>{{ u.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="id_producto">Producto</label>
+        <select id="id_producto" name="producto">
+          <option value="">Todos</option>
+          {% for p in productos %}
+            <option value="{{ p.id }}" {% if producto_id == p.id|stringformat:"s" %}selected{% endif %}>{{ p.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="id_from">Desde</label>
+        <input id="id_from" type="date" name="from" value="{{ date_from }}" />
+      </div>
+      <div class="filter-field">
+        <label for="id_to">Hasta</label>
+        <input id="id_to" type="date" name="to" value="{{ date_to }}" />
+      </div>
+      <div class="filter-actions">
+        <button type="submit">Filtrar</button>
+        <a class="cta ghost" href="{% url 'stock_movimientos' %}">Limpiar</a>
+      </div>
+    </form>
+
+    <table class="movimientos-table">
+      <thead>
+        <tr>
+          <th>Fecha y hora</th>
+          <th>Tipo</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Camioneta</th>
+          <th>Pedido</th>
+          <th>Usuario</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mov in movimientos %}
+        <tr>
+          <td data-label="Fecha y hora"><span class="mov-fecha">{{ mov.created_at|date:"d/m/Y H:i:s" }}</span></td>
+          <td data-label="Tipo"><span class="tipo-badge tipo-{{ mov.tipo }}">{{ mov.get_tipo_display }}</span></td>
+          <td data-label="Producto">{{ mov.producto.nombre }}</td>
+          <td data-label="Cantidad"><span class="mov-cantidad">{{ mov.cantidad }}</span></td>
+          <td data-label="Camioneta">{{ mov.camioneta.nombre }}</td>
+          <td data-label="Pedido">{% if mov.pedido %}#{{ mov.pedido.id }}{% else %}-{% endif %}</td>
+          <td data-label="Usuario">{% if mov.usuario %}{{ mov.usuario.username }}{% else %}-{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">No hay movimientos registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

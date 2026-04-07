@@ -66,9 +66,18 @@
       </div>
 
       <div class="order-actions-row">
+        {% if pedido.estado != 'ENTREGADO' and pedido.estado != 'PAGADO' %}
         <a class="cta ghost" href="{% url 'orders_assign' pedido.id %}">Asignar camioneta</a>
         <a class="cta ghost" href="{% url 'orders_status' pedido.id %}">Cambiar estado</a>
+        {% endif %}
+        {% if pedido.estado != 'PAGADO' %}
         <a class="cta ghost" href="{% url 'orders_pay' pedido.id %}">Registrar pago</a>
+        {% endif %}
+        {% if pedido.estado == 'PAGADO' %}
+        <p class="hint" style="margin:0;padding:.5rem 1rem;background:rgba(34,197,94,.1);border-radius:8px;color:#22c55e;">✅ Este pedido ya fue pagado.</p>
+        {% elif pedido.estado == 'ENTREGADO' %}
+        <p class="hint" style="margin:0;padding:.5rem 1rem;background:rgba(251,191,36,.1);border-radius:8px;color:#f59e0b;">📦 Pedido entregado — pendiente de pago.</p>
+        {% endif %}
       </div>
     </section>
 

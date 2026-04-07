@@ -2,12 +2,17 @@
 
 {% block title %}Stock general{% endblock %}
 
+{% block header_action %}
+  <a class="cta" href="{% url 'home' %}">Volver</a>
+{% endblock %}
+
 {% block content %}
   <div class="grid">
     <section class="card stock-header">
       <div>
         <h1>Stock general</h1>
-        <p>Vista operativa del depósito central y camionetas activas.</p>
+        <p>Vista operativa del deposito central y camionetas activas.</p>
+        <a class="cta ghost" href="{% url 'stock_movimientos' %}" style="margin-top:.75rem;display:inline-block">📋 Ver historial de movimientos</a>
       </div>
       <div class="stock-legend">
         <span class="pill status-ok">Stock OK</span>
@@ -26,6 +31,11 @@
         </div>
         <span class="chip">Stock general</span>
       </div>
+      {% if puede_editar %}
+      <div class="deposito-actions" style="margin-bottom:1rem">
+        <a class="cta ghost" href="{% url 'stock_deposito_cargar' %}">📥 Cargar mercadería al depósito</a>
+      </div>
+      {% endif %}
       <div class="deposito-grid">
         {% for row in deposito_stock %}
           <div class="deposito-item {{ row.status }}">
@@ -65,7 +75,9 @@
             <div class="camioneta-card-actions">
               <a class="cta ghost" href="{% url 'stock_camioneta' card.camioneta.id %}">Ver stock</a>
               <a class="cta ghost" href="{% url 'orders_list' %}?camioneta={{ card.camioneta.id }}">Ver pedidos</a>
+              {% if puede_editar %}
               <button class="cta ghost js-open-carga" type="button" data-camioneta="{{ card.camioneta.id }}" data-nombre="{{ card.camioneta.nombre }}">Cargar</button>
+              {% endif %}
             </div>
           </article>
         {% empty %}

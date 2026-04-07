@@ -45,6 +45,18 @@
       <span class="quicklink-desc">Accesos y roles</span>
     </a>
     {% endif %}
+    {% if is_encargado_stock %}
+    <a class="quicklink-card" href="{% url 'stock_general' %}">
+      <span class="quicklink-icon">📦</span>
+      <span class="quicklink-label">Stock</span>
+      <span class="quicklink-desc">Gestión de inventario</span>
+    </a>
+    <a class="quicklink-card" href="{% url 'stock_deposito_cargar' %}">
+      <span class="quicklink-icon">📥</span>
+      <span class="quicklink-label">Cargar depósito</span>
+      <span class="quicklink-desc">Ingresar mercadería</span>
+    </a>
+    {% endif %}
     {% if is_repartidor %}
     <a class="quicklink-card" href="{% url 'mis_entregas' %}">
       <span class="quicklink-icon">📍</span>

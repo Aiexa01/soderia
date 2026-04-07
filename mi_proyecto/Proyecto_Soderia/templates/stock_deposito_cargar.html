@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Cargar deposito{% endblock %}
+
+{% block header_action %}
+  <a class="cta" href="{% url 'stock_general' %}">Volver</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card deposito-card">
+      <div class="deposito-head">
+        <div>
+          <h1>Cargar mercaderia al deposito</h1>
+          {% if deposito %}
+            <p class="hint">{{ deposito.nombre }} - {{ deposito.direccion|default:"Sin direccion cargada" }}</p>
+          {% endif %}
+        </div>
+        <span class="chip">Ingreso de stock</span>
+      </div>
+
+      {% if deposito_stock %}
+      <h3 style="margin:1.5rem 0 .75rem">Stock actual en deposito</h3>
+      <div class="deposito-grid">
+        {% for row in deposito_stock %}
+          <div class="deposito-item {{ row.status }}">
+            <div class="deposito-name">{{ row.item.producto.nombre }}</div>
+            <div class="deposito-qty">{{ row.item.cantidad_actual }}</div>
+            <div class="deposito-meta">
+              <span class="badge">{% if row.item.producto.retornable %}Retornable{% else %}No retornable{% endif %}</span>
+              <span class="badge">{{ row.item.producto.get_tipo_envase_display }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <h3 style="margin:1.5rem 0 .75rem">Ingresar mercaderia</h3>
+      <p class="hint">Ingresa las cantidades a sumar al stock del deposito central.</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="carga-list">
+          {% for row in deposito_stock %}
+            <div class="carga-row">
+              <div>
+                <strong>{{ row.item.producto.nombre }}</strong>
+                <div class="hint">Stock actual: {{ row.item.cantidad_actual }}</div>
+              </div>
+              <div class="carga-input">
+                <input type="number" step="1" min="0" name="qty_{{ row.item.producto.id }}" value="0" />
+              </div>
+            </div>
+          {% endfor %}
+
+          {% for producto in productos_sin_stock %}
+            <div class="carga-row">
+              <div>
+                <strong>{{ producto.nombre }}</strong>
+                <div class="hint">Sin stock en deposito</div>
+              </div>
+              <div class="carga-input">
+                <input type="number" step="1" min="0" name="qty_{{ producto.id }}" value="0" />
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="modal-actions" style="margin-top:1.5rem">
+          <button type="submit" class="cta">Confirmar ingreso</button>
+          <a class="cta ghost" href="{% url 'stock_general' %}">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

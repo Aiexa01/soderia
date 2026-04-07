@@ -46,7 +46,7 @@
           <span class="side-icon">💰</span> Ventas
         </a>
         {% endif %}
-        {% if is_admin %}
+        {% if is_admin or is_encargado_stock %}
         <a class="side-link {% if request.resolver_match.url_name == 'stock_general' %}active{% endif %}"
           href="{% url 'stock_general' %}">
           <span class="side-icon">📦</span> Stock

@@ -7,52 +7,40 @@
   <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
 {% endblock %}
 
+{% block header_action %}
+  <a class="cta" href="{% url 'mis_entregas' %}">Volver</a>
+{% endblock %}
+
 {% block content %}
   <div class="grid form-grid">
     <section class="card form-card">
-      <h1>Operar pedido #{{ pedido.id }}</h1>
-      <p>Cliente: {{ pedido.cliente.name }} · {{ pedido.cliente.direccion|default:"-" }}</p>
+      <h1>Operar entrega #{{ pedido.id }}</h1>
+      <p>{{ pedido.cliente.name }} - {{ pedido.cliente.direccion|default:"-" }}</p>
       {% if errores %}
-        <div class="alert">
-          {% for error in errores %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        </div>
+        {% for error in errores %}
+          <p class="form-error">{{ error }}</p>
+        {% endfor %}
       {% endif %}
-      <div class="order-lines">
-        <h3>Productos</h3>
-        <div class="order-lines-grid">
-          {% for detalle in detalles %}
-            <div class="order-line">
-              <span>{{ detalle.producto.nombre }}</span>
-              <span>Cant: {{ detalle.cantidad }}</span>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
       <form method="post">
         {% csrf_token %}
-        <div class="order-lines">
-          <h3>Entrega por producto</h3>
-          <div class="order-lines-grid">
-            {% for detalle in detalles %}
-              <div class="order-line">
-                <strong>{{ detalle.producto.nombre }}</strong>
-                <span>Pedido: {{ detalle.cantidad }}</span>
-                <label for="id_entregado_{{ detalle.id }}">Entregado</label>
-                <input id="id_entregado_{{ detalle.id }}" type="number" step="1" min="0" name="entregado_{{ detalle.id }}" value="0" />
-                <label for="id_devuelto_{{ detalle.id }}">Devuelto</label>
-                <input id="id_devuelto_{{ detalle.id }}" type="number" step="1" min="0" name="devuelto_{{ detalle.id }}" value="0" />
-              </div>
-            {% endfor %}
+        {% for detalle in detalles %}
+          <div class="entrega-row">
+            <div>
+              <strong>{{ detalle.producto.nombre }}</strong>
+              <div class="hint">Pedido: {{ detalle.cantidad }} - ${{ detalle.precio_unitario }}</div>
+            </div>
+            <div class="entrega-inputs">
+              <label for="id_entregado_{{ detalle.id }}">Entregado</label>
+              <input id="id_entregado_{{ detalle.id }}" type="number" step="1" min="0" max="{{ detalle.cantidad }}" name="entregado_{{ detalle.id }}" value="0" />
+              <label for="id_devuelto_{{ detalle.id }}">Devuelto</label>
+              <input id="id_devuelto_{{ detalle.id }}" type="number" step="1" min="0" name="devuelto_{{ detalle.id }}" value="0" />
+            </div>
           </div>
-        </div>
-
+        {% endfor %}
         <label for="id_motivo">Motivo (si devuelve)</label>
         <input id="id_motivo" type="text" name="motivo" />
-
         <div class="form-actions">
-          <button type="submit">Guardar</button>
+          <button type="submit">Confirmar</button>
           <a class="cta ghost" href="{% url 'mis_entregas' %}">Cancelar</a>
         </div>
       </form>

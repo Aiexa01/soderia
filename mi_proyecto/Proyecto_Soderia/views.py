@@ -25,6 +25,7 @@ from .models import (
 ROLE_NAMES = [
     'Administrador',
     'Encargado de Atencion al Cliente',
+    'Encargado de Stock',
     'Tecnico',
     'Repartidor',
 ]
@@ -38,6 +39,11 @@ ROLE_META = {
         'code': 'EAC',
         'desc': 'Clientes, ventas e instalaciones.',
         'warn': 'No combinar con Tecnico.',
+    },
+    'Encargado de Stock': {
+        'code': 'EST',
+        'desc': 'Gestion de stock en depositos y camionetas.',
+        'warn': 'No combinar con Administrador.',
     },
     'Tecnico': {
         'code': 'TEC',
@@ -77,18 +83,27 @@ def _can_manage_orders(user):
 def _can_manage_logistics(user):
     return _is_admin(user)
 
+def _is_encargado_stock(user):
+    return _has_any_role(user, ['Encargado de Stock'])
+
+def _can_manage_stock(user):
+    return _is_admin(user) or _is_encargado_stock(user)
+
 def _get_user_camioneta(user):
     return Camioneta.objects.filter(repartidor=user, active=True).first()
 
 def _role_context(user):
     is_admin = _is_admin(user)
     is_eac = _has_any_role(user, ['Encargado de Atencion al Cliente'])
+    is_encargado_stock = _is_encargado_stock(user)
     is_tecnico = _has_any_role(user, ['Tecnico'])
     is_repartidor = _has_any_role(user, ['Repartidor'])
     if is_admin:
         role_label = 'Administrador'
     elif is_eac:
         role_label = 'Encargado de Atencion al Cliente'
+    elif is_encargado_stock:
+        role_label = 'Encargado de Stock'
     elif is_tecnico:
         role_label = 'Tecnico'
     elif is_repartidor:
@@ -98,6 +113,7 @@ def _role_context(user):
     return {
         'is_admin': is_admin,
         'is_eac': is_eac,
+        'is_encargado_stock': is_encargado_stock,
         'is_tecnico': is_tecnico,
         'is_repartidor': is_repartidor,
         'role_label': role_label,
@@ -110,6 +126,35 @@ def _stock_status(quantity):
     if quantity <= 5:
         return 'status-low'
     return 'status-ok'
+
+
+def _descontar_stock_pedido(pedido, usuario):
+    """Descuenta stock de la camioneta al entregar un pedido.
+    Solo descuenta si no se hizo ya (evita doble descuento)."""
+    if not pedido.camioneta:
+        return
+    ya_descontado = StockMovimiento.objects.filter(
+        pedido=pedido,
+        tipo=StockMovimiento.Tipos.ENTREGA,
+    ).exists()
+    if ya_descontado:
+        return
+    for detalle in pedido.detalles.select_related('producto').all():
+        stock, _ = StockCamioneta.objects.get_or_create(
+            camioneta=pedido.camioneta,
+            producto=detalle.producto,
+            defaults={'cantidad_actual': 0},
+        )
+        stock.cantidad_actual -= detalle.cantidad
+        stock.save(update_fields=['cantidad_actual'])
+        StockMovimiento.objects.create(
+            camioneta=pedido.camioneta,
+            producto=detalle.producto,
+            pedido=pedido,
+            tipo=StockMovimiento.Tipos.ENTREGA,
+            cantidad=detalle.cantidad,
+            usuario=usuario,
+        )
 
 
 def _ensure_roles():
@@ -712,6 +757,8 @@ def orders_detail(request, order_id):
 @user_passes_test(_can_manage_orders)
 def orders_assign(request, order_id):
     pedido = get_object_or_404(Pedido, pk=order_id)
+    if pedido.estado in (Pedido.Estados.ENTREGADO, Pedido.Estados.PAGADO):
+        return redirect('orders_detail', order_id=pedido.id)
     suggested = Camioneta.objects.none()
     if pedido.cliente and pedido.cliente.zona_id:
         suggested = Camioneta.objects.filter(
@@ -757,6 +804,8 @@ def orders_assign(request, order_id):
 @user_passes_test(_can_manage_orders)
 def orders_status(request, order_id):
     pedido = get_object_or_404(Pedido, pk=order_id)
+    if pedido.estado in (Pedido.Estados.ENTREGADO, Pedido.Estados.PAGADO):
+        return redirect('orders_detail', order_id=pedido.id)
     if request.method == 'POST':
         form = PedidoStatusForm(request.POST)
         if form.is_valid():
@@ -770,6 +819,8 @@ def orders_status(request, order_id):
                 usuario=request.user,
                 motivo=motivo,
             )
+            if estado == Pedido.Estados.ENTREGADO:
+                _descontar_stock_pedido(pedido, request.user)
             return redirect('orders_detail', order_id=pedido.id)
     else:
         form = PedidoStatusForm(initial={'estado': pedido.estado})
@@ -782,6 +833,8 @@ def orders_status(request, order_id):
 @user_passes_test(_can_manage_orders)
 def orders_pay(request, order_id):
     pedido = get_object_or_404(Pedido, pk=order_id)
+    if pedido.estado == Pedido.Estados.PAGADO:
+        return redirect('orders_detail', order_id=pedido.id)
     if request.method == 'POST':
         form = PedidoPagoForm(request.POST, pedido=pedido)
         if form.is_valid():
@@ -797,6 +850,7 @@ def orders_pay(request, order_id):
                 usuario=request.user,
                 motivo=pedido.pago_motivo,
             )
+            _descontar_stock_pedido(pedido, request.user)
             return redirect('orders_detail', order_id=pedido.id)
     else:
         form = PedidoPagoForm(pedido=pedido)
@@ -1190,7 +1244,7 @@ def mi_camioneta(request):
 
 
 @login_required
-@user_passes_test(_is_admin)
+@user_passes_test(_can_manage_stock)
 def stock_general(request):
     deposito = Deposito.objects.filter(activo=True).order_by('id').first()
     camionetas = Camioneta.objects.select_related('repartidor').filter(active=True).order_by('nombre')
@@ -1228,17 +1282,20 @@ def stock_general(request):
             }
         )
 
+    puede_editar = _can_manage_stock(request.user)
+
     context = {
         'deposito': deposito,
         'deposito_stock': deposito_stock,
         'camioneta_cards': camioneta_cards,
+        'puede_editar': puede_editar,
     }
     context.update(_role_context(request.user))
     return render(request, 'stock_general.html', context)
 
 
 @login_required
-@user_passes_test(_is_admin)
+@user_passes_test(_can_manage_stock)
 def stock_cargar(request, camioneta_id):
     camioneta = get_object_or_404(Camioneta, pk=camioneta_id)
 
@@ -1284,10 +1341,105 @@ def stock_cargar(request, camioneta_id):
 
 
 @login_required
-@user_passes_test(_is_admin)
+@user_passes_test(_can_manage_stock)
 def stock_camioneta(request, camioneta_id):
     camioneta = get_object_or_404(Camioneta, pk=camioneta_id)
     stock = StockCamioneta.objects.filter(camioneta=camioneta).select_related('producto')
     context = {'camioneta': camioneta, 'stock': stock}
     context.update(_role_context(request.user))
     return render(request, 'stock_camioneta.html', context)
+
+
+@login_required
+@user_passes_test(_can_manage_stock)
+def stock_deposito_cargar(request):
+    deposito = Deposito.objects.filter(activo=True).order_by('id').first()
+    if not deposito:
+        return redirect('stock_general')
+
+    productos = Producto.objects.filter(active=True).order_by('nombre')
+    deposito_stock = deposito.stocks.select_related('producto').order_by('producto__nombre')
+
+    productos_en_deposito = {s.producto_id for s in deposito_stock}
+    productos_sin_stock = [p for p in productos if p.id not in productos_en_deposito]
+
+    if request.method == 'POST':
+        for producto in productos:
+            key = f'qty_{producto.id}'
+            try:
+                qty = int(request.POST.get(key, '0') or 0)
+            except ValueError:
+                qty = 0
+            if qty <= 0:
+                continue
+            stock_item, created = StockDeposito.objects.get_or_create(
+                deposito=deposito,
+                producto=producto,
+                defaults={'cantidad_actual': 0},
+            )
+            stock_item.cantidad_actual += qty
+            stock_item.save(update_fields=['cantidad_actual'])
+        return redirect('stock_general')
+
+    deposito_stock_display = [
+        {
+            'item': item,
+            'status': _stock_status(item.cantidad_actual),
+        }
+        for item in deposito_stock
+    ]
+
+    context = {
+        'deposito': deposito,
+        'deposito_stock': deposito_stock_display,
+        'productos_sin_stock': productos_sin_stock,
+    }
+    context.update(_role_context(request.user))
+    return render(request, 'stock_deposito_cargar.html', context)
+
+
+@login_required
+@user_passes_test(_can_manage_stock)
+def stock_movimientos(request):
+    movimientos = StockMovimiento.objects.select_related(
+        'camioneta', 'producto', 'pedido', 'usuario',
+    ).order_by('-created_at')
+
+    tipo = request.GET.get('tipo', '').strip()
+    camioneta_id = request.GET.get('camioneta', '').strip()
+    usuario_id = request.GET.get('usuario', '').strip()
+    producto_id = request.GET.get('producto', '').strip()
+    date_from = request.GET.get('from', '').strip()
+    date_to = request.GET.get('to', '').strip()
+
+    if tipo:
+        movimientos = movimientos.filter(tipo=tipo)
+    if camioneta_id:
+        movimientos = movimientos.filter(camioneta_id=camioneta_id)
+    if usuario_id:
+        movimientos = movimientos.filter(usuario_id=usuario_id)
+    if producto_id:
+        movimientos = movimientos.filter(producto_id=producto_id)
+    if date_from:
+        movimientos = movimientos.filter(created_at__date__gte=date_from)
+    if date_to:
+        movimientos = movimientos.filter(created_at__date__lte=date_to)
+
+    total_movimientos = movimientos.count()
+
+    context = {
+        'movimientos': movimientos[:200],
+        'total_movimientos': total_movimientos,
+        'tipo': tipo,
+        'camioneta_id': camioneta_id,
+        'usuario_id': usuario_id,
+        'producto_id': producto_id,
+        'date_from': date_from,
+        'date_to': date_to,
+        'tipo_choices': StockMovimiento.Tipos.choices,
+        'camionetas': Camioneta.objects.filter(active=True).order_by('nombre'),
+        'usuarios': User.objects.filter(is_active=True).order_by('username'),
+        'productos': Producto.objects.filter(active=True).order_by('nombre'),
+    }
+    context.update(_role_context(request.user))
+    return render(request, 'stock_movimientos.html', context)

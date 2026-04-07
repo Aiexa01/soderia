@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
 {% endblock %}
 
+{% block header_action %}
+  <a class="cta" href="{% url 'home' %}">Volver</a>
+{% endblock %}
+
 {% block content %}
   <div class="grid logistica-grid">
     <section class="card">
