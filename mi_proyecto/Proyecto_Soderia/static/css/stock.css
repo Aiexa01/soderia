@@ -1,0 +1,387 @@
+/* ============================================================
+   STOCK UNIFIED — stock.css
+   Centralised styles for stock_general, stock_camioneta,
+   stock_deposito_cargar, stock_movimientos and mi_stock.
+   ============================================================ */
+
+/* ---- Legend pills ---- */
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.stock-legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-ok       { background: #dcfce7; color: #15803d; }
+.status-low      { background: #fef9c3; color: #854d0e; }
+.status-critical { background: #fee2e2; color: #991b1b; }
+
+/* ---- Stock list / row (mi_stock, stock_camioneta) ---- */
+.stock-list {
+  display: grid;
+  gap: 0;
+  margin-top: 12px;
+}
+
+.stock-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s ease;
+}
+.stock-row:last-child { border-bottom: none; }
+.stock-row:hover      { background: var(--surface-base); }
+
+.stock-block { margin-top: 18px; }
+
+/* ---- Deposito ---- */
+.deposito-card {
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.deposito-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* Deposito list layout (previously a card grid) */
+.deposito-list {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.deposito-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s ease;
+}
+.deposito-item:last-child { border-bottom: none; }
+.deposito-item:hover      { background: var(--surface-base); }
+
+.deposito-item.ok      { border-left: 3px solid #86efac; }
+.deposito-item.bajo    { border-left: 3px solid #fde68a; }
+.deposito-item.critico { border-left: 3px solid #fca5a5; }
+
+.deposito-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  min-width: 140px;
+}
+.deposito-qty {
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: center;
+  color: var(--water-700);
+}
+.deposito-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+/* ---- Camionetas section ---- */
+.camionetas-section {
+  border: 1px solid var(--border);
+}
+.camionetas-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+/* Camionetas list layout (previously a card grid) */
+.camionetas-list {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.camioneta-stock-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s ease;
+}
+.camioneta-stock-item:last-child { border-bottom: none; }
+.camioneta-stock-item:hover      { background: var(--surface-base); }
+
+.camioneta-stock-item.ok      { border-left: 3px solid #86efac; }
+.camioneta-stock-item.bajo    { border-left: 3px solid #fde68a; }
+.camioneta-stock-item.critico { border-left: 3px solid #fca5a5; }
+
+.camioneta-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+}
+.camioneta-item-info strong { font-size: 13.5px; }
+.camioneta-item-info .hint  { font-size: 12px; color: var(--text-muted); }
+
+.camioneta-item-meta {
+  display: flex;
+  gap: 18px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  flex: 1;
+  flex-wrap: wrap;
+}
+.camioneta-item-meta span {
+  white-space: nowrap;
+}
+
+.camioneta-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* ---- Modals ---- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 30, 50, 0.45);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 5;
+}
+.modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.97);
+  width: min(860px, 92vw);
+  max-height: 88vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 6;
+}
+.modal.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Capacidad panel inside modal */
+.capacidad-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  background: var(--surface-base);
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+/* Progress bars */
+.progress     { height: 8px; border-radius: 999px; background: var(--border); overflow: hidden; }
+.progress-bar { height: 100%; width: 0%; background: #22c55e; border-radius: 999px; transition: width 0.3s ease; }
+.progress-bar.bajo    { background: #f59e0b; }
+.progress-bar.critico { background: #ef4444; }
+
+/* Carga list (inside modal & deposito_cargar) */
+.carga-list  { display: grid; gap: 12px; }
+.carga-row   {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: #fff;
+}
+.carga-input { display: grid; gap: 6px; justify-items: end; }
+
+/* ============================================================
+   MOVIMIENTOS
+   ============================================================ */
+.movimientos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.movimientos-header .header-content h1 { margin: 0; }
+.movimientos-header .header-content p  { margin: .25rem 0 0; color: #64748b; }
+
+.movimientos-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: flex-end;
+  padding: 1rem 0;
+}
+.movimientos-filters .filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+.movimientos-filters .filter-field label {
+  font-size: .75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.movimientos-filters .filter-field select,
+.movimientos-filters .filter-field input {
+  padding: .5rem .75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: .875rem;
+  background: #fff;
+  min-width: 140px;
+}
+.movimientos-filters .filter-actions {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-end;
+}
+.movimientos-filters .filter-actions button { padding: .5rem 1.25rem; }
+
+.movimientos-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+}
+.movimientos-table th {
+  text-align: left;
+  padding: .75rem 1rem;
+  font-size: .75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  border-bottom: 2px solid #e2e8f0;
+}
+.movimientos-table td {
+  padding: .75rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: .875rem;
+  vertical-align: middle;
+}
+.movimientos-table tr:hover td { background: #f8fafc; }
+
+.tipo-badge      { display: inline-block; padding: .2rem .6rem; border-radius: 6px; font-size: .75rem; font-weight: 600; }
+.tipo-ENTREGA    { background: rgba(239,68,68,.1); color: #dc2626; }
+.tipo-DEVOLUCION { background: rgba(34,197,94,.1); color: #16a34a; }
+.tipo-AJUSTE     { background: rgba(59,130,246,.1); color: #2563eb; }
+
+.mov-fecha    { white-space: nowrap; color: #64748b; font-size: .8rem; }
+.mov-cantidad { font-weight: 700; font-size: 1rem; }
+
+.kpi-bar {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+.kpi-bar .kpi-chip {
+  padding: .5rem 1rem;
+  border-radius: 8px;
+  background: #f1f5f9;
+  font-size: .875rem;
+  font-weight: 600;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 860px) {
+  .capacidad-panel { grid-template-columns: 1fr; }
+  .carga-row       { flex-direction: column; align-items: flex-start; }
+  .carga-input     { justify-items: start; }
+
+  .deposito-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .deposito-qty { text-align: left; }
+
+  .camioneta-stock-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .movimientos-table,
+  .movimientos-table thead,
+  .movimientos-table tbody,
+  .movimientos-table tr,
+  .movimientos-table th,
+  .movimientos-table td { display: block; }
+  .movimientos-table thead { display: none; }
+  .movimientos-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: .5rem;
+  }
+  .movimientos-table td { padding: .4rem .75rem; border: none; }
+  .movimientos-table td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: .75rem;
+    color: #64748b;
+    display: block;
+    margin-bottom: .15rem;
+  }
+}

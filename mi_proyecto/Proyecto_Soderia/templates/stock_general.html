@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Stock general{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/stock.css' %}" />
+{% endblock %}
 
 {% block header_action %}
   <a class="cta" href="{% url 'home' %}">Volver</a>
@@ -36,7 +41,7 @@
         <a class="cta ghost" href="{% url 'stock_deposito_cargar' %}">📥 Cargar mercadería al depósito</a>
       </div>
       {% endif %}
-      <div class="deposito-grid">
+      <div class="deposito-list">
         {% for row in deposito_stock %}
           <div class="deposito-item {{ row.status }}">
             <div class="deposito-name">{{ row.item.producto.nombre }}</div>
@@ -57,29 +62,27 @@
         <h2>Camionetas</h2>
         <p class="hint">Resumen de carga y estado de cada unidad.</p>
       </div>
-      <div class="camionetas-grid">
+      <div class="camionetas-list">
         {% for card in camioneta_cards %}
-          <article class="camioneta-stock-card {{ card.status }}">
-            <div class="camioneta-card-head">
-              <div>
-                <strong>{{ card.camioneta.nombre }}</strong>
-                <div class="hint">{{ card.camioneta.patente }}</div>
-              </div>
-              <span class="badge">{{ card.camioneta.get_estado_display }}</span>
+          <div class="camioneta-stock-item {{ card.status }}">
+            <div class="camioneta-item-info">
+              <strong>{{ card.camioneta.nombre }}</strong>
+              <span class="hint">{{ card.camioneta.patente }}</span>
             </div>
-            <div class="camioneta-card-meta">
-              <span>{{ card.count }} productos cargados</span>
-              <span>{{ card.total_unidades }} unidades</span>
+            <span class="badge">{{ card.camioneta.get_estado_display }}</span>
+            <div class="camioneta-item-meta">
+              <span>{{ card.count }} productos</span>
+              <span>{{ card.total_unidades }} uds.</span>
               <span>{% if card.camioneta.repartidor %}{{ card.camioneta.repartidor.username }}{% else %}Sin repartidor{% endif %}</span>
             </div>
-            <div class="camioneta-card-actions">
+            <div class="camioneta-item-actions">
               <a class="cta ghost" href="{% url 'stock_camioneta' card.camioneta.id %}">Ver stock</a>
               <a class="cta ghost" href="{% url 'orders_list' %}?camioneta={{ card.camioneta.id }}">Ver pedidos</a>
               {% if puede_editar %}
               <button class="cta ghost js-open-carga" type="button" data-camioneta="{{ card.camioneta.id }}" data-nombre="{{ card.camioneta.nombre }}">Cargar</button>
               {% endif %}
             </div>
-          </article>
+          </div>
         {% empty %}
           <p class="hint">No hay camionetas cargadas.</p>
         {% endfor %}

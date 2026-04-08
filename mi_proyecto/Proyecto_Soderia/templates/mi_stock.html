@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Mi stock{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/stock.css' %}" />
+{% endblock %}
 
 {% block header_action %}
   <a class="cta" href="{% url 'home' %}">Volver</a>

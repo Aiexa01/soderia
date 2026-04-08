@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Cargar deposito{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/stock.css' %}" />
+{% endblock %}
 
 {% block header_action %}
   <a class="cta" href="{% url 'stock_general' %}">Volver</a>
@@ -21,7 +26,7 @@
 
       {% if deposito_stock %}
       <h3 style="margin:1.5rem 0 .75rem">Stock actual en deposito</h3>
-      <div class="deposito-grid">
+      <div class="deposito-list">
         {% for row in deposito_stock %}
           <div class="deposito-item {{ row.status }}">
             <div class="deposito-name">{{ row.item.producto.nombre }}</div>

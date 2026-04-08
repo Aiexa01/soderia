@@ -4,41 +4,7 @@
 {% block title %}Movimientos de stock{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/orders.css' %}" />
-<style>
-  .movimientos-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; }
-  .movimientos-header .header-content h1 { margin:0; }
-  .movimientos-header .header-content p { margin:.25rem 0 0; color:#64748b; }
-  .movimientos-filters { display:flex; flex-wrap:wrap; gap:.75rem; align-items:flex-end; padding:1rem 0; }
-  .movimientos-filters .filter-field { display:flex; flex-direction:column; gap:.25rem; }
-  .movimientos-filters .filter-field label { font-size:.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:.03em; }
-  .movimientos-filters .filter-field select,
-  .movimientos-filters .filter-field input { padding:.5rem .75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:.875rem; background:#fff; min-width:140px; }
-  .movimientos-filters .filter-actions { display:flex; gap:.5rem; align-items:flex-end; }
-  .movimientos-filters .filter-actions button { padding:.5rem 1.25rem; }
-  .movimientos-table { width:100%; border-collapse:separate; border-spacing:0; margin-top:1rem; }
-  .movimientos-table th { text-align:left; padding:.75rem 1rem; font-size:.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:.03em; border-bottom:2px solid #e2e8f0; }
-  .movimientos-table td { padding:.75rem 1rem; border-bottom:1px solid #f1f5f9; font-size:.875rem; vertical-align:middle; }
-  .movimientos-table tr:hover td { background:#f8fafc; }
-  .tipo-badge { display:inline-block; padding:.2rem .6rem; border-radius:6px; font-size:.75rem; font-weight:600; }
-  .tipo-ENTREGA { background:rgba(239,68,68,.1); color:#dc2626; }
-  .tipo-DEVOLUCION { background:rgba(34,197,94,.1); color:#16a34a; }
-  .tipo-AJUSTE { background:rgba(59,130,246,.1); color:#2563eb; }
-  .mov-fecha { white-space:nowrap; color:#64748b; font-size:.8rem; }
-  .mov-cantidad { font-weight:700; font-size:1rem; }
-  .kpi-bar { display:flex; gap:1.5rem; margin:1rem 0; flex-wrap:wrap; }
-  .kpi-bar .kpi-chip { padding:.5rem 1rem; border-radius:8px; background:#f1f5f9; font-size:.875rem; font-weight:600; }
-
-  @media (max-width: 768px) {
-    .movimientos-table, .movimientos-table thead, .movimientos-table tbody, .movimientos-table tr, .movimientos-table th, .movimientos-table td {
-      display: block;
-    }
-    .movimientos-table thead { display:none; }
-    .movimientos-table tr { margin-bottom:1rem; border:1px solid #e2e8f0; border-radius:8px; padding:.5rem; }
-    .movimientos-table td { padding:.4rem .75rem; border:none; }
-    .movimientos-table td:before { content:attr(data-label); font-weight:600; font-size:.75rem; color:#64748b; display:block; margin-bottom:.15rem; }
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/stock.css' %}" />
 {% endblock %}
 
 {% block header_action %}
