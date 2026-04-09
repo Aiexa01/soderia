@@ -31,7 +31,8 @@ Sistema web para la empresa **Soda y Agua Tres Cerritos** de Salta Capital, Arge
 - Stock por camioneta y depósito
 - Usuarios con roles diferenciados
 - Zonas y barrios de cobertura
-- Landing page pública con información de la empresa
+- Landing page pública con formulario de contacto integrado
+- Consultas web: captación de potenciales clientes desde la landing page
 
 ---
 
@@ -166,14 +167,17 @@ soderia/
         ├── models.py           # Modelos de datos
         ├── views.py            # Vistas (lógica de negocio)
         ├── urls.py             # Rutas de la aplicación
+        ├── context_processors.py # Badge de consultas nuevas
         ├── admin.py
         ├── templates/          # Plantillas HTML
-        │   ├── landing.html        # Página pública
-        │   ├── base.html           # Layout base del sistema
+        │   ├── landing.html        # Página pública con formulario de contacto
+        │   ├── base.html           # Layout base del sistema (sidebar + badge)
         │   ├── home.html           # Dashboard principal
         │   ├── registration/       # Login
         │   ├── clients_*.html      # CRUD de clientes
         │   ├── orders_*.html       # Gestión de pedidos
+        │   ├── consultas_list.html  # Listado de consultas web
+        │   ├── consulta_detail.html # Detalle de consulta
         │   ├── productos_*.html    # Gestión de productos
         │   ├── camionetas_*.html   # Gestión de camionetas
         │   ├── barrios_*.html      # Gestión de barrios
@@ -188,6 +192,7 @@ soderia/
             ├── css/
             │   ├── styles.css      # Estilos del sistema interno
             │   ├── landing.css     # Estilos de la landing page
+            │   ├── consultas.css   # Estilos del módulo de consultas
             │   └── logistica.css   # Estilos de logística
             └── images/             # Imágenes de la empresa
 ```
@@ -198,15 +203,34 @@ soderia/
 
 ### 🌐 Landing Page Pública (`/`)
 Página institucional con información de la empresa, productos, valores, contacto y redes sociales.
+- Formulario de contacto funcional que envía datos al sistema
+- Feedback visual con notificaciones toast al enviar
+- WhatsApp flotante para contacto directo
 
 ### 🏠 Home / Dashboard (`/home/`)
 Panel principal con accesos rápidos según el rol del usuario.
+- Tarjeta de **Consultas Web** con contador de nuevas (se destaca con animación cuando hay pendientes)
+
+### 📩 Consultas Web (`/consultas/`)
+Módulo de captación de potenciales clientes desde la landing page pública.
+- **Endpoint público** `POST /api/contacto/` — recibe datos del formulario sin requerir login
+- Listado de consultas con filtros por estado y búsqueda libre
+- Detalle con datos del contacto y mensaje completo
+- **Flujo de estados**: Nueva → Leída → Contactada → Convertida / Descartada
+- Marcado automático como "Leída" al abrir el detalle
+- **Link directo a WhatsApp** con mensaje pre-armado para respuesta rápida
+- **Convertir en Cliente**: redirige al formulario de alta con datos pre-llenados
+- Al guardar el cliente, la consulta se marca como "Convertida" automáticamente
+- Notas internas editables para seguimiento del operador
+- Badge en el sidebar con contador de consultas sin leer
+- Tabla `web_inquiries` separada de clientes para no contaminar la base
 
 ### 👥 Gestión de Clientes (`/clientes/`)
 - Listado con búsqueda y filtros
 - Alta, edición y baja de clientes
 - Tipos: Persona / Comercio
 - Asignación de zona y barrio
+- Creación desde consulta web con datos pre-llenados
 
 ### 🛒 Gestión de Pedidos (`/ventas/`)
 - Creación de pedidos con detalle de productos
@@ -328,6 +352,8 @@ cd /opt/back_end/mi_proyecto
 | Login            | `http://localhost:8004/login/`                |
 | Home             | `http://localhost:8004/home/`                 |
 | Clientes         | `http://localhost:8004/clientes/`             |
+| Consultas Web    | `http://localhost:8004/consultas/`            |
+| API Contacto     | `POST http://localhost:8004/api/contacto/`    |
 | Ventas/Pedidos   | `http://localhost:8004/ventas/`               |
 | Logística        | `http://localhost:8004/logistica/`            |
 | Stock            | `http://localhost:8004/stock/`                |
