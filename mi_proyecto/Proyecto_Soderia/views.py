@@ -2,14 +2,18 @@ from django import forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from datetime import timedelta
 
 from .models import (
     Barrio,
     Camioneta,
     Client,
+    ConsultaWeb,
     Deposito,
     Pedido,
     PedidoDetalle,
@@ -168,7 +172,12 @@ def landing(request):
 
 @login_required
 def home(request):
-    return render(request, 'home.html', _role_context(request.user))
+    ctx = _role_context(request.user)
+    if ctx['is_admin'] or ctx['is_eac']:
+        ctx['consultas_nuevas'] = ConsultaWeb.objects.filter(
+            estado=ConsultaWeb.Estados.NUEVA,
+        ).count()
+    return render(request, 'home.html', ctx)
 
 
 class UserForm(forms.ModelForm):
@@ -609,17 +618,37 @@ def clients_list(request):
 @login_required
 @user_passes_test(_can_manage_clients)
 def clients_create(request):
+    prefill = request.session.pop('consulta_prefill', None)
     if request.method == 'POST':
         form = ClientForm(request.POST)
         if form.is_valid():
-            form.save()
+            client = form.save()
+            # Si viene de una consulta web, marcarla como convertida
+            consulta_id = request.POST.get('consulta_id')
+            if consulta_id:
+                try:
+                    consulta = ConsultaWeb.objects.get(pk=consulta_id)
+                    consulta.estado = ConsultaWeb.Estados.CONVERTIDA
+                    consulta.cliente_convertido = client
+                    consulta.save(update_fields=['estado', 'cliente_convertido', 'updated_at'])
+                except ConsultaWeb.DoesNotExist:
+                    pass
             return redirect('clients_list')
     else:
-        form = ClientForm(initial={'activo': True})
+        initial = {'activo': True}
+        if prefill:
+            initial.update({
+                'name': prefill.get('name', ''),
+                'email': prefill.get('email', ''),
+                'telefono': prefill.get('telefono', ''),
+                'referencias': prefill.get('referencias', ''),
+            })
+        form = ClientForm(initial=initial)
     context = {
         'form': form,
         'title': 'Nuevo cliente',
         'is_create': True,
+        'consulta_id': prefill.get('consulta_id') if prefill else None,
         'barrios_autocomplete': list(
             Barrio.objects.filter(active=True, clientes__isnull=False)
             .select_related('zona')
@@ -1443,3 +1472,118 @@ def stock_movimientos(request):
     }
     context.update(_role_context(request.user))
     return render(request, 'stock_movimientos.html', context)
+
+
+# ─────────────────────────────────────────────────────────
+#  CONSULTAS WEB
+# ─────────────────────────────────────────────────────────
+
+@csrf_exempt
+@require_POST
+def contacto_submit(request):
+    """Endpoint público que recibe el formulario de contacto de la landing."""
+    import json
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        data = request.POST
+
+    nombre = (data.get('nombre') or '').strip()
+    email = (data.get('email') or '').strip()
+    telefono = (data.get('telefono') or '').strip()
+    mensaje = (data.get('mensaje') or '').strip()
+
+    if not nombre or not telefono:
+        return JsonResponse(
+            {'ok': False, 'error': 'Nombre y teléfono son obligatorios.'},
+            status=400,
+        )
+
+    ConsultaWeb.objects.create(
+        nombre=nombre,
+        email=email,
+        telefono=telefono,
+        mensaje=mensaje,
+    )
+    return JsonResponse({'ok': True, 'message': '¡Consulta enviada con éxito!'})
+
+
+@login_required
+@user_passes_test(_can_manage_clients)
+def consultas_list(request):
+    estado = request.GET.get('estado', 'all')
+    q = request.GET.get('q', '').strip()
+
+    consultas = ConsultaWeb.objects.all()
+    total = consultas.count()
+    nuevas = consultas.filter(estado=ConsultaWeb.Estados.NUEVA).count()
+
+    if estado != 'all':
+        consultas = consultas.filter(estado=estado)
+    if q:
+        consultas = consultas.filter(
+            Q(nombre__icontains=q)
+            | Q(email__icontains=q)
+            | Q(telefono__icontains=q)
+            | Q(mensaje__icontains=q)
+        )
+
+    context = {
+        'consultas': consultas[:200],
+        'total': total,
+        'nuevas': nuevas,
+        'estado': estado,
+        'query': q,
+        'estado_choices': ConsultaWeb.Estados.choices,
+    }
+    context.update(_role_context(request.user))
+    return render(request, 'consultas_list.html', context)
+
+
+@login_required
+@user_passes_test(_can_manage_clients)
+def consulta_detail(request, consulta_id):
+    consulta = get_object_or_404(ConsultaWeb, pk=consulta_id)
+    # Marcar como leída automáticamente si es nueva
+    if consulta.estado == ConsultaWeb.Estados.NUEVA:
+        consulta.estado = ConsultaWeb.Estados.LEIDA
+        consulta.save(update_fields=['estado'])
+
+    if request.method == 'POST' and 'notas_internas' in request.POST:
+        consulta.notas_internas = request.POST.get('notas_internas', '')
+        consulta.save(update_fields=['notas_internas'])
+        return redirect('consulta_detail', consulta_id=consulta.pk)
+
+    context = {
+        'consulta': consulta,
+        'estado_choices': ConsultaWeb.Estados.choices,
+    }
+    context.update(_role_context(request.user))
+    return render(request, 'consulta_detail.html', context)
+
+
+@login_required
+@user_passes_test(_can_manage_clients)
+def consulta_estado(request, consulta_id):
+    consulta = get_object_or_404(ConsultaWeb, pk=consulta_id)
+    nuevo_estado = request.POST.get('estado', '')
+    if nuevo_estado in dict(ConsultaWeb.Estados.choices):
+        consulta.estado = nuevo_estado
+        consulta.save(update_fields=['estado', 'updated_at'])
+    return redirect('consulta_detail', consulta_id=consulta.pk)
+
+
+@login_required
+@user_passes_test(_can_manage_clients)
+def consulta_convertir(request, consulta_id):
+    """Redirige al formulario de alta de cliente con los datos pre‑llenados."""
+    consulta = get_object_or_404(ConsultaWeb, pk=consulta_id)
+    # Store in session so the create view can read them
+    request.session['consulta_prefill'] = {
+        'consulta_id': consulta.pk,
+        'name': consulta.nombre,
+        'email': consulta.email,
+        'telefono': consulta.telefono,
+        'referencias': consulta.mensaje,
+    }
+    return redirect('clients_create')

@@ -27,6 +27,13 @@
       <span class="quicklink-label">Ventas</span>
       <span class="quicklink-desc">Pedidos y facturación</span>
     </a>
+    <a class="quicklink-card {% if consultas_nuevas %}quicklink-highlight{% endif %}" href="{% url 'consultas_list' %}">
+      <span class="quicklink-icon">📩</span>
+      <span class="quicklink-label">Consultas Web</span>
+      <span class="quicklink-desc">
+        {% if consultas_nuevas %}{{ consultas_nuevas }} nueva{{ consultas_nuevas|pluralize:"s" }}{% else %}Mensajes de la web{% endif %}
+      </span>
+    </a>
     {% endif %}
     {% if is_admin %}
     <a class="quicklink-card" href="{% url 'stock_general' %}">

@@ -58,4 +58,10 @@ urlpatterns = [
     path('admin-panel/barrios/nuevo/', views.barrios_create, name='barrios_create'),
     path('admin-panel/barrios/<int:barrio_id>/editar/', views.barrios_edit, name='barrios_edit'),
     path('admin-panel/barrios/<int:barrio_id>/estado/', views.barrios_toggle, name='barrios_toggle'),
+    # Consultas web
+    path('api/contacto/', views.contacto_submit, name='contacto_submit'),
+    path('consultas/', views.consultas_list, name='consultas_list'),
+    path('consultas/<int:consulta_id>/', views.consulta_detail, name='consulta_detail'),
+    path('consultas/<int:consulta_id>/estado/', views.consulta_estado, name='consulta_estado'),
+    path('consultas/<int:consulta_id>/convertir/', views.consulta_convertir, name='consulta_convertir'),
 ]

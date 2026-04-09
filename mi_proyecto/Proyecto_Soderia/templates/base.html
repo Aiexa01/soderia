@@ -39,6 +39,11 @@
           href="{% url 'clients_list' %}">
           <span class="side-icon">👥</span> Clientes
         </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'consultas_list' or request.resolver_match.url_name == 'consulta_detail' %}active{% endif %}"
+          href="{% url 'consultas_list' %}">
+          <span class="side-icon">📩</span> Consultas Web
+          {% if consultas_nuevas_count %}<span class="side-badge">{{ consultas_nuevas_count }}</span>{% endif %}
+        </a>
         {% endif %}
         {% if is_admin or is_eac %}
         <a class="side-link {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}"
