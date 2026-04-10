@@ -323,13 +323,46 @@ Definidas en `docker-compose.yml`:
 
 ---
 
-## 📊 Scripts de Carga de Datos
+## 📊 Carga de Datos Iniciales
 
 Ejecutar dentro del contenedor (`docker exec -it soderia bash`):
 
 ```bash
 cd /opt/back_end/mi_proyecto
+python ../scripts/seed_all.py
 ```
+
+Este único comando carga **todo lo necesario** para que el sistema funcione:
+
+| Datos                | Cantidad | Detalle                                       |
+|----------------------|----------|-----------------------------------------------|
+| Roles                | 5        | Administrador, EAC, Stock, Técnico, Repartidor|
+| Usuarios             | 7        | Con roles y contraseñas pre-configuradas      |
+| Zonas                | 5        | Centro, Norte, Sur, Este, Oeste               |
+| Barrios              | 24       | Distribuidos en todas las zonas               |
+| Productos            | 10       | Sifones, bidones, dispensers, no retornables   |
+| Camionetas           | 5        | 2 con repartidor asignado                     |
+| Clientes             | 20       | 15 personas + 5 comercios                     |
+| Depósito             | 1        | Depósito Central                              |
+| Consultas Web        | 8        | En distintos estados (demo)                   |
+
+### 🔑 Credenciales de Usuarios Precargados
+
+| Usuario      | Contraseña     | Rol                              |
+|--------------|----------------|----------------------------------|
+| `marlene`    | `admin123`     | Administrador (superusuario)     |
+| `admin`      | `admin123`     | Administrador (superusuario)     |
+| `carolina`   | `carolina123`  | Encargado de Atención al Cliente |
+| `jorge`      | `jorge123`     | Encargado de Stock               |
+| `mario`      | `mario123`     | Repartidor                       |
+| `ricardo`    | `ricardo123`   | Repartidor                       |
+| `roberto`    | `roberto123`   | Técnico                          |
+
+> **Nota:** El script es **idempotente** — se puede ejecutar varias veces sin duplicar datos. Los usuarios existentes no se sobreescriben ni se les cambia la contraseña.
+
+### Scripts Individuales (opcional)
+
+Si necesitás cargar datos por separado:
 
 | Script                              | Descripción                                      |
 |-------------------------------------|--------------------------------------------------|
@@ -337,6 +370,7 @@ cd /opt/back_end/mi_proyecto
 | `python ../scripts/load_sample_products.py` | Carga productos de ejemplo                |
 | `python ../scripts/load_sample_clients_salta.py` | Carga clientes de ejemplo           |
 | `python ../scripts/load_sample_camionetas.py` | Carga camionetas de ejemplo             |
+| `python ../scripts/load_sample_consultas.py` | Carga consultas web de ejemplo           |
 | `python ../scripts/update_barrios_zonas.py` | Actualiza asignación de barrios a zonas  |
 | `python seed_payment_methods.py`    | Carga métodos de pago                            |
 
