@@ -380,12 +380,12 @@
           </div>
         </div>
 
-        <form class="landing-contact-form" onsubmit="return false;">
-          <input type="text" placeholder="Tu nombre completo" />
-          <input type="email" placeholder="Tu email" />
-          <input type="tel" placeholder="Tu teléfono" />
-          <textarea rows="4" placeholder="Describí lo que necesitás..."></textarea>
-          <button type="submit">✈ Enviar Consulta</button>
+        <form class="landing-contact-form" id="contact-form">
+          <input type="text" name="nombre" placeholder="Tu nombre completo" required />
+          <input type="email" name="email" placeholder="Tu email" />
+          <input type="tel" name="telefono" placeholder="Tu teléfono" required />
+          <textarea rows="4" name="mensaje" placeholder="Describí lo que necesitás..."></textarea>
+          <button type="submit" id="contact-submit-btn"> Enviar Consulta</button>
         </form>
       </div>
     </div>
@@ -409,6 +409,9 @@
         d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z" />
     </svg>
   </a>
+
+  <!-- Toast notification -->
+  <div class="landing-toast" id="landing-toast"></div>
 
   <!-- ==================== JS ==================== -->
   <script>
@@ -445,6 +448,54 @@
         } else {
           nav.classList.remove('scrolled');
         }
+      });
+
+      // ── Contact form submission ──
+      var toast = document.getElementById('landing-toast');
+      function showToast(msg, ok) {
+        toast.textContent = msg;
+        toast.className = 'landing-toast ' + (ok ? 'toast-success' : 'toast-error') + ' toast-show';
+        setTimeout(function () {
+          toast.classList.remove('toast-show');
+        }, 4000);
+      }
+
+      var contactForm = document.getElementById('contact-form');
+      var submitBtn = document.getElementById('contact-submit-btn');
+
+      contactForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando...';
+
+        var payload = {
+          nombre: contactForm.nombre.value,
+          email: contactForm.email.value,
+          telefono: contactForm.telefono.value,
+          mensaje: contactForm.mensaje.value,
+        };
+
+        fetch('{% url "contacto_submit" %}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.ok) {
+              showToast('✅ ' + data.message, true);
+              contactForm.reset();
+            } else {
+              showToast('⚠️ ' + (data.error || 'Error al enviar.'), false);
+            }
+          })
+          .catch(function () {
+            showToast('⚠️ Error de conexión. Intentá de nuevo.', false);
+          })
+          .finally(function () {
+            submitBtn.disabled = false;
+            submitBtn.textContent = ' Enviar Consulta';
+          });
       });
     })();
   </script>

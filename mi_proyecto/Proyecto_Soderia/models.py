@@ -290,3 +290,41 @@ class StockDeposito(models.Model):
 
     def __str__(self):
         return f'{self.deposito} - {self.producto}'
+
+
+class ConsultaWeb(models.Model):
+    class Estados(models.TextChoices):
+        NUEVA = 'NUEVA', 'Nueva'
+        LEIDA = 'LEIDA', 'Leída'
+        CONTACTADA = 'CONTACTADA', 'Contactada'
+        CONVERTIDA = 'CONVERTIDA', 'Convertida a cliente'
+        DESCARTADA = 'DESCARTADA', 'Descartada'
+
+    nombre = models.CharField(max_length=120)
+    email = models.EmailField(blank=True)
+    telefono = models.CharField(max_length=30)
+    mensaje = models.TextField()
+    estado = models.CharField(
+        max_length=20,
+        choices=Estados.choices,
+        default=Estados.NUEVA,
+    )
+    cliente_convertido = models.ForeignKey(
+        Client,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='consultas_origen',
+    )
+    notas_internas = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        db_table = 'web_inquiries'
+        verbose_name = 'Consulta web'
+        verbose_name_plural = 'Consultas web'
+
+    def __str__(self):
+        return f'Consulta #{self.pk} - {self.nombre}'

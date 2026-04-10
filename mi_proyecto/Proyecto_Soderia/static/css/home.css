@@ -420,6 +420,22 @@
   color: var(--text-muted);
 }
 
+.quicklink-highlight {
+  border-color: var(--water-500);
+  box-shadow: 0 0 0 2px rgba(10, 167, 194, 0.15), var(--shadow-xs);
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(10, 167, 194, 0.10), var(--shadow-xs); }
+  50% { box-shadow: 0 0 0 4px rgba(10, 167, 194, 0.20), var(--shadow-sm); }
+}
+
+.quicklink-highlight .quicklink-desc {
+  color: var(--water-700);
+  font-weight: 600;
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */

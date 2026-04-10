@@ -18,6 +18,12 @@
       <p>Completa la ficha del cliente para crear o actualizar la cuenta.</p>
       <form method="post" class="client-form">
         {% csrf_token %}
+        {% if consulta_id %}
+          <input type="hidden" name="consulta_id" value="{{ consulta_id }}">
+          <div class="form-alert form-alert-info">
+            📩 Estás creando un cliente a partir de una <strong>consulta web</strong>. Los datos fueron pre-llenados automáticamente.
+          </div>
+        {% endif %}
         <div class="form-block">
           <div class="form-block-title">Datos del cliente</div>
           <div class="form-columns">
