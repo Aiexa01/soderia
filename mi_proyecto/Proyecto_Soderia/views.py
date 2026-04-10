@@ -1493,9 +1493,9 @@ def contacto_submit(request):
     telefono = (data.get('telefono') or '').strip()
     mensaje = (data.get('mensaje') or '').strip()
 
-    if not nombre or not telefono:
+    if not nombre or not email or not telefono or not mensaje:
         return JsonResponse(
-            {'ok': False, 'error': 'Nombre y teléfono son obligatorios.'},
+            {'ok': False, 'error': 'Todos los campos son obligatorios.'},
             status=400,
         )
 

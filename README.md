@@ -340,7 +340,7 @@ Este único comando carga **todo lo necesario** para que el sistema funcione:
 | Usuarios             | 7        | Con roles y contraseñas pre-configuradas      |
 | Zonas                | 5        | Centro, Norte, Sur, Este, Oeste               |
 | Barrios              | 24       | Distribuidos en todas las zonas               |
-| Productos            | 10       | Sifones, bidones, dispensers, no retornables   |
+| Productos            | 10       | Bidones, sifones, dispensers, no retornables   |
 | Camionetas           | 5        | 2 con repartidor asignado                     |
 | Clientes             | 20       | 15 personas + 5 comercios                     |
 | Depósito             | 1        | Depósito Central                              |
