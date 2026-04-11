@@ -87,13 +87,12 @@ if db_engine == 'django.db.backends.sqlite3':
 else:
     DATABASES = {  
         'default': {
-            'ENGINE': db_engine,  # default: MySQL
-            'NAME': os.environ.get('DB_NAME', 'soderia'),
-            'USER': os.environ.get('DB_USER', 'root'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', 'admin'),
-            'HOST': os.environ.get('DB_HOST', 'host.docker.internal'),
-
-            'PORT': os.environ.get('DB_PORT', '3306'),
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'soderia',
+            'USER': 'root',
+            'PASSWORD': '1234',
+            'HOST': 'mysql-soderia',  
+            'PORT': '3306',
         }
     }
 

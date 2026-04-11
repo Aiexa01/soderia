@@ -198,6 +198,7 @@
   position: relative;
   z-index: 2;
   max-width: 640px;
+  margin-left: 70px;
 }
 
 .landing-hero-tag {
@@ -289,7 +290,7 @@
 .landing-hero-social {
   position: absolute;
   left: 40px;
-  bottom: 80px;
+  top: 38%;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1290,6 +1291,7 @@
   /* Hero */
   .landing-hero { min-height: 85vh; padding: 100px 20px 60px; }
   .landing-hero-social { display: none; }
+  .landing-hero-content { margin-left: 0; }
 
   /* Stats */
   .landing-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
