@@ -181,28 +181,54 @@
       </div>
 
       <div class="landing-products-grid">
-        <!-- 1. Bidón Azul -->
+        <!-- 1. Bidón Azul 10L -->
         <div class="landing-pcard">
           <div class="landing-pcard-img">
-            <img src="{% static 'images/bidon-poli-12-pag-300x300.jpg' %}" alt="Bidón Azul Retornable" loading="lazy" />
+            <img src="{% static 'images/bidon-poli-12-pag-300x300.jpg' %}" alt="Bidón Azul 10L" loading="lazy" />
             <span class="landing-pcard-badge">Retornable</span>
           </div>
           <div class="landing-pcard-body">
-            <h3>Bidón Azul</h3>
-            <p>Agua purificada en bidones retornables de 10 y 20 litros. Ideal para hogares y oficinas.</p>
+            <h3>Bidón Azul 10 L</h3>
+            <p>Agua purificada en bidón retornable de 10 litros. Práctico y liviano para el hogar.</p>
             <a href="#contacto" class="landing-pcard-cta">Consultar</a>
           </div>
         </div>
 
-        <!-- 2. Línea Baja en Sodio -->
+        <!-- 2. Bidón Azul 20L -->
         <div class="landing-pcard">
           <div class="landing-pcard-img">
-            <img src="{% static 'images/bajo sodio 12 l.jpg' %}" alt="Bidón Baja en Sodio" loading="lazy" />
+            <img src="{% static 'images/bidon 20 l.jpg' %}" alt="Bidón Azul 20L" loading="lazy" />
+            <span class="landing-pcard-badge">Retornable</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Bidón Azul 20 L</h3>
+            <p>Agua purificada en bidón retornable de 20 litros. Ideal para oficinas y familias.</p>
+            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
+          </div>
+        </div>
+
+        <!-- 3. Baja en Sodio 10L -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/bajo sodio 12 l.jpg' %}" alt="Bidón Baja en Sodio 10L" loading="lazy" />
             <span class="landing-pcard-badge badge-green">Baja en Sodio</span>
           </div>
           <div class="landing-pcard-body">
-            <h3>Línea Baja en Sodio</h3>
-            <p>Agua con bajo contenido de sodio en bidones de 10 y 20 litros. Pensada para tu salud.</p>
+            <h3>Baja en Sodio 10 L</h3>
+            <p>Agua con bajo contenido de sodio en bidón de 10 litros. Pensada para tu salud.</p>
+            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
+          </div>
+        </div>
+
+        <!-- 4. Baja en Sodio 20L -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/bidon verde 20 lts.webp' %}" alt="Bidón Baja en Sodio 20L" loading="lazy" />
+            <span class="landing-pcard-badge badge-green">Baja en Sodio</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Baja en Sodio 20 L</h3>
+            <p>Agua con bajo contenido de sodio en bidón de 20 litros. Para toda la familia.</p>
             <a href="#contacto" class="landing-pcard-cta">Consultar</a>
           </div>
         </div>
@@ -285,42 +311,67 @@
   </section>
 
   <!-- ==================== VALUES ==================== -->
-  <section class="landing-values">
+  <section class="landing-values" id="valores">
+    <!-- Subtle bubble SVGs as background decoration -->
+    <svg class="landing-values-bubbles" aria-hidden="true" viewBox="0 0 1200 600" preserveAspectRatio="none">
+      <circle cx="100" cy="480" r="60" fill="rgba(56,189,248,0.06)" />
+      <circle cx="250" cy="350" r="25" fill="rgba(56,189,248,0.05)" />
+      <circle cx="1050" cy="120" r="80" fill="rgba(56,189,248,0.05)" />
+      <circle cx="900" cy="450" r="35" fill="rgba(56,189,248,0.04)" />
+      <circle cx="600" cy="80" r="45" fill="rgba(56,189,248,0.04)" />
+      <circle cx="150" cy="150" r="18" fill="rgba(56,189,248,0.06)" />
+      <circle cx="1100" cy="350" r="22" fill="rgba(56,189,248,0.05)" />
+    </svg>
+
     <h2 class="landing-section-title">Nuestros Valores</h2>
     <div class="landing-section-bar"></div>
+
     <div class="landing-values-grid">
+      <!-- Pureza Garantizada -->
       <div class="landing-value-card">
         <div class="landing-value-icon">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <!-- Water drop icon -->
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
           </svg>
         </div>
-        <h3>Calidad</h3>
-        <p>A través de la mejora continua, buscamos la <strong>excelencia</strong> en cada producto y servicio que
-          brindamos a nuestros clientes.</p>
+        <h3>Pureza Garantizada</h3>
+        <p>Sometemos nuestra agua a procesos de <strong>filtrado y purificación</strong> de última tecnología para asegurar un sabor liviano y libre de impurezas en cada gota.</p>
       </div>
+
+      <!-- Puntualidad en tu Puerta -->
       <div class="landing-value-card">
         <div class="landing-value-icon">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
+          <!-- Truck / delivery icon -->
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13" rx="2" />
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
           </svg>
         </div>
-        <h3>Puntualidad</h3>
-        <p>Nuestro compromiso es garantizar la <strong>entrega puntual</strong> en cada reparto y en cada proceso
-          operativo.</p>
+        <h3>Puntualidad en tu Puerta</h3>
+        <p>Sabemos que el agua es vital. Por eso, <strong>optimizamos nuestras rutas</strong> para que tu pedido de agua o soda llegue siempre a tiempo, sin demoras.</p>
       </div>
+
+      <!-- Compromiso Familiar -->
       <div class="landing-value-card">
         <div class="landing-value-icon">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M20.8 14.4c.6-.3 1.2-.3 1.2.4v3.2c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h10" />
-            <path d="M18 2l4 4-10 10H8v-4L18 2z" />
+          <!-- Heart in hand / care icon -->
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.4 4.6a5.5 5.5 0 00-7.8 0L12 5.2l-.6-.6a5.5 5.5 0 00-7.8 7.8l.6.6L12 20.8l7.8-7.8.6-.6a5.5 5.5 0 000-7.8z" />
           </svg>
         </div>
-        <h3>Confianza</h3>
-        <p>Contamos con un equipo comprometido y <strong>confiable</strong>, que atiende cada pedido con dedicación y
-          responsabilidad.</p>
+        <h3>Compromiso Familiar</h3>
+        <p>Como empresa local, <strong>cuidamos a tu familia</strong> como a la nuestra, garantizando envases sanitizados y un servicio amable en cada entrega.</p>
       </div>
+    </div>
+
+    <div class="landing-values-cta">
+      <a href="#contacto" class="landing-btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" /></svg>
+        Pedí tu agua o soda
+      </a>
     </div>
   </section>
 
@@ -331,22 +382,22 @@
 
     <div class="landing-why-top">
       <div class="landing-why-info">
-        <span class="landing-why-info-tag">1990 - 2026</span>
-        <h3>Experiencia y Trayectoria:</h3>
-        <h4>Más de 30 años en el sector</h4>
+        <span class="landing-why-info-tag">1990 — 2026</span>
+        <h3>35 años hidratando a la comunidad.</h3>
+        <h4>Desde 1990, mantenemos la tradición de frescura en cada mesa, evolucionando para ofrecerte siempre lo mejor.</h4>
         <div class="landing-why-bar">
-          <div class="landing-why-bar-fill" style="width: 85%"></div>
+          <div class="landing-why-bar-fill" style="width: 97%"></div>
         </div>
-        <small>Rumbo a los 35 años</small>
+        <small>Casi 4 décadas de confianza</small>
       </div>
       <div class="landing-why-info">
-        <span class="landing-why-info-tag">Flota y operaciones</span>
-        <h3>Compromiso con la Calidad:</h3>
-        <h4>Agua pura como prioridad</h4>
+        <span class="landing-why-info-tag">Agua y Soda</span>
+        <h3>El equilibrio perfecto de frescura.</h3>
+        <h4>Nuestra agua es de mineralización débil, ideal para toda la familia. Y nuestra soda, con la presión justa de gas para ese "estallido" de frescura que tus comidas necesitan.</h4>
         <div class="landing-why-bar">
           <div class="landing-why-bar-fill" style="width: 100%"></div>
         </div>
-        <small>en cada momento, en todos los procesos</small>
+        <small>calidad garantizada en cada gota</small>
       </div>
     </div>
 

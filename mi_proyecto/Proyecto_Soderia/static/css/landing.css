@@ -565,11 +565,22 @@
 }
 
 /* ============================================================
-   VALUES — Light ice-blue background
+   VALUES — Ice background with bubble decoration
    ============================================================ */
 .landing-values {
   padding: 90px 40px;
   background: var(--landing-ice);
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-values-bubbles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .landing-section-title {
@@ -579,6 +590,8 @@
   color: var(--landing-text-dark);
   letter-spacing: -0.02em;
   margin: 0 0 8px 0;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-section-bar {
@@ -587,6 +600,8 @@
   background: var(--landing-accent);
   border-radius: 2px;
   margin: 0 auto 48px;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-values-grid {
@@ -595,6 +610,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-value-card {
@@ -604,26 +621,33 @@
   padding: 36px 28px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .landing-value-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  border-color: #7dd3fc;
 }
 
 .landing-value-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--landing-ice);
-  border: 1px solid #bae6fd;
-  border-radius: 14px;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #e0f2fe, #cffafe);
+  border: 1px solid #a5f3fc;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  color: var(--landing-blue);
+  color: #0891b2;
   font-size: 26px;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.landing-value-card:hover .landing-value-icon {
+  background: linear-gradient(135deg, #a5f3fc, #67e8f9);
+  transform: scale(1.08);
 }
 
 .landing-value-card h3 {
@@ -643,8 +667,25 @@
 }
 
 .landing-value-card p strong {
-  color: var(--landing-blue);
+  color: #0891b2;
   font-weight: 600;
+}
+
+/* Values CTA */
+.landing-values-cta {
+  text-align: center;
+  margin-top: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.landing-values-cta .landing-btn-primary {
+  background: linear-gradient(135deg, #0891b2, var(--landing-blue));
+  box-shadow: 0 4px 20px rgba(8, 145, 178, 0.30);
+}
+
+.landing-values-cta .landing-btn-primary:hover {
+  box-shadow: 0 8px 30px rgba(8, 145, 178, 0.45);
 }
 
 /* ============================================================
