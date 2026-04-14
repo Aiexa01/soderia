@@ -167,7 +167,23 @@ def _ensure_roles():
 
 
 def landing(request):
-    return render(request, 'landing.html')
+    import datetime
+    
+    anio_base = 1994
+    anios_experiencia = datetime.date.today().year - anio_base
+    anios_experiencia_redondeado = (anios_experiencia // 10) * 10
+    
+    cantidad_clientes = Client.objects.filter(activo=True).count()
+    camionetas_reparto = Camioneta.objects.filter(active=True).count()
+    entregas_realizadas = Pedido.objects.filter(estado=Pedido.Estados.ENTREGADO).count()
+    
+    ctx = {
+        'anios_experiencia': anios_experiencia_redondeado,
+        'cantidad_clientes': cantidad_clientes,
+        'camionetas_reparto': camionetas_reparto,
+        'entregas_realizadas': entregas_realizadas,
+    }
+    return render(request, 'landing.html', ctx)
 
 
 @login_required

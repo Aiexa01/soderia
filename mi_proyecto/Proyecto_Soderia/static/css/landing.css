@@ -832,29 +832,41 @@
   gap: 24px;
 }
 
-.landing-why-card {
-  border-radius: 16px;
-  overflow: hidden;
+.landing-pcard {
   background: var(--landing-white);
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e1e7ef;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
 
-.landing-why-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
+.landing-pcard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
 }
 
-.landing-why-card-img {
+.landing-pcard-img {
   width: 100%;
-  height: 260px;
-  object-fit: cover;
-  object-position: center;
+  height: 250px;
+  background: #f8fafc;
+  position: relative;
+  overflow: hidden;
 }
 
-.landing-why-card-body {
-  padding: 20px;
+.landing-pcard-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 30px;
+  transition: transform 0.5s ease;
+}
+
+.landing-pcard:hover .landing-pcard-img img {
+  transform: scale(1.08);
 }
 
 .landing-why-card-body h4 {
@@ -1026,7 +1038,14 @@
 
 .landing-contact-form button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+.landing-contact-form button:disabled {
+  background: #64748b;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ============================================================

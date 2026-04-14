@@ -1,4 +1,4 @@
-{% load static %}
+{% load static humanize %}
 <!doctype html>
 <html lang="es">
 
@@ -103,7 +103,7 @@
             <circle cx="12" cy="10" r="3" />
           </svg>
         </div>
-        <div class="landing-stat-number">30+</div>
+        <div class="landing-stat-number">{{ anios_experiencia }}+</div>
         <div class="landing-stat-label">Años de Experiencia</div>
       </div>
       <div class="landing-stat-item landing-animate landing-delay-2">
@@ -114,7 +114,7 @@
             <path d="M23 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8" />
           </svg>
         </div>
-        <div class="landing-stat-number">1000+</div>
+        <div class="landing-stat-number">{{ cantidad_clientes|intcomma }}</div>
         <div class="landing-stat-label">Clientes Satisfechos</div>
       </div>
       <div class="landing-stat-item landing-animate landing-delay-3">
@@ -126,7 +126,7 @@
             <circle cx="18.5" cy="18.5" r="2.5" />
           </svg>
         </div>
-        <div class="landing-stat-number">5</div>
+        <div class="landing-stat-number">{{ camionetas_reparto }}</div>
         <div class="landing-stat-label">Camionetas en Reparto</div>
       </div>
       <div class="landing-stat-item landing-animate landing-delay-4">
@@ -136,12 +136,13 @@
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
         </div>
-        <div class="landing-stat-number">98%</div>
-        <div class="landing-stat-label">Entregas a Tiempo</div>
+        <div class="landing-stat-number">{{ entregas_realizadas|intcomma }}</div>
+        <div class="landing-stat-label">Entregas Realizadas</div>
       </div>
     </div>
   </section>
 
+  
   <!-- ==================== ABOUT ==================== -->
   <section class="landing-about" id="nosotros">
     <h2 class="landing-section-title">Sobre Nosotros</h2>
@@ -167,163 +168,7 @@
       </div>
     </div>
   </section>
-
-  <!-- ==================== PRODUCTS ==================== -->
-  <section class="landing-products" id="productos">
-    <div class="landing-products-wrapper">
-      <div class="landing-products-header">
-        <!-- <span class="landing-products-tag">Catálogo</span> -->
-        <h2 class="landing-products-title">Nuestros Productos</h2>
-        <p class="landing-products-subtitle">
-          Elegí la calidad y pureza de nuestros productos.
-          <strong>¡Entrega a domicilio sin cargo!</strong>
-        </p>
-      </div>
-
-      <div class="landing-products-grid">
-        <!-- 1. Bidón Azul 10L -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/bidon-poli-12-pag-300x300.jpg' %}" alt="Bidón Azul 10L" loading="lazy" />
-            <span class="landing-pcard-badge">Retornable</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Bidón Azul 10 L</h3>
-            <p>Agua purificada en bidón retornable de 10 litros. Práctico y liviano para el hogar.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 2. Bidón Azul 20L -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/bidon 20 l.jpg' %}" alt="Bidón Azul 20L" loading="lazy" />
-            <span class="landing-pcard-badge">Retornable</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Bidón Azul 20 L</h3>
-            <p>Agua purificada en bidón retornable de 20 litros. Ideal para oficinas y familias.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 3. Baja en Sodio 10L -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/bajo sodio 12 l.jpg' %}" alt="Bidón Baja en Sodio 10L" loading="lazy" />
-            <span class="landing-pcard-badge badge-green">Baja en Sodio</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Baja en Sodio 10 L</h3>
-            <p>Agua con bajo contenido de sodio en bidón de 10 litros. Pensada para tu salud.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 4. Baja en Sodio 20L -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/bidon verde 20 lts.webp' %}" alt="Bidón Baja en Sodio 20L" loading="lazy" />
-            <span class="landing-pcard-badge badge-green">Baja en Sodio</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Baja en Sodio 20 L</h3>
-            <p>Agua con bajo contenido de sodio en bidón de 20 litros. Para toda la familia.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 3. Sifón Retornable -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/sifonRETORNABLE 1.5 LITROAS.png' %}" alt="Sifones de Soda Retornables" loading="lazy" />
-            <span class="landing-pcard-badge">Retornable</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Sifones de Soda</h3>
-            <p>Soda en sifón retornable de 650 cc y 1.5 L. El clásico de siempre, ahora en tu casa.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 4. No Retornable -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/botella de agua 500 ml.jpg' %}" alt="Agua No Retornable 500ml" loading="lazy" />
-            <span class="landing-pcard-badge badge-light">Descartable</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Agua No Retornable</h3>
-            <p>Botellas individuales de 500 ml. Perfectas para llevar y eventos.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 6. Dispenser Común -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/dispenser naturalñ.webp' %}" alt="Dispenser Natural" loading="lazy" />
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Dispenser Común</h3>
-            <p>Dispenser de mesa para bidón. Práctico, compacto y sin instalación eléctrica.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 7. Dispenser Frío Calor -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/Dispenser-FrioCalor.png' %}" alt="Dispenser Frío Calor" loading="lazy" />
-            <span class="landing-pcard-badge badge-red">Frío / Calor</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Dispenser Frío Calor</h3>
-            <p>Agua fría y caliente al instante. Ideal para oficinas, consultorios y hogares.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-
-        <!-- 8. Bidón Descartable -->
-        <div class="landing-pcard">
-          <div class="landing-pcard-img">
-            <img src="{% static 'images/Bidon-desc-8-lts-300x300.jpg' %}" alt="Bidón Descartable 8L" loading="lazy" />
-            <span class="landing-pcard-badge badge-light">Descartable</span>
-          </div>
-          <div class="landing-pcard-body">
-            <h3>Bidón Descartable 8 L</h3>
-            <p>Bidón descartable liviano y práctico. Sin necesidad de devolución.</p>
-            <a href="#contacto" class="landing-pcard-cta">Consultar</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA final -->
-      <div class="landing-products-cta-wrap">
-        <a href="https://wa.me/5493874393920?text=Hola%2C%20quiero%20consultar%20por%20sus%20productos"
-           target="_blank" rel="noopener"
-           class="landing-btn-primary landing-products-wa-btn">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
-          Pedí por WhatsApp
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== VALUES ==================== -->
-  <section class="landing-values" id="valores">
-    <!-- Subtle bubble SVGs as background decoration -->
-    <svg class="landing-values-bubbles" aria-hidden="true" viewBox="0 0 1200 600" preserveAspectRatio="none">
-      <circle cx="100" cy="480" r="60" fill="rgba(56,189,248,0.06)" />
-      <circle cx="250" cy="350" r="25" fill="rgba(56,189,248,0.05)" />
-      <circle cx="1050" cy="120" r="80" fill="rgba(56,189,248,0.05)" />
-      <circle cx="900" cy="450" r="35" fill="rgba(56,189,248,0.04)" />
-      <circle cx="600" cy="80" r="45" fill="rgba(56,189,248,0.04)" />
-      <circle cx="150" cy="150" r="18" fill="rgba(56,189,248,0.06)" />
-      <circle cx="1100" cy="350" r="22" fill="rgba(56,189,248,0.05)" />
-    </svg>
-
-    <h2 class="landing-section-title">Nuestros Valores</h2>
+  <h2 class="landing-section-title">Nuestros Valores</h2>
     <div class="landing-section-bar"></div>
 
     <div class="landing-values-grid">
@@ -367,16 +212,161 @@
       </div>
     </div>
 
-    <div class="landing-values-cta">
-      <a href="#contacto" class="landing-btn-primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" /></svg>
-        Pedí tu agua o soda
-      </a>
+  <!-- ==================== PRODUCTS ==================== -->
+  <section class="landing-products" id="productos">
+    <div class="landing-products-wrapper">
+      <div class="landing-products-header">
+        <!-- <span class="landing-products-tag">Catálogo</span> -->
+        <h2 class="landing-products-title">Nuestros Productos</h2>
+        <p class="landing-products-subtitle">
+          Elegí la calidad y pureza de nuestros productos.
+          <strong>¡Entrega a domicilio sin cargo!</strong>
+        </p>
+      </div>
+
+      <div class="landing-products-grid">
+        <!-- 1. Bidón Azul 10L -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/bidon-poli-12-pag-300x300.jpg' %}" alt="Bidón Azul 10L" loading="lazy" />
+            <span class="landing-pcard-badge">Retornable</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Bidón Azul 10 L</h3>
+            <p>Agua purificada en bidón retornable de 10 litros. Práctico y liviano para el hogar.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 2. Bidón Azul 20L -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/bidon 20 l.jpg' %}" alt="Bidón Azul 20L" loading="lazy" />
+            <span class="landing-pcard-badge">Retornable</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Bidón Azul 20 L</h3>
+            <p>Agua purificada en bidón retornable de 20 litros. Ideal para oficinas y familias.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 3. Baja en Sodio 10L -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/bajo sodio 12 l.jpg' %}" alt="Bidón Baja en Sodio 10L" loading="lazy" />
+            <span class="landing-pcard-badge badge-green">Baja en Sodio</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Baja en Sodio 10 L</h3>
+            <p>Agua con bajo contenido de sodio en bidón de 10 litros. Pensada para tu salud.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 4. Baja en Sodio 20L -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/bidon verde 20 lts.webp' %}" alt="Bidón Baja en Sodio 20L" loading="lazy" />
+            <span class="landing-pcard-badge badge-green">Baja en Sodio</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Baja en Sodio 20 L</h3>
+            <p>Agua con bajo contenido de sodio en bidón de 20 litros. Para toda la familia.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 3. Sifón Retornable -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/sifonRETORNABLE 1.5 LITROAS.png' %}" alt="Sifones de Soda Retornables" loading="lazy" />
+            <span class="landing-pcard-badge">Retornable</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Sifones de Soda</h3>
+            <p>Soda en sifón retornable de 650 cc y 1.5 L. El clásico de siempre, ahora en tu casa.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 4. No Retornable -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/botella de agua 500 ml.jpg' %}" alt="Agua No Retornable 500ml" loading="lazy" />
+            <span class="landing-pcard-badge badge-light">Descartable</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Agua No Retornable</h3>
+            <p>Botellas individuales de 500 ml. Perfectas para llevar y eventos.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 6. Dispenser Común -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/dispenser naturalñ.webp' %}" alt="Dispenser Natural" loading="lazy" />
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Dispenser Común</h3>
+            <p>Dispenser de mesa para bidón. Práctico, compacto y sin instalación eléctrica.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 7. Dispenser Frío Calor -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/Dispenser-FrioCalor.png' %}" alt="Dispenser Frío Calor" loading="lazy" />
+            <span class="landing-pcard-badge badge-red">Frío / Calor</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Dispenser Frío Calor</h3>
+            <p>Agua fría y caliente al instante. Ideal para oficinas, consultorios y hogares.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+
+        <!-- 8. Bidón Descartable -->
+        <div class="landing-pcard">
+          <div class="landing-pcard-img">
+            <img src="{% static 'images/Bidon-desc-8-lts-300x300.jpg' %}" alt="Bidón Descartable 8L" loading="lazy" />
+            <span class="landing-pcard-badge badge-light">Descartable</span>
+          </div>
+          <div class="landing-pcard-body">
+            <h3>Bidón Descartable 8 L</h3>
+            <p>Bidón descartable liviano y práctico. Sin necesidad de devolución.</p>
+            <!-- <a href="#contacto" class="landing-pcard-cta">Consultar</a> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA final
+      <div class="landing-products-cta-wrap">
+        <a href="https://wa.me/5493874393920?text=Hola%2C%20quiero%20consultar%20por%20sus%20productos"
+           target="_blank" rel="noopener"
+           class="landing-btn-primary landing-products-wa-btn">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
+          Pedí por WhatsApp
+        </a>
+      </div> -->
     </div>
+    <!-- ==================== VALUES ==================== -->
+
+      <!-- <div class="landing-values-cta">
+        <a href="#contacto" class="landing-btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" /></svg>
+          Pedí tu agua o soda
+        </a>
+      </div> -->
+
   </section>
 
+  
+
   <!-- ==================== WHY US ==================== -->
-  <section class="landing-why" id="por-que">
+  <!-- <section class="landing-why" id="por-que">
     <h2 class="landing-section-title">¿Por qué elegirnos?</h2>
     <div class="landing-section-bar"></div>
 
@@ -430,7 +420,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <!-- ==================== CONTACT ==================== -->
   <section class="landing-contact" id="contacto">

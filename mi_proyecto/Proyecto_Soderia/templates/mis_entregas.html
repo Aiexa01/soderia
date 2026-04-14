@@ -15,14 +15,14 @@
   <div class="grid">
     <section class="card">
       <h1>Mis entregas</h1>
-      {% if camioneta %}
-        <p>Camioneta asignada: {{ camioneta.nombre }} ({{ camioneta.patente }})</p>
+      {% if camioneta or is_admin %}
+        <p>Camioneta asignada: {% if is_admin %}Todas{% else %}{{ camioneta.nombre }} ({{ camioneta.patente }}){% endif %}</p>
         <h3>Pedidos actuales</h3>
         <div class="order-list">
           {% for pedido in pedidos %}
             <article class="order-card">
               <div class="order-main">
-                <div class="order-id">Pedido #{{ pedido.id }}</div>
+                <div class="order-id">Pedido #{{ pedido.id }}{% if is_admin and pedido.camioneta %} ({{ pedido.camioneta.nombre }}){% endif %}</div>
                 <div class="order-client">{{ pedido.cliente.name }}</div>
                 <div class="order-meta">
                   <span>Estado: {{ pedido.get_estado_display }}</span>
@@ -42,7 +42,7 @@
           {% for pedido in historial %}
             <article class="order-card">
               <div class="order-main">
-                <div class="order-id">Pedido #{{ pedido.id }}</div>
+                <div class="order-id">Pedido #{{ pedido.id }}{% if is_admin and pedido.camioneta %} ({{ pedido.camioneta.nombre }}){% endif %}</div>
                 <div class="order-client">{{ pedido.cliente.name }}</div>
                 <div class="order-meta">
                   <span>Estado: {{ pedido.get_estado_display }}</span>
