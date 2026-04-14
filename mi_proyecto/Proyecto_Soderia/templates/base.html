@@ -30,10 +30,12 @@
       </div>
       <div class="side-section">Menu principal</div>
       <nav class="side-nav">
+        {% if not is_encargado_stock %}
         <a class="side-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
           href="{% url 'home' %}">
           <span class="side-icon">🏠</span> Inicio
         </a>
+        {% endif %}
         {% if is_admin or is_eac %}
         <a class="side-link {% if request.resolver_match.url_name == 'clients_list' %}active{% endif %}"
           href="{% url 'clients_list' %}">
