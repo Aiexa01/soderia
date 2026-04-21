@@ -1,0 +1,655 @@
+/* ═══════════════════════════════════════════
+   LOGÍSTICA — CSS OPERATIVO
+   ═══════════════════════════════════════════ */
+
+/* ── Wrapper general ── */
+.logistica-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Cabecera ── */
+.logistica-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.logistica-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.logistica-fecha {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.logistica-header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Métricas ── */
+.logistica-metricas {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.logistica-metrica {
+  flex: 1 1 100px;
+  min-width: 90px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+  border-top: 3px solid #e2e8f0;
+}
+
+.logistica-metrica.pendiente  { border-top-color: #f59e0b; }
+.logistica-metrica.asignado   { border-top-color: #3b82f6; }
+.logistica-metrica.despachado { border-top-color: #8b5cf6; }
+.logistica-metrica.ruta       { border-top-color: #f97316; }
+.logistica-metrica.entregado  { border-top-color: #22c55e; }
+.logistica-metrica.devuelto   { border-top-color: #ef4444; }
+.logistica-metrica.tasa       { border-top-color: #06b6d4; }
+
+.logistica-metrica-num {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.logistica-metrica-label {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Secciones ── */
+.logistica-section {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+}
+
+.logistica-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logistica-badge {
+  background: #3b82f6;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  line-height: 1.6;
+}
+
+.logistica-hint {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: -8px 0 16px;
+}
+
+/* ── Camionetas ── */
+.logistica-camionetas {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.logistica-camioneta-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #fafafa;
+  transition: box-shadow 0.2s;
+}
+
+.logistica-camioneta-card:hover {
+  box-shadow: 0 6px 18px rgba(15,23,42,0.08);
+}
+
+.logistica-camioneta-card.en-ruta {
+  border-left: 4px solid #f97316;
+  background: #fff7ed;
+}
+
+.logistica-camioneta-card.disponible {
+  border-left: 4px solid #22c55e;
+}
+
+.logistica-camioneta-card.fuera {
+  border-left: 4px solid #94a3b8;
+  opacity: 0.75;
+}
+
+.logistica-cam-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.logistica-cam-nombre {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.logistica-cam-patente {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.logistica-cam-repartidor {
+  font-size: 0.83rem;
+  color: #475569;
+  margin-top: 2px;
+}
+
+.logistica-cam-estado {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.estado-disponible { background: #dcfce7; color: #15803d; }
+.estado-en_ruta    { background: #fef3c7; color: #b45309; }
+.estado-fuera      { background: #f1f5f9; color: #64748b; }
+.estado-creado     { background: #f1f5f9; color: #475569; }
+.estado-asignado   { background: #dbeafe; color: #1d4ed8; }
+.estado-despachado { background: #ede9fe; color: #6d28d9; }
+.estado-en_reparto { background: #fef3c7; color: #b45309; }
+.estado-entregado  { background: #dcfce7; color: #15803d; }
+.estado-devuelto   { background: #fee2e2; color: #b91c1c; }
+.estado-pagado     { background: #d1fae5; color: #065f46; }
+.estado-reintentar { background: #fef9c3; color: #92400e; border: 1px solid #fbbf24; }
+
+
+.logistica-cam-contadores {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.logistica-cam-cnt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+}
+
+.cnt-num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.cnt-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.logistica-cam-acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Pedidos pendientes / sin asignar ── */
+.logistica-pendientes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logistica-pendiente-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.logistica-pend-info {
+  flex: 1;
+}
+
+.logistica-pend-id {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.logistica-pend-cliente {
+  font-size: 0.93rem;
+  color: #0f172a;
+  margin-top: 1px;
+}
+
+.logistica-pend-meta {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.logistica-pend-acciones {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Métricas semana ── */
+.logistica-semana-cards {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.logistica-sem-card {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: center;
+  min-width: 160px;
+}
+
+.logistica-sem-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.logistica-sem-label {
+  font-size: 0.8rem;
+  color: #0369a1;
+  margin-top: 4px;
+}
+
+/* ── Alertas ── */
+.logistica-alert {
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.logistica-alert-info {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.logistica-alert-success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+/* ── DESPACHO ── */
+.despacho-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.despacho-pedido-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  transition: box-shadow 0.15s;
+}
+
+.despacho-pedido-card:hover {
+  box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+}
+
+.despacho-orden {
+  flex-shrink: 0;
+}
+
+.despacho-orden-input {
+  width: 52px;
+  text-align: center;
+  padding: 6px 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.despacho-pedido-info {
+  flex: 1;
+}
+
+.despacho-pedido-id {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.despacho-pedido-cliente {
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-top: 1px;
+}
+
+.despacho-pedido-cliente .hint {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.despacho-pedido-productos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.despacho-prod-tag {
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.despacho-pedido-total {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.despacho-notas {
+  margin-bottom: 16px;
+}
+
+.despacho-notas label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.despacho-notas textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #0f172a;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.despacho-acciones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── REPARTIDOR — Ruta del día ── */
+.repartidor-metricas {
+  justify-content: flex-start;
+}
+
+.ruta-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ruta-pedido-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.04);
+}
+
+/* Pedido con estado REINTENTAR: destaque en naranja */
+.ruta-pedido-reintentar {
+  border-left: 4px solid #f59e0b !important;
+  background: #fffbeb;
+}
+
+
+.ruta-pedido-num {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.ruta-num-reintentar {
+  background: #f59e0b;
+  font-size: 1rem;
+}
+
+
+.ruta-pedido-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ruta-pedido-cliente {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 1rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.ruta-estado {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.ruta-pedido-dir,
+.ruta-pedido-tel,
+.ruta-pedido-ref {
+  font-size: 0.83rem;
+  color: #475569;
+  margin-top: 2px;
+}
+
+.ruta-pedido-ref {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.ruta-pedido-productos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ruta-pedido-total {
+  font-size: 0.88rem;
+  color: #374151;
+  margin-top: 6px;
+}
+
+.ruta-pedido-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ruta-btn-entregar {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.ruta-btn-entregar:hover {
+  background: #16a34a;
+}
+
+.ruta-btn-devolver {
+  display: block;
+  padding: 7px 14px;
+  border: 1.5px solid #ef4444;
+  border-radius: 10px;
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.ruta-btn-devolver:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.ruta-btn-detalle {
+  display: block;
+  padding: 6px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 0.8rem;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.ruta-btn-detalle:hover {
+  background: #f1f5f9;
+}
+
+/* ── Historial colapsable ── */
+.ruta-historial {
+  margin: 0;
+}
+
+.ruta-historial summary {
+  list-style: none;
+  padding: 6px 0;
+  user-select: none;
+}
+
+.ruta-historial summary::marker { display: none; }
+
+.ruta-historial summary .logistica-section-title::before {
+  content: '▶ ';
+  font-size: 0.75em;
+}
+
+.ruta-historial[open] summary .logistica-section-title::before {
+  content: '▼ ';
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .logistica-camionetas {
+    grid-template-columns: 1fr;
+  }
+
+  .logistica-header {
+    flex-direction: column;
+  }
+
+  .ruta-pedido-card {
+    flex-direction: column;
+  }
+
+  .ruta-pedido-acciones {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .ruta-btn-entregar,
+  .ruta-btn-devolver,
+  .ruta-btn-detalle {
+    flex: 1;
+  }
+}

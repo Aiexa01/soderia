@@ -36,8 +36,8 @@
     <ul class="landing-nav-links" id="nav-links">
       <li><a href="#inicio">Inicio</a></li>
       <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#nuestros-valores">Nuestros Valores</a></li>
       <li><a href="#productos">Productos</a></li>
-      <li><a href="#por-que">¿Por qué elegirnos?</a></li>
       <li><a href="#contacto">Contacto</a></li>
       <li><a href="{% url 'login' %}" class="landing-nav-login">Iniciar Sesión</a></li>
     </ul>
@@ -168,50 +168,51 @@
       </div>
     </div>
   </section>
-  <h2 class="landing-section-title">Nuestros Valores</h2>
-    <div class="landing-section-bar"></div>
+  <section class="landing-about" id="nuestros-valores">
+    <h2 class="landing-section-title">Nuestros Valores</h2>
+      <div class="landing-section-bar"></div>
 
-    <div class="landing-values-grid">
-      <!-- Pureza Garantizada -->
-      <div class="landing-value-card">
-        <div class="landing-value-icon">
-          <!-- Water drop icon -->
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
-          </svg>
+      <div class="landing-values-grid">
+        <!-- Pureza Garantizada -->
+        <div class="landing-value-card">
+          <div class="landing-value-icon">
+            <!-- Water drop icon -->
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+            </svg>
+          </div>
+          <h3>Pureza Garantizada</h3>
+          <p>Sometemos nuestra agua a procesos de <strong>filtrado y purificación</strong> de última tecnología para asegurar un sabor liviano y libre de impurezas en cada gota.</p>
         </div>
-        <h3>Pureza Garantizada</h3>
-        <p>Sometemos nuestra agua a procesos de <strong>filtrado y purificación</strong> de última tecnología para asegurar un sabor liviano y libre de impurezas en cada gota.</p>
-      </div>
 
-      <!-- Puntualidad en tu Puerta -->
-      <div class="landing-value-card">
-        <div class="landing-value-icon">
-          <!-- Truck / delivery icon -->
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="1" y="3" width="15" height="13" rx="2" />
-            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-            <circle cx="5.5" cy="18.5" r="2.5" />
-            <circle cx="18.5" cy="18.5" r="2.5" />
-          </svg>
+        <!-- Puntualidad en tu Puerta -->
+        <div class="landing-value-card">
+          <div class="landing-value-icon">
+            <!-- Truck / delivery icon -->
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13" rx="2" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+          </div>
+          <h3>Puntualidad en tu Puerta</h3>
+          <p>Sabemos que el agua es vital. Por eso, <strong>optimizamos nuestras rutas</strong> para que tu pedido de agua o soda llegue siempre a tiempo, sin demoras.</p>
         </div>
-        <h3>Puntualidad en tu Puerta</h3>
-        <p>Sabemos que el agua es vital. Por eso, <strong>optimizamos nuestras rutas</strong> para que tu pedido de agua o soda llegue siempre a tiempo, sin demoras.</p>
-      </div>
 
-      <!-- Compromiso Familiar -->
-      <div class="landing-value-card">
-        <div class="landing-value-icon">
-          <!-- Heart in hand / care icon -->
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.4 4.6a5.5 5.5 0 00-7.8 0L12 5.2l-.6-.6a5.5 5.5 0 00-7.8 7.8l.6.6L12 20.8l7.8-7.8.6-.6a5.5 5.5 0 000-7.8z" />
-          </svg>
+        <!-- Compromiso Familiar -->
+        <div class="landing-value-card">
+          <div class="landing-value-icon">
+            <!-- Heart in hand / care icon -->
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.4 4.6a5.5 5.5 0 00-7.8 0L12 5.2l-.6-.6a5.5 5.5 0 00-7.8 7.8l.6.6L12 20.8l7.8-7.8.6-.6a5.5 5.5 0 000-7.8z" />
+            </svg>
+          </div>
+          <h3>Compromiso Familiar</h3>
+          <p>Como empresa local, <strong>cuidamos a tu familia</strong> como a la nuestra, garantizando envases sanitizados y un servicio amable en cada entrega.</p>
         </div>
-        <h3>Compromiso Familiar</h3>
-        <p>Como empresa local, <strong>cuidamos a tu familia</strong> como a la nuestra, garantizando envases sanitizados y un servicio amable en cada entrega.</p>
       </div>
-    </div>
-
+  </section>
   <!-- ==================== PRODUCTS ==================== -->
   <section class="landing-products" id="productos">
     <div class="landing-products-wrapper">
@@ -307,6 +308,7 @@
         <div class="landing-pcard">
           <div class="landing-pcard-img">
             <img src="{% static 'images/dispenser naturalñ.webp' %}" alt="Dispenser Natural" loading="lazy" />
+            <span class="landing-pcard-badge badge-light">Templado</span>
           </div>
           <div class="landing-pcard-body">
             <h3>Dispenser Común</h3>
@@ -430,6 +432,7 @@
       <p class="landing-contact-subtitle">
         ¿Necesitás soda o agua? Contactanos y te asesoramos sin compromiso.
       </p>
+
       <div class="landing-contact-grid">
         <div class="landing-contact-info">
           <div class="landing-contact-item">
@@ -486,12 +489,25 @@
         </div>
 
         <form class="landing-contact-form" id="contact-form">
+          <select name="motivo" required>
+            <option value="CLIENTE" >Quiero ser cliente</option>
+            <option value="GENERAL" selected>Hacer una consulta</option>
+          </select>
           <input type="text" name="nombre" placeholder="Tu nombre completo" required />
           <input type="email" name="email" placeholder="Tu email" required />
           <input type="tel" name="telefono" placeholder="Tu teléfono" required />
           <textarea rows="4" name="mensaje" placeholder="Describí lo que necesitás..." required></textarea>
-          <button type="submit" id="contact-submit-btn"> Enviar Consulta</button>
+          <button type="submit" id="contact-submit-btn">Enviar Consulta</button>
         </form>
+      </div>
+
+      <!-- ── Existing client? WhatsApp link ── -->
+      <div class="landing-ya-cliente">
+        <span>¿Ya sos cliente y tenés un problema con tu pedido?</span>
+        <a href="https://wa.me/5493874393920?text=Hola%2C%20soy%20cliente%20y%20necesito%20ayuda%20con%20mi%20pedido" target="_blank" rel="noopener">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
+          Escribinos por WhatsApp
+        </a>
       </div>
     </div>
   </section>
@@ -565,6 +581,7 @@
         }, 4000);
       }
 
+      // ── Contact form submission ──
       var contactForm = document.getElementById('contact-form');
       var submitBtn = document.getElementById('contact-submit-btn');
 
@@ -577,6 +594,7 @@
           nombre: contactForm.nombre.value,
           email: contactForm.email.value,
           telefono: contactForm.telefono.value,
+          motivo: contactForm.motivo.value,
           mensaje: contactForm.mensaje.value,
         };
 
@@ -599,7 +617,7 @@
           })
           .finally(function () {
             submitBtn.disabled = false;
-            submitBtn.textContent = ' Enviar Consulta';
+            submitBtn.textContent = 'Enviar Consulta';
           });
       });
     })();

@@ -1,0 +1,23 @@
+
+@media (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .side-menu {
+    border-right: none;
+    border-bottom: 1px solid #e0edf3;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .users-grid {
+      grid-template-columns: 1fr;
+  }
+
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+}

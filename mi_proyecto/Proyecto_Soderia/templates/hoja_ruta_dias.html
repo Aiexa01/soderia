@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Hoja de Ruta — {{ camioneta.nombre }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta ghost" href="{% url 'logistica_panel' %}">← Volver a Logística</a>
+{% endblock %}
+
+{% block content %}
+<div class="logistica-wrapper">
+
+  <!-- ── CABECERA ── -->
+  <div class="logistica-header">
+    <div>
+      <h1 class="logistica-title">📋 Hoja de Ruta</h1>
+      <div class="logistica-fecha">
+        <strong>{{ camioneta.nombre }}</strong>
+        <span class="logistica-cam-patente">{{ camioneta.patente }}</span>
+        {% if camioneta.repartidor %}
+          &nbsp;·&nbsp; 🧑‍✈️ {{ camioneta.repartidor.get_full_name|default:camioneta.repartidor.username }}
+        {% endif %}
+      </div>
+    </div>
+    <div class="logistica-header-actions">
+      <a class="cta ghost" href="{% url 'logistica_despacho' camioneta.id %}">🚚 Armar despacho</a>
+      <a class="cta ghost" href="{% url 'stock_camioneta' camioneta.id %}">📦 Stock</a>
+    </div>
+  </div>
+
+  <!-- ── LISTA DE DÍAS ── -->
+  <section class="logistica-section">
+    <h2 class="logistica-section-title">
+      Días de reparto
+      <span class="logistica-badge">{{ dias|length }}</span>
+    </h2>
+
+    {% if dias %}
+      <div class="hr-dias-lista">
+        {% for dia in dias %}
+        <article class="hr-dia-card hr-dia-{{ dia.visual }}">
+
+          <!-- Indicador visual + fecha -->
+          <div class="hr-dia-header">
+            <div class="hr-dia-fecha-wrap">
+              <span class="hr-dia-fecha">{{ dia.fecha|date:"d/m/Y" }}</span>
+              <span class="hr-dia-diasem">{{ dia.fecha|date:"l" }}</span>
+            </div>
+            <div class="hr-dia-badges">
+              {% if dia.visual == 'completo' %}
+                <span class="hr-badge hr-badge-completo">✅ Completado</span>
+              {% elif dia.visual == 'problemas' %}
+                <span class="hr-badge hr-badge-problemas">⚠️ Con devoluciones</span>
+              {% elif dia.visual == 'en_ruta' %}
+                <span class="hr-badge hr-badge-en_ruta">🟡 En ruta</span>
+              {% elif dia.visual == 'abierto' %}
+                <span class="hr-badge hr-badge-abierto">🔵 Abierto</span>
+              {% else %}
+                <span class="hr-badge hr-badge-cerrado">⬜ Cerrado</span>
+              {% endif %}
+              <span class="hr-badge hr-badge-despacho">Desp. #{{ dia.despacho.id }}</span>
+            </div>
+          </div>
+
+          <!-- Contadores -->
+          <div class="hr-dia-contadores">
+            <div class="hr-cnt">
+              <span class="hr-cnt-num">{{ dia.total }}</span>
+              <span class="hr-cnt-label">Total</span>
+            </div>
+            <div class="hr-cnt hr-cnt-entregado">
+              <span class="hr-cnt-num">{{ dia.entregados }}</span>
+              <span class="hr-cnt-label">Entregados</span>
+            </div>
+            {% if dia.en_ruta %}
+            <div class="hr-cnt hr-cnt-ruta">
+              <span class="hr-cnt-num">{{ dia.en_ruta }}</span>
+              <span class="hr-cnt-label">En ruta</span>
+            </div>
+            {% endif %}
+            {% if dia.devueltos %}
+            <div class="hr-cnt hr-cnt-devuelto">
+              <span class="hr-cnt-num">{{ dia.devueltos }}</span>
+              <span class="hr-cnt-label">Devueltos</span>
+            </div>
+            {% endif %}
+            {% if dia.asignados %}
+            <div class="hr-cnt hr-cnt-asignado">
+              <span class="hr-cnt-num">{{ dia.asignados }}</span>
+              <span class="hr-cnt-label">Asignados</span>
+            </div>
+            {% endif %}
+            <div class="hr-cnt hr-cnt-facturado">
+              <span class="hr-cnt-num hr-cnt-num-facturado" style="color:#16a34a;">${{ dia.cobrado|floatformat:0 }}</span>
+              <span class="hr-cnt-label">Cobrado</span>
+            </div>
+            {% if dia.pendiente_cobro %}
+            <div class="hr-cnt">
+              <span class="hr-cnt-num hr-cnt-num-facturado" style="color:#ea580c;">${{ dia.pendiente_cobro|floatformat:0 }}</span>
+              <span class="hr-cnt-label">Pendiente</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Acción -->
+          <div class="hr-dia-accion">
+            <a class="cta" href="{% url 'hoja_ruta_pedidos' camioneta.id dia.despacho.id %}">
+              Ver pedidos del día →
+            </a>
+          </div>
+
+        </article>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <div class="empty-state-premium">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📭</div>
+        <h3>Sin días de reparto registrados</h3>
+        <p>Creá el primer despacho para {{ camioneta.nombre }} para comenzar a ver el historial.</p>
+        <a class="cta" href="{% url 'logistica_despacho' camioneta.id %}">🚚 Armar despacho</a>
+      </div>
+    {% endif %}
+
+  </section>
+
+</div>
+{% endblock %}

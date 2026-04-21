@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Despacho — {{ camioneta.nombre }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  {% if is_admin %}
+  <a class="cta ghost" href="{% url 'logistica_panel' %}">← Logística</a>
+  {% else %}
+  <a class="cta ghost" href="{% url 'mis_entregas' %}">← Mis entregas</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="logistica-wrapper">
+
+  <!-- CABECERA -->
+  <div class="logistica-header">
+    <div>
+      <h1 class="logistica-title">Armar despacho</h1>
+      <span class="logistica-fecha">
+        🚚 {{ camioneta.nombre }} ({{ camioneta.patente }})
+        {% if camioneta.repartidor %}
+          · {{ camioneta.repartidor.get_full_name|default:camioneta.repartidor.username }}
+        {% endif %}
+        — {{ hoy|date:"d/m/Y" }}
+      </span>
+    </div>
+  </div>
+
+  <!-- ERROR (doble despacho, sin pedidos, etc.) -->
+  {% if error %}
+  <div class="logistica-alert" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;">
+    ⚠️ {{ error }}
+  </div>
+  {% endif %}
+
+  <!-- ERROR DE STOCK -->
+  {% if errores_stock %}
+  <div class="logistica-alert" style="background:#fff7ed; color:#c2410c; border:1px solid #fdba74;">
+    <strong>⛔ Stock insuficiente para confirmar el despacho:</strong>
+    <ul style="margin: 8px 0 0 18px; padding:0; font-size:0.9rem;">
+      {% for err in errores_stock %}
+        <li>{{ err }}</li>
+      {% endfor %}
+    </ul>
+    <p style="margin-top:8px; font-size:0.85rem;">
+      Cargá stock al depósito o a la camioneta antes de continuar.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- ÉXITO: orden por proximidad aplicado -->
+  {% if orden_aplicado %}
+  <div class="logistica-alert logistica-alert-success">
+    ✅ <strong>Ruta reordenada por proximidad</strong> — zona → barrio → calle → número.
+    Revisá el orden y ajustá si necesitás. Después guardá el despacho.
+  </div>
+  {% endif %}
+
+  <!-- ═══ ESTADO: DESPACHO ABIERTO (en preparación) ═══ -->
+  {% if despacho_activo and despacho_activo.estado == "ABIERTO" %}
+  <section class="logistica-section">
+    <h2 class="logistica-section-title">
+      📋 Despacho #{{ despacho_activo.id }} — En preparación
+      <span class="logistica-cam-estado estado-asignado">PREPARANDO</span>
+    </h2>
+    <p class="logistica-hint">
+      El despacho está armado con {{ despacho_activo.total_pedidos }} pedidos.
+      Cuando la camioneta esté lista para salir, confirmá la salida.
+    </p>
+
+    {% if pedidos_despacho %}
+    <div class="despacho-lista">
+      {% for item in pedidos_despacho %}
+      <article class="despacho-pedido-card">
+        <div class="despacho-orden" style="width:28px; height:28px; background:#3b82f6; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;">
+          {{ item.orden_entrega }}
+        </div>
+        <div class="despacho-pedido-info">
+          <div class="despacho-pedido-id">Pedido #{{ item.pedido.id }}</div>
+          <div class="despacho-pedido-cliente">
+            <strong>{{ item.pedido.cliente.name }}</strong>
+            {% if item.pedido.cliente.direccion %}
+              <span class="hint">{{ item.pedido.cliente.direccion }}</span>
+            {% endif %}
+            <div style="color: #ef4444; font-weight: 600; font-size: 0.75rem; margin-top:2px;">
+              🔴 Sin entregar (Hace {{ item.pedido.created_at|timesince }})
+            </div>
+          </div>
+          <div class="despacho-pedido-productos">
+            {% for det in item.pedido.detalles.all %}
+              <span class="despacho-prod-tag">{{ det.producto.nombre }} ×{{ det.cantidad }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="despacho-pedido-total">${{ item.pedido.total }}</div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ACCIÓN: Confirmar salida -->
+    <div class="despacho-acciones" style="margin-top:20px;">
+      <form method="post"
+            onsubmit="return confirm('¿Confirmar salida de {{ camioneta.nombre }}? Se enviará la camioneta a ruta y los pedidos pasarán a EN REPARTO.');">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="confirmar_salida" />
+        <button type="submit" class="cta" style="background:#f97316;">
+          🚛 Confirmar salida — {{ despacho_activo.total_pedidos }} pedidos
+        </button>
+      </form>
+      <form method="post" action="{% url 'logistica_cerrar_despacho' despacho_activo.id %}" 
+            onsubmit="return confirm('¿Cancelar esta ruta y devolver pedidos a asignados?');">
+        {% csrf_token %}
+        <button type="submit" class="cta ghost" style="color:#ef4444; border-color:#ef4444;">
+          🚫 Cancelar y cerrar preparación
+        </button>
+      </form>
+      {% if is_admin %}
+      <a class="cta ghost" href="{% url 'logistica_panel' %}">Volver al panel</a>
+      {% else %}
+      <a class="cta ghost" href="{% url 'mis_entregas' %}">Volver a mis entregas</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- ═══ ESTADO: DESPACHO EN RUTA ═══ -->
+  {% elif despacho_activo and despacho_activo.estado == "EN_RUTA" %}
+  <div class="logistica-alert logistica-alert-info">
+    <strong>🚛 Camioneta en ruta</strong> — Despacho #{{ despacho_activo.id }}
+    con {{ despacho_activo.total_pedidos }} pedidos en el camión.
+  </div>
+  
+  <section class="logistica-section">
+    <h2 class="logistica-section-title">Fin del recorrido</h2>
+    <p class="logistica-hint">
+      Si ya terminaste tu recorrido por hoy, podés cerrar la ruta. 
+      Los pedidos que no hayas entregado serán reprogramados automáticamente para el día siguiente.
+    </p>
+    <div class="despacho-acciones" style="margin-top:20px;">
+      <form method="post" action="{% url 'logistica_cerrar_despacho' despacho_activo.id %}" 
+            onsubmit="return confirm('¿Estás seguro de finalizar la ruta? Todo lo no entregado pasará a mañana.');">
+        {% csrf_token %}
+        <button type="submit" class="cta main" style="background:#ef4444;">
+          ✓ Finalizar y Cerrar Ruta
+        </button>
+      </form>
+      {% if is_admin %}
+      <a class="cta ghost" href="{% url 'logistica_panel' %}">Volver al panel</a>
+      {% else %}
+      <a class="cta ghost" href="{% url 'mis_entregas' %}">Volver a mis entregas</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- ═══ ESTADO: SIN DESPACHO (armar uno nuevo) ═══ -->
+  {% elif pedidos_asignados %}
+  <section class="logistica-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+      <h2 class="logistica-section-title" style="margin:0;">
+        Pedidos a despachar
+        <span class="logistica-badge">{{ pedidos_asignados.count }}</span>
+      </h2>
+      <!-- Botón sugerir orden por proximidad -->
+      <form method="post" style="margin:0;">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="sugerir_orden" />
+        <button type="submit" class="cta ghost"
+                style="font-size:0.82rem; padding:6px 12px;"
+                title="Reordena automáticamente por zona → barrio → calle → número de puerta">
+          📍 Sugerir orden por zona
+        </button>
+      </form>
+    </div>
+    <p class="logistica-hint">
+      Ajustá el número de orden si necesitás cambiar la ruta.
+      Usá <strong>📍 Sugerir orden</strong> para que la ruta quede agrupada por barrio automáticamente.
+    </p>
+
+    <form method="post" id="despacho-form">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="guardar" />
+
+      <div class="despacho-lista" id="despacho-lista">
+        {% for pedido in pedidos_asignados %}
+        <article class="despacho-pedido-card" data-id="{{ pedido.id }}">
+          <div class="despacho-orden">
+            <input
+              type="number"
+              name="pedido_orden_num_{{ pedido.id }}"
+              class="despacho-orden-input"
+              value="{{ forloop.counter }}"
+              min="1"
+              max="{{ pedidos_asignados.count }}"
+              data-pedido="{{ pedido.id }}"
+            />
+            <input type="hidden" name="pedido_orden" value="{{ pedido.id }}" class="pedido-orden-hidden" />
+          </div>
+          <div class="despacho-pedido-info">
+            <div class="despacho-pedido-id">Pedido #{{ pedido.id }}</div>
+            <div class="despacho-pedido-cliente">
+              <strong>{{ pedido.cliente.name }}</strong>
+              {% if pedido.cliente.direccion %}
+                <span class="hint">{{ pedido.cliente.direccion }}{% if pedido.cliente.barrio %}, {{ pedido.cliente.barrio.nombre }}{% endif %}</span>
+              {% endif %}
+              {% if pedido.cliente.barrio %}
+              <span style="font-size:0.72rem; background:#e0f2fe; color:#0369a1; padding:1px 7px; border-radius:99px; display:inline-block; margin-top:4px;">
+                {% if pedido.cliente.barrio.zona %}{{ pedido.cliente.barrio.zona.nombre }} · {% endif %}{{ pedido.cliente.barrio.nombre }}
+              </span>
+              {% endif %}
+              <div style="color: #ef4444; font-weight: 600; font-size: 0.75rem; margin-top:4px;">
+                🔴 Sin entregar (Hace {{ pedido.created_at|timesince }})
+              </div>
+            </div>
+            <div class="despacho-pedido-productos">
+              {% for det in pedido.detalles.all %}
+                <span class="despacho-prod-tag">{{ det.producto.nombre }} ×{{ det.cantidad }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="despacho-pedido-total">${{ pedido.total }}</div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <div class="despacho-notas">
+        <label for="id_notas">Notas para el repartidor (opcional)</label>
+        <textarea id="id_notas" name="notas" rows="2" placeholder="Ej: Entregar primero el barrio norte..."></textarea>
+      </div>
+
+      <div class="despacho-acciones">
+        <button type="submit" class="cta" id="btn-guardar-despacho">
+          📋 Guardar despacho ({{ pedidos_asignados.count }} pedidos)
+        </button>
+        {% if is_admin %}
+        <a class="cta ghost" href="{% url 'logistica_panel' %}">Cancelar</a>
+        {% else %}
+        <a class="cta ghost" href="{% url 'mis_entregas' %}">Cancelar</a>
+        {% endif %}
+      </div>
+      <p class="logistica-hint" style="margin-top:8px;">
+        ℹ️ Guardar crea el despacho en preparación. La camioneta sale cuando confirmás la salida.
+      </p>
+    </form>
+  </section>
+
+  {% else %}
+  <div class="empty-state-premium">
+    <h3>No hay pedidos asignados a esta camioneta</h3>
+    <p>Asigná pedidos desde el panel o desde la lista de abajo.</p>
+  </div>
+  {% endif %}
+
+  <!-- AGREGAR PEDIDOS PENDIENTES INLINE -->
+  {% if pedidos_sin_asignar and not despacho_activo %}
+  <section class="logistica-section">
+    <h2 class="logistica-section-title">
+      Pedidos sin asignar — agregar a esta camioneta
+      <span class="logistica-badge">{{ pedidos_sin_asignar|length }}</span>
+    </h2>
+    <div class="logistica-pendientes">
+      {% for pedido in pedidos_sin_asignar %}
+      <article class="logistica-pendiente-card">
+        <div class="logistica-pend-info">
+          <div class="logistica-pend-id">Pedido #{{ pedido.id }}</div>
+          <div class="logistica-pend-cliente">
+            <strong>{{ pedido.cliente.name }}</strong>
+            {% if pedido.cliente.zona %} · {{ pedido.cliente.zona.nombre }}{% endif %}
+            <div style="color: #ef4444; font-weight: 600; font-size: 0.75rem; margin-top:4px;">
+              🔴 Sin entregar (Hace {{ pedido.created_at|timesince }})
+            </div>
+          </div>
+          <div class="logistica-pend-meta">{{ pedido.created_at|date:"d/m H:i" }}</div>
+        </div>
+        <div class="logistica-pend-acciones">
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="asignar_pedido" />
+            <input type="hidden" name="pedido_id" value="{{ pedido.id }}" />
+            <button type="submit" class="cta ghost">+ Agregar</button>
+          </form>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}
