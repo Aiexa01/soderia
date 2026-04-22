@@ -459,7 +459,7 @@ class PedidoCreateForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['precio_unitario'].widget.attrs['readonly'] = True
         self.fields['producto'].queryset = Producto.objects.filter(active=True).order_by('nombre')
-        self.fields['producto'].label_from_instance = lambda obj: f'{obj.nombre} - ${obj.precio}'
+        self.fields['producto'].label_from_instance = lambda obj: obj.nombre
         producto_inicial = None
         if self.is_bound:
             producto_id = self.data.get('producto')
@@ -833,7 +833,13 @@ def orders_create(request):
             return redirect('orders_detail', order_id=pedido.id)
     else:
         form = PedidoCreateForm()
-    context = {'form': form, 'title': 'Nuevo pedido'}
+    
+    productos_activos = Producto.objects.filter(active=True)
+    context = {
+        'form': form, 
+        'title': 'Nuevo pedido',
+        'productos': productos_activos
+    }
     context.update(_role_context(request.user))
     return render(request, 'orders_form.html', context)
 

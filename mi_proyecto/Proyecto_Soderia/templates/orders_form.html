@@ -20,7 +20,15 @@
         {{ form.cliente.errors }}
 
         <label for="{{ form.producto.id_for_label }}">Producto</label>
-        {{ form.producto }}
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            {{ form.producto }}
+          </div>
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 500; cursor: pointer; white-space: nowrap;">
+            <input type="checkbox" name="es_retornable" style="width: 18px; height: 18px;">
+            ¿Es retornable?
+          </label>
+        </div>
         {{ form.producto.errors }}
 
         <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
@@ -53,6 +61,12 @@
       var subtotal = document.getElementById("id_subtotal");
       if (!producto || !precio || !cantidad || !subtotal) return;
 
+      var preciosMap = {
+        {% for p in productos %}
+        "{{ p.id }}": "{{ p.precio }}".replace(",", "."),
+        {% endfor %}
+      };
+
       function updateSubtotal() {
         var precioValue = parseFloat(precio.value || "0");
         var cantidadValue = parseInt(cantidad.value || "0", 10);
@@ -61,20 +75,15 @@
       }
 
       function updatePrice() {
-        var option = producto.options[producto.selectedIndex];
-        precio.value = option ? (option.getAttribute("data-precio") || "") : "";
+        var val = producto.value;
+        precio.value = preciosMap[val] || "";
         updateSubtotal();
       }
 
-      Array.prototype.forEach.call(producto.options, function (option) {
-        if (!option.value) return;
-        if (!option.getAttribute("data-precio") && option.textContent.indexOf(" - $") > -1) {
-          option.setAttribute("data-precio", option.textContent.split(" - $").pop().trim());
-        }
-      });
-
       producto.addEventListener("change", updatePrice);
       cantidad.addEventListener("input", updateSubtotal);
+      
+      // Initialize on load
       updatePrice();
     })();
   </script>
