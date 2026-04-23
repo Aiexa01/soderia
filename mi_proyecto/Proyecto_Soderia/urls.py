@@ -64,4 +64,5 @@ urlpatterns = [
     path('consultas/<int:consulta_id>/', views.consulta_detail, name='consulta_detail'),
     path('consultas/<int:consulta_id>/estado/', views.consulta_estado, name='consulta_estado'),
     path('consultas/<int:consulta_id>/convertir/', views.consulta_convertir, name='consulta_convertir'),
+    path('stock/transferir/', views.stock_transferir, name='stock_transferir'),
 ]

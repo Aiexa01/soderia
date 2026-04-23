@@ -13,11 +13,19 @@
       <p>Registra el pedido y su primer detalle. El precio se toma automaticamente desde el producto.</p>
       <form method="post">
         {% csrf_token %}
-        {{ form.non_field_errors }}
+        {% if form.non_field_errors %}
+          <div class="error-box">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
 
         <label for="{{ form.cliente.id_for_label }}">Cliente</label>
         {{ form.cliente }}
         {{ form.cliente.errors }}
+
+        <label for="{{ form.deposito.id_for_label }}">Seleccionar depósito</label>
+        {{ form.deposito }}
+        {{ form.deposito.errors }}
 
         <label for="{{ form.producto.id_for_label }}">Producto</label>
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">

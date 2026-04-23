@@ -383,6 +383,7 @@ class PedidoForm(forms.ModelForm):
 
 class PedidoCreateForm(forms.Form):
     cliente = forms.ModelChoiceField(queryset=Client.objects.all().order_by('name'))
+    deposito = forms.ModelChoiceField(queryset=Deposito.objects.filter(activo=True).order_by('nombre'), label="Seleccionar depósito")
     producto = forms.ModelChoiceField(queryset=Producto.objects.filter(active=True).order_by('nombre'))
     cantidad = forms.IntegerField(min_value=1)
     precio_unitario = forms.DecimalField(max_digits=10, decimal_places=2, required=False)
@@ -733,6 +734,7 @@ def orders_list(request):
         'date_to': date_to,
         'clientes': Client.objects.all().order_by('name'),
         'estado_choices': Pedido.Estados.choices,
+        'all_orders': Pedido.objects.select_related('cliente', 'camioneta').order_by('-created_at'),
     }
     context.update(_role_context(request.user))
     return render(request, 'orders_list.html', context)
@@ -744,26 +746,58 @@ def orders_create(request):
     if request.method == 'POST':
         form = PedidoCreateForm(request.POST)
         if form.is_valid():
-            pedido = Pedido(
-                cliente=form.cleaned_data['cliente'],
-                forma_pago=form.cleaned_data.get('forma_pago', ''),
-            )
-            pedido.creado_por = request.user
-            pedido.save()
-            detalle = PedidoDetalle.objects.create(
-                pedido=pedido,
-                producto=form.cleaned_data['producto'],
-                cantidad=form.cleaned_data['cantidad'],
-                precio_unitario=form.cleaned_data['precio_unitario'],
-            )
-            pedido.total = detalle.subtotal()
-            pedido.save(update_fields=['total'])
-            PedidoEstado.objects.create(
-                pedido=pedido,
-                estado=Pedido.Estados.CREADO,
-                usuario=request.user,
-            )
-            return redirect('orders_detail', order_id=pedido.id)
+            cliente = form.cleaned_data['cliente']
+            deposito = form.cleaned_data['deposito']
+            producto = form.cleaned_data['producto']
+            cantidad = form.cleaned_data['cantidad']
+            
+            # Verificar stock en deposito
+            stock_depo = StockDeposito.objects.filter(deposito=deposito, producto=producto).first()
+            if not stock_depo or stock_depo.cantidad_actual < cantidad:
+                form.add_error(None, f"No hay stock suficiente en el depósito {deposito.nombre}. Disponible: {stock_depo.cantidad_actual if stock_depo else 0}")
+            else:
+                # Todo OK, procedemos
+                pedido = Pedido(
+                    cliente=cliente,
+                    deposito=deposito,
+                    forma_pago=form.cleaned_data.get('forma_pago', ''),
+                )
+                pedido.creado_por = request.user
+                pedido.save()
+                
+                detalle = PedidoDetalle.objects.create(
+                    pedido=pedido,
+                    producto=producto,
+                    cantidad=cantidad,
+                    precio_unitario=form.cleaned_data['precio_unitario'],
+                )
+                pedido.total = detalle.subtotal()
+                pedido.save(update_fields=['total'])
+                
+                # Descontar stock del deposito
+                stock_depo.cantidad_actual -= cantidad
+                stock_depo.save(update_fields=['cantidad_actual'])
+                
+                # Registrar movimiento de venta
+                StockMovimiento.objects.create(
+                    producto=producto,
+                    tipo=StockMovimiento.Tipos.VENTA,
+                    cantidad=cantidad,
+                    usuario=request.user,
+                    deposito=deposito,
+                    pedido=pedido
+                )
+                
+                # Opcional: Registrar movimiento de stock (aunque sea de depósito, podemos usar una lógica similar o crear otra tabla si fuera necesario, pero el usuario pidió que funcione)
+                # Como no hay una tabla StockMovimientoDeposito, podemos crearla o simplemente dejar el descuento.
+                # El usuario dijo "No importa si creas otra tablas intermedias".
+                
+                PedidoEstado.objects.create(
+                    pedido=pedido,
+                    estado=Pedido.Estados.CREADO,
+                    usuario=request.user,
+                )
+                return redirect('orders_detail', order_id=pedido.id)
     else:
         form = PedidoCreateForm()
     
@@ -1281,19 +1315,27 @@ def mi_camioneta(request):
 @login_required
 @user_passes_test(_can_manage_stock)
 def stock_general(request):
-    deposito = Deposito.objects.filter(activo=True).order_by('id').first()
+    depositos = Deposito.objects.filter(activo=True).order_by('id')
     camionetas = Camioneta.objects.select_related('repartidor').filter(active=True).order_by('nombre')
-    deposito_stock_qs = StockDeposito.objects.none()
-    if deposito:
-        deposito_stock_qs = deposito.stocks.select_related('producto').order_by('producto__nombre')
+    
+    # Preparar stock por deposito
+    stock_por_deposito = []
+    for dep in depositos:
+        qs = dep.stocks.select_related('producto').order_by('producto__nombre')
+        items = [
+            {
+                'item': item,
+                'status': _stock_status(item.cantidad_actual),
+            }
+            for item in qs
+        ]
+        stock_por_deposito.append({
+            'deposito': dep,
+            'stocks': items
+        })
 
-    deposito_stock = [
-        {
-            'item': item,
-            'status': _stock_status(item.cantidad_actual),
-        }
-        for item in deposito_stock_qs
-    ]
+    # Historial real de movimientos
+    historial = StockMovimiento.objects.select_related('producto', 'deposito', 'deposito_destino', 'camioneta', 'usuario').order_by('-created_at')[:50]
 
     stock_por_camioneta = {}
     stock_items = (
@@ -1303,7 +1345,7 @@ def stock_general(request):
     )
     for item in stock_items:
         stock_por_camioneta.setdefault(item.camioneta_id, []).append(item)
-
+ 
     camioneta_cards = []
     for camioneta in camionetas:
         items = stock_por_camioneta.get(camioneta.id, [])
@@ -1320,13 +1362,61 @@ def stock_general(request):
     puede_editar = _can_manage_stock(request.user)
 
     context = {
-        'deposito': deposito,
-        'deposito_stock': deposito_stock,
+        'depositos': depositos,
+        'stock_por_deposito': stock_por_deposito,
+        'all_productos': Producto.objects.filter(active=True).order_by('nombre'),
         'camioneta_cards': camioneta_cards,
-        'puede_editar': puede_editar,
+        'historial': historial,
+        'puede_editar': _can_manage_stock(request.user),
     }
     context.update(_role_context(request.user))
     return render(request, 'stock_general.html', context)
+
+
+@login_required
+@user_passes_test(_can_manage_stock)
+@require_POST
+def stock_transferir(request):
+    producto_id = request.POST.get('producto_id')
+    cantidad = int(request.POST.get('cantidad', 0))
+    dep_origen_id = request.POST.get('origen_id')
+    dep_destino_id = request.POST.get('destino_id')
+    
+    if not (producto_id and cantidad > 0 and dep_origen_id and dep_destino_id):
+        return JsonResponse({'success': False, 'error': 'Datos incompletos'})
+        
+    dep_origen = get_object_or_404(Deposito, pk=dep_origen_id)
+    dep_destino = get_object_or_404(Deposito, pk=dep_destino_id)
+    producto = get_object_or_404(Producto, pk=producto_id)
+    
+    # Validar stock origen
+    stock_origen = StockDeposito.objects.filter(deposito=dep_origen, producto=producto).first()
+    if not stock_origen or stock_origen.cantidad_actual < cantidad:
+        return JsonResponse({'success': False, 'error': 'Stock insuficiente en origen'})
+        
+    # Realizar transferencia
+    stock_origen.cantidad_actual -= cantidad
+    stock_origen.save()
+    
+    stock_destino, created = StockDeposito.objects.get_or_create(
+        deposito=dep_destino,
+        producto=producto,
+        defaults={'cantidad_actual': 0}
+    )
+    stock_destino.cantidad_actual += cantidad
+    stock_destino.save()
+    
+    # Registrar movimiento
+    StockMovimiento.objects.create(
+        producto=producto,
+        tipo=StockMovimiento.Tipos.TRANSFERENCIA,
+        cantidad=cantidad,
+        usuario=request.user,
+        deposito=dep_origen,
+        deposito_destino=dep_destino
+    )
+    
+    return JsonResponse({'success': True})
 
 
 @login_required
@@ -1388,7 +1478,12 @@ def stock_camioneta(request, camioneta_id):
 @login_required
 @user_passes_test(_can_manage_stock)
 def stock_deposito_cargar(request):
-    deposito = Deposito.objects.filter(activo=True).order_by('id').first()
+    deposito_id = request.POST.get('deposito_id')
+    if deposito_id:
+        deposito = get_object_or_404(Deposito, pk=deposito_id)
+    else:
+        deposito = Deposito.objects.filter(activo=True).order_by('id').first()
+        
     if not deposito:
         return redirect('stock_general')
 
@@ -1414,6 +1509,15 @@ def stock_deposito_cargar(request):
             )
             stock_item.cantidad_actual += qty
             stock_item.save(update_fields=['cantidad_actual'])
+
+            # Registrar movimiento
+            StockMovimiento.objects.create(
+                producto=producto,
+                tipo=StockMovimiento.Tipos.AJUSTE,
+                cantidad=qty,
+                usuario=request.user,
+                # Nota: Camioneta queda en null para movimientos de depósito
+            )
         return redirect('stock_general')
 
     deposito_stock_display = [

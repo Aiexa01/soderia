@@ -59,6 +59,12 @@
           <span class="side-icon">📦</span> Stock
         </a>
         {% endif %}
+        {% if is_repartidor or is_admin %}
+        <a class="side-link side-sublink {% if request.resolver_match.url_name == 'mi_stock' %}active{% endif %}"
+          href="{% url 'mi_stock' %}">
+          <span class="side-icon">📦</span> Stock asignado
+        </a>
+        {% endif %}
         {% if is_admin %}
         <a class="side-link {% if request.resolver_match.url_name == 'logistica_panel' %}active{% endif %}"
           href="{% url 'logistica_panel' %}">
@@ -72,18 +78,6 @@
         <a class="side-link" href="/servicios/"><span class="side-icon">🧰</span> Servicios tecnicos</a>
         {% endif %}
         {% if is_repartidor %}
-        <a class="side-link {% if request.resolver_match.url_name == 'mis_entregas' %}active{% endif %}"
-          href="{% url 'mis_entregas' %}">
-          <span class="side-icon">📍</span> Mis entregas
-        </a>
-        <a class="side-link {% if request.resolver_match.url_name == 'mi_camioneta' %}active{% endif %}"
-          href="{% url 'mi_camioneta' %}">
-          <span class="side-icon">🚐</span> Mi camioneta
-        </a>
-        <a class="side-link {% if request.resolver_match.url_name == 'mi_stock' %}active{% endif %}"
-          href="{% url 'mi_stock' %}">
-          <span class="side-icon">📦</span> Mi stock
-        </a>
         <a class="side-link" href="/servicios-asignados/"><span class="side-icon">🧾</span> Servicios asignados</a>
         {% endif %}
         {% if is_admin %}
@@ -100,6 +94,14 @@
           href="{% url 'camionetas_list' %}">
           <span class="side-icon">🚚</span> Camionetas
         </a>
+        {% endif %}
+        {% if is_repartidor or is_admin %}
+        <a class="side-link side-sublink {% if request.resolver_match.url_name == 'mi_camioneta' %}active{% endif %}"
+          href="{% url 'mi_camioneta' %}">
+          <span class="side-icon">🚐</span> Camionetas asignadas
+        </a>
+        {% endif %}
+        {% if is_admin %}
         <a class="side-link {% if request.resolver_match.url_name == 'productos_list' %}active{% endif %}"
           href="{% url 'productos_list' %}">
           <span class="side-icon">🧴</span> Productos

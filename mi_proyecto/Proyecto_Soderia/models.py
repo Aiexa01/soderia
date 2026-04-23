@@ -138,6 +138,7 @@ class Pedido(models.Model):
         MERCADOPAGO = 'mercadopago', 'Mercado Pago'
 
     cliente = models.ForeignKey(Client, on_delete=models.PROTECT, related_name='pedidos')
+    deposito = models.ForeignKey('Deposito', null=True, blank=True, on_delete=models.SET_NULL, related_name='pedidos')
     camioneta = models.ForeignKey(Camioneta, null=True, blank=True, on_delete=models.SET_NULL, related_name='pedidos')
     estado = models.CharField(max_length=20, choices=Estados.choices, default=Estados.CREADO)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -241,8 +242,13 @@ class StockMovimiento(models.Model):
         ENTREGA = 'ENTREGA', 'Entrega'
         DEVOLUCION = 'DEVOLUCION', 'Devolucion'
         AJUSTE = 'AJUSTE', 'Ajuste'
+        VENTA = 'VENTA', 'Venta'
+        TRANSFERENCIA = 'TRANSFERENCIA', 'Transferencia'
+        CARGA = 'CARGA', 'Carga'
 
-    camioneta = models.ForeignKey(Camioneta, on_delete=models.CASCADE, related_name='movimientos')
+    camioneta = models.ForeignKey(Camioneta, null=True, blank=True, on_delete=models.CASCADE, related_name='movimientos')
+    deposito = models.ForeignKey('Deposito', null=True, blank=True, on_delete=models.SET_NULL, related_name='movimientos')
+    deposito_destino = models.ForeignKey('Deposito', null=True, blank=True, on_delete=models.SET_NULL, related_name='movimientos_destino')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, related_name='movimientos')
     pedido = models.ForeignKey(Pedido, null=True, blank=True, on_delete=models.SET_NULL, related_name='movimientos')
     tipo = models.CharField(max_length=20, choices=Tipos.choices)
