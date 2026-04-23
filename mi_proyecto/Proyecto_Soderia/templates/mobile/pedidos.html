@@ -1,0 +1,40 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Pedidos Rápidos - Tres Cerritos{% endblock %}
+{% block header_title %}Pedidos del Día{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+  <h2 style="margin: 0; font-size: 1.2rem;">Últimos Pedidos</h2>
+  <a href="{% url 'mobile_pedido_crear' %}" class="btn btn-primary" style="width: auto; padding: 0 16px; height: 36px; border-radius: 18px; font-size: 0.875rem;">+ Crear</a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+  {% for pedido in pedidos %}
+    <div class="card" style="display: flex; flex-direction: column; gap: 8px; position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h3 style="margin: 0 0 4px 0; font-size: 1rem;">{{ pedido.cliente.name }}</h3>
+          <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">{{ pedido.created_at|date:"H:i" }} · #{{ pedido.id }}</p>
+        </div>
+        <span class="badge {% if pedido.estado == 'CREADO' %}badge-danger{% elif pedido.estado == 'ENTREGADO' or pedido.estado == 'PAGADO' %}badge-success{% else %}badge-warning{% endif %}">
+          {{ pedido.get_estado_display }}
+        </span>
+      </div>
+      
+      <div style="background: var(--bg-color); padding: 8px; border-radius: 6px; font-size: 0.875rem;">
+        {% for detalle in pedido.detalles.all %}
+          <div style="display: flex; justify-content: space-between;">
+            <span>{{ detalle.cantidad }}x {{ detalle.producto.nombre }}</span>
+            <span style="font-weight: 500;">${{ detalle.precio_unitario }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% empty %}
+    <div style="text-align: center; padding: 48px 16px;">
+      <p style="margin: 0; color: var(--text-muted);">No hay pedidos recientes.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -18,13 +18,6 @@
       <p>Completa la ficha del cliente para crear o actualizar la cuenta.</p>
       <form method="post" class="client-form">
         {% csrf_token %}
-        {% if form.non_field_errors %}
-          <div class="form-alert form-alert-error">
-            {% for error in form.non_field_errors %}
-              <p>⚠️ {{ error }}</p>
-            {% endfor %}
-          </div>
-        {% endif %}
         {% if consulta_id %}
           <input type="hidden" name="consulta_id" value="{{ consulta_id }}">
           <div class="form-alert form-alert-info">

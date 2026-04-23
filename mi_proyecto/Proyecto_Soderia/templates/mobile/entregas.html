@@ -1,0 +1,53 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Entregas - Tres Cerritos{% endblock %}
+{% block header_title %}Entregas Pendientes{% endblock %}
+
+{% block content %}
+  {% if pedidos %}
+    {% for pedido in pedidos %}
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <h3 style="margin:0; font-size: 1.1rem; color: var(--text-main);">{{ pedido.cliente.name }}</h3>
+            <p style="margin: 4px 0 0 0; font-size: 0.875rem; color: var(--text-muted);">{{ pedido.cliente.direccion|default:"Sin dirección" }}</p>
+            {% if pedido.cliente.barrio %}
+            <span class="badge" style="background: var(--bg-color); border: 1px solid var(--border); color: var(--text-muted); margin-top: 4px; display: inline-block;">{{ pedido.cliente.barrio.nombre }}</span>
+            {% endif %}
+          </div>
+          <span class="badge badge-info">#{{ pedido.id }}</span>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          {% for detalle in pedido.detalles.all %}
+            <div style="font-size: 0.875rem; margin-bottom: 4px;">
+              <span style="font-weight: 500;">{{ detalle.cantidad }}x</span> {{ detalle.producto.nombre }}
+            </div>
+          {% endfor %}
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
+          <!-- GPS Button -->
+          <a href="https://maps.google.com/?q={{ pedido.cliente.direccion|urlencode }}" target="_blank" class="btn btn-ghost" style="flex: 1; padding: 0 4px; font-size: 0.875rem;">
+            📍 Mapa
+          </a>
+          <a href="{% url 'mobile_entrega_operar' pedido.id %}" class="btn btn-primary" style="flex: 1; background-color: var(--status-warning); padding: 0 4px; font-size: 0.875rem;">
+            ⚙️ Ajustar
+          </a>
+          <form method="post" action="{% url 'mobile_entrega_rapida' pedido.id %}" style="flex: 1; display:flex;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0 4px; font-size: 0.875rem; background-color: var(--status-ok);" onclick="return confirm('¿Marcar como Entregado y Cobrado Efectivo Exacto?');">
+              🚀 Rápida
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align: center; padding: 48px 16px;">
+      <div style="font-size: 3rem; margin-bottom: 16px;">🎉</div>
+      <h3 style="margin: 0 0 8px 0; color: var(--text-main);">¡Todo listo!</h3>
+      <p style="margin: 0; color: var(--text-muted);">No tenés más entregas pendientes por hoy.</p>
+    </div>
+  {% endif %}
+{% endblock %}

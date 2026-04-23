@@ -44,26 +44,13 @@
         </select>
       </div>
       <div class="filter-group">
-        <label for="filter-motivo">Motivo</label>
-        <select name="motivo" id="filter-motivo">
-          <option value="all" {% if motivo == 'all' %}selected{% endif %}>Todos</option>
-          {% for val, label in motivo_choices %}
-            <option value="{{ val }}" {% if motivo == val %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="filter-group">
         <label for="filter-q">Buscar</label>
         <input type="text" name="q" id="filter-q" value="{{ query }}" placeholder="Nombre, email, teléfono...">
       </div>
-      <div class="filter-group">
       <button type="submit" class="cta">Filtrar</button>
-      </div>
-      <div class="filter-group">
-      {% if estado != 'all' or motivo != 'all' or query %}
+      {% if estado != 'all' or query %}
         <a href="{% url 'consultas_list' %}" class="cta ghost">Limpiar</a>
       {% endif %}
-      </div>
     </form>
   </div>
 
@@ -75,7 +62,9 @@
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Motivo</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Mensaje</th>
             <th>Fecha</th>
             <th>Estado</th>
             <th>Acciones</th>
@@ -87,16 +76,22 @@
             <td class="col-nombre">
               <strong>{{ c.nombre }}</strong>
             </td>
-            <td>
-              <span class="badge badge-motivo-{{ c.motivo|lower }}">{{ c.get_motivo_display }}</span>
+            <td class="col-telefono">
+              <a href="https://wa.me/549{{ c.telefono|cut:'-'|cut:' '|cut:'+' }}" target="_blank" rel="noopener"
+                 class="wa-link" title="Enviar WhatsApp">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
+                {{ c.telefono }}
+              </a>
             </td>
+            <td class="col-email">{{ c.email|default:"-" }}</td>
+            <td class="col-mensaje">{{ c.mensaje|truncatechars:60 }}</td>
             <td class="col-fecha">{{ c.created_at|date:"d/m/Y H:i" }}</td>
             <td>
               <span class="badge badge-{{ c.estado|lower }}">{{ c.get_estado_display }}</span>
             </td>
             <td class="col-acciones">
               <a href="{% url 'consulta_detail' c.pk %}" class="cta small">Ver</a>
-              {% if c.estado != 'CONVERTIDA' and c.estado != 'DESCARTADA' and c.telefono not in existing_phones %}
+              {% if c.estado != 'CONVERTIDA' and c.estado != 'DESCARTADA' %}
                 <a href="{% url 'consulta_convertir' c.pk %}" class="cta small accent">Convertir</a>
               {% endif %}
             </td>

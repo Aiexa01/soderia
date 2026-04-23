@@ -1,0 +1,102 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Operar #{{ pedido.id }}{% endblock %}
+{% block header_title %}Entrega #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<div class="card" style="background-color: var(--primary); color: white; border: none;">
+  <h3 style="margin:0 0 4px 0;">{{ pedido.cliente.name }}</h3>
+  <p style="margin:0; opacity: 0.9; font-size: 0.875rem;">{{ pedido.cliente.direccion|default:"Sin dirección" }}</p>
+</div>
+
+{% if errores %}
+  <div class="card" style="border-color: var(--status-critical); background-color: #FEF2F2;">
+    {% for error in errores %}
+      <p style="color: var(--status-critical); margin: 4px 0; font-size: 0.875rem; font-weight: 500;">{{ error }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<form method="post" action="{% url 'mobile_entrega_operar' pedido.id %}">
+  {% csrf_token %}
+  
+  {% for detalle in detalles %}
+    <div class="card">
+      <h4 style="margin: 0 0 12px 0;">{{ detalle.producto.nombre }} <span style="font-weight: normal; color: var(--text-muted);">| Solicitado: {{ detalle.cantidad }}</span></h4>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 500;">Entregado:</span>
+          <div class="stepper">
+            <button type="button" class="stepper-btn" onclick="updateQty('entregado_{{ detalle.id }}', -1)">-</button>
+            <input type="number" id="entregado_{{ detalle.id }}" name="entregado_{{ detalle.id }}" value="{{ detalle.cantidad }}" min="0" max="{{ detalle.cantidad }}" class="stepper-input" readonly>
+            <button type="button" class="stepper-btn" onclick="updateQty('entregado_{{ detalle.id }}', 1, {{ detalle.cantidad }})">+</button>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 500;">Devuelto:</span>
+          <div class="stepper" style="background-color: #FEF3C7;">
+            <button type="button" class="stepper-btn" style="color: var(--status-warning);" onclick="updateQty('devuelto_{{ detalle.id }}', -1)">-</button>
+            <input type="number" id="devuelto_{{ detalle.id }}" name="devuelto_{{ detalle.id }}" value="0" min="0" max="{{ detalle.cantidad }}" class="stepper-input" readonly>
+            <button type="button" class="stepper-btn" style="color: var(--status-warning);" onclick="updateQty('devuelto_{{ detalle.id }}', 1, {{ detalle.cantidad }})">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  
+  <div class="card">
+    <label for="cobrado_efectivo" style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--status-ok);">💰 Cobrado Efectivo (Opcional)</label>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.2rem; font-weight: bold; color: var(--text-muted);">$</span>
+        <input type="number" step="0.01" id="cobrado_efectivo" name="cobrado_efectivo" placeholder="Ej: {{ pedido.total }}" style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1rem;">
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Total del pedido original: ${{ pedido.total }}</div>
+  </div>
+
+  <div class="card">
+    <label for="motivo" style="display: block; margin-bottom: 8px; font-weight: 500;">Motivo (opcional / si hay devolución)</label>
+    <input type="text" id="motivo" name="motivo" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1rem;">
+  </div>
+  
+  <div style="display: flex; gap: 12px; margin-top: 24px;">
+    <a href="{% url 'mobile_entregas' %}" class="btn btn-ghost" style="flex: 1;">Cancelar</a>
+    <button type="submit" class="btn btn-primary" style="flex: 2;">Confirmar</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQty(id, change, max = null) {
+  const input = document.getElementById(id);
+  let val = parseInt(input.value) || 0;
+  val += change;
+  if (val < 0) val = 0;
+  if (max !== null && val > max) val = max;
+  input.value = val;
+  
+  // Custom logic to balance
+  if (id.startsWith('entregado_')) {
+    const devueltoId = id.replace('entregado_', 'devuelto_');
+    const devInput = document.getElementById(devueltoId);
+    if(devInput) {
+       let devVal = parseInt(devInput.value) || 0;
+       if (val + devVal > max) {
+           devInput.value = max - val;
+       }
+    }
+  } else if (id.startsWith('devuelto_')) {
+    const entregadoId = id.replace('devuelto_', 'entregado_');
+    const entInput = document.getElementById(entregadoId);
+    if(entInput) {
+       let entVal = parseInt(entInput.value) || 0;
+       if (val + entVal > max) {
+           entInput.value = max - val;
+       }
+    }
+  }
+}
+</script>
+{% endblock %}

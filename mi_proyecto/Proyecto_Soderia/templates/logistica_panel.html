@@ -1,191 +1,50 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Logística del día{% endblock %}
+{% block title %}Logistica{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
 {% endblock %}
 
 {% block header_action %}
-  <a class="cta ghost" href="{% url 'home' %}">Volver</a>
+  <a class="cta" href="{% url 'home' %}">Volver</a>
 {% endblock %}
 
 {% block content %}
-<div class="logistica-wrapper">
-
-  <!-- ── CABECERA ── -->
-  <div class="logistica-header">
-    <div>
-      <h1 class="logistica-title">Logística del día</h1>
-      <span class="logistica-fecha">{{ hoy|date:"l d \d\e F" }}</span>
-    </div>
-    <div class="logistica-header-actions">
-      <a class="cta ghost" href="{% url 'orders_list' %}">Ver todos los pedidos</a>
-      <a class="cta ghost" href="{% url 'orders_create' %}">+ Nuevo pedido</a>
-    </div>
-  </div>
-
-  <!-- ── MÉTRICAS GLOBALES ── -->
-  <div class="logistica-metricas">
-    <div class="logistica-metrica pendiente">
-      <div class="logistica-metrica-num">{{ metricas_hoy.pendientes }}</div>
-      <div class="logistica-metrica-label">Sin asignar</div>
-    </div>
-    <div class="logistica-metrica asignado">
-      <div class="logistica-metrica-num">{{ metricas_hoy.asignados }}</div>
-      <div class="logistica-metrica-label">Asignados</div>
-    </div>
-    <div class="logistica-metrica despachado">
-      <div class="logistica-metrica-num">{{ metricas_hoy.despachados }}</div>
-      <div class="logistica-metrica-label">Despachados</div>
-    </div>
-    <div class="logistica-metrica ruta">
-      <div class="logistica-metrica-num">{{ metricas_hoy.en_ruta }}</div>
-      <div class="logistica-metrica-label">En reparto</div>
-    </div>
-    <div class="logistica-metrica entregado">
-      <div class="logistica-metrica-num">{{ metricas_hoy.entregados }}</div>
-      <div class="logistica-metrica-label">Entregados</div>
-    </div>
-    <div class="logistica-metrica devuelto">
-      <div class="logistica-metrica-num">{{ metricas_hoy.devueltos }}</div>
-      <div class="logistica-metrica-label">Devueltos</div>
-    </div>
-    {% if metricas_hoy.tasa is not None %}
-    <div class="logistica-metrica tasa">
-      <div class="logistica-metrica-num">{{ metricas_hoy.tasa }}%</div>
-      <div class="logistica-metrica-label">Tasa entrega</div>
-    </div>
-    {% endif %}
-  </div>
-
-  <!-- ── CAMIONETAS ── -->
-  <section class="logistica-section">
-    <h2 class="logistica-section-title">Camionetas activas</h2>
-    {% if resumen_camionetas %}
-      <div class="logistica-camionetas">
-        {% for item in resumen_camionetas %}
-        <article class="logistica-camioneta-card {% if item.camioneta.estado == 'EN_RUTA' %}en-ruta{% elif item.camioneta.estado == 'FUERA' %}fuera{% else %}disponible{% endif %}">
-          <div class="logistica-cam-top">
-            <div class="logistica-cam-info">
-              <div class="logistica-cam-nombre">
-                {{ item.camioneta.nombre }}
-                <span class="logistica-cam-patente">{{ item.camioneta.patente }}</span>
-              </div>
-              <div class="logistica-cam-repartidor">
-                {% if item.camioneta.repartidor %}
-                  🧑‍✈️ {{ item.camioneta.repartidor.get_full_name|default:item.camioneta.repartidor.username }}
-                {% else %}
-                  <span class="hint">Sin repartidor asignado</span>
-                {% endif %}
-              </div>
+  <div class="grid logistica-grid">
+    <section class="card">
+      <h1>Logistica diaria</h1>
+      <p>Resumen por camioneta y estado de ruta.</p>
+      <div class="logistica-list">
+        {% for item in resumen %}
+          <article class="logistica-card">
+            <div>
+              <strong>{{ item.camioneta.nombre }}</strong>
+              <div class="hint">Patente: {{ item.camioneta.patente }}</div>
+              <div class="hint">Repartidor: {% if item.camioneta.repartidor %}{{ item.camioneta.repartidor.username }}{% else %}-{% endif %}</div>
             </div>
-            <span class="logistica-cam-estado estado-{{ item.camioneta.estado|lower }}">
-              {{ item.camioneta.get_estado_display }}
-            </span>
+            <div class="logistica-meta">
+              <span>Pedidos: {{ item.cantidad }}</span>
+              <span>En reparto: {{ item.en_ruta }}</span>
+              <span>Estado: {{ item.camioneta.get_estado_display }}</span>
+            </div>
+            <div class="logistica-actions">
+              <a class="cta ghost" href="{% url 'camionetas_edit' item.camioneta.id %}">Editar</a>
+              <a class="cta ghost" href="{% url 'orders_list' %}?camioneta={{ item.camioneta.id }}">Ver pedidos</a>
+            </div>
+          </article>
+        {% empty %}
+          <div class="empty-state-premium">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3>No hay camionetas cargadas</h3>
+            <p>Agrega una camioneta para organizar la logistica.</p>
+            <a class="cta-primary" href="{% url 'camionetas_create' %}">Crear camioneta</a>
           </div>
-
-          <div class="logistica-cam-contadores">
-            <div class="logistica-cam-cnt">
-              <span class="cnt-num">{{ item.asignados }}</span>
-              <span class="cnt-label">Asignados</span>
-            </div>
-            <div class="logistica-cam-cnt">
-              <span class="cnt-num">{{ item.despachados }}</span>
-              <span class="cnt-label">Despachados</span>
-            </div>
-            <div class="logistica-cam-cnt">
-              <span class="cnt-num">{{ item.entregados }}</span>
-              <span class="cnt-label">Entregados</span>
-            </div>
-            <div class="logistica-cam-cnt">
-              <span class="cnt-num">{{ item.devueltos }}</span>
-              <span class="cnt-label">Devueltos</span>
-            </div>
-          </div>
-
-          <div class="logistica-cam-acciones">
-            {% if item.despacho and item.despacho.estado != 'CERRADO' %}
-              <form method="post" action="{% url 'logistica_cerrar_despacho' item.despacho.id %}" onsubmit="return confirm('¿Cerrar el despacho de {{ item.camioneta.nombre }}?');">
-                {% csrf_token %}
-                <button type="submit" class="cta ghost">✓ Cerrar ruta</button>
-              </form>
-            {% elif not item.despacho or item.despacho.estado == 'CERRADO' %}
-              <a class="cta" href="{% url 'logistica_despacho' item.camioneta.id %}">
-                🚚 Armar despacho {% if item.asignados %}({{ item.asignados }}){% endif %}
-              </a>
-            {% endif %}
-            <a class="cta ghost" href="{% url 'hoja_ruta_dias' item.camioneta.id %}">📋 Ver hoja de ruta</a>
-            <a class="cta ghost" href="{% url 'stock_camioneta' item.camioneta.id %}">Stock</a>
-          </div>
-        </article>
         {% endfor %}
       </div>
-    {% else %}
-      <div class="empty-state-premium">
-        <h3>No hay camionetas activas</h3>
-        <p>Agregá una camioneta para organizar la logística.</p>
-        <a class="cta" href="{% url 'camionetas_create' %}">+ Nueva camioneta</a>
-      </div>
-    {% endif %}
-  </section>
-
-  <!-- ── PEDIDOS SIN ASIGNAR ── -->
-  {% if pedidos_sin_asignar %}
-  <section class="logistica-section">
-    <h2 class="logistica-section-title">
-      ⚠️ Pedidos sin asignar
-      <span class="logistica-badge">{{ pedidos_sin_asignar.count }}</span>
-    </h2>
-    <div class="logistica-pendientes">
-      {% for pedido in pedidos_sin_asignar %}
-      <article class="logistica-pendiente-card">
-        <div class="logistica-pend-info">
-          <div class="logistica-pend-id">Pedido #{{ pedido.id }}</div>
-          <div class="logistica-pend-cliente">
-            <strong>{{ pedido.cliente.name }}</strong>
-            {% if pedido.cliente.direccion %}- {{ pedido.cliente.direccion }}{% endif %}
-            <div style="color: #ef4444; font-weight: 600; font-size: 0.75rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.9rem;">🔴</span> Sin entregar (Hace {{ pedido.created_at|timesince }})
-            </div>
-          </div>
-          <div class="logistica-pend-meta">
-            {% if pedido.cliente.zona %}Zona: {{ pedido.cliente.zona.nombre }}{% endif %}
-            {% if pedido.cliente.barrio %} · {{ pedido.cliente.barrio.nombre }}{% endif %}
-            · {{ pedido.created_at|date:"H:i" }}
-          </div>
-        </div>
-        <div class="logistica-pend-acciones">
-          <form method="post" style="display: flex; gap: 8px;">
-            {% csrf_token %}
-            <input type="hidden" name="accion" value="asignar_rapido">
-            <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
-            <select name="camioneta_id" required style="padding: 6px; border-radius: 6px; border: 1px solid #ccc;">
-              <option value="">-- Elige una camioneta --</option>
-              {% for cam in camionetas_disponibles %}
-                <option value="{{ cam.id }}">{{ cam.nombre }}</option>
-              {% endfor %}
-            </select>
-            <button type="submit" class="cta">Asignar</button>
-          </form>
-        </div>
-      </article>
-      {% endfor %}
-    </div>
-  </section>
-  {% endif %}
-
-  <!-- ── MÉTRICAS SEMANA ── -->
-  <section class="logistica-section logistica-semana">
-    <h2 class="logistica-section-title">Esta semana</h2>
-    <div class="logistica-semana-cards">
-      <div class="logistica-sem-card">
-        <div class="logistica-sem-num">{{ entregados_semana }}</div>
-        <div class="logistica-sem-label">Pedidos entregados (7 días)</div>
-      </div>
-    </div>
-  </section>
-
-</div>
+    </section>
+  </div>
 {% endblock %}

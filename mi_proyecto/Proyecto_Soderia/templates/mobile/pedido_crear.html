@@ -1,0 +1,57 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Nuevo Pedido Rápido{% endblock %}
+{% block header_title %}Crear Pedido{% endblock %}
+
+{% block header_actions %}
+  <a href="{% url 'mobile_pedidos_list' %}" style="color: white; text-decoration: none; font-size: 0.875rem;">Cancelar</a>
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'mobile_pedido_crear' %}">
+  {% csrf_token %}
+  
+  <div class="card">
+    <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Seleccionar Cliente</h3>
+    <select name="cliente" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;">
+      <option value="">-- Buscar / Seleccionar --</option>
+      {% for cliente in clientes %}
+        <option value="{{ cliente.id }}">{{ cliente.name }} ({{ cliente.direccion|default:"Sin dir." }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  
+  <div class="card">
+    <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Seleccionar Producto Principal</h3>
+    <select name="producto" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; margin-bottom: 16px;">
+      <option value="">-- Seleccionar Producto --</option>
+      {% for producto in productos %}
+        <option value="{{ producto.id }}">{{ producto.nombre }} - ${{ producto.precio }}</option>
+      {% endfor %}
+    </select>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px; border-radius: 8px;">
+      <span style="font-weight: 500;">Cantidad:</span>
+      <div class="stepper" style="background: var(--surface);">
+        <button type="button" class="stepper-btn" onclick="updateQty(-1)">-</button>
+        <input type="number" id="cantidad" name="cantidad" value="1" min="1" class="stepper-input" style="width: 40px;" readonly>
+        <button type="button" class="stepper-btn" onclick="updateQty(1)">+</button>
+      </div>
+    </div>
+  </div>
+  
+  <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Crear Pedido</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQty(change) {
+  const input = document.getElementById('cantidad');
+  let val = parseInt(input.value) || 1;
+  val += change;
+  if (val < 1) val = 1;
+  input.value = val;
+}
+</script>
+{% endblock %}

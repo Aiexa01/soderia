@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.db import models
 from django.contrib.auth.models import Group, User
 
@@ -128,12 +126,10 @@ class Pedido(models.Model):
     class Estados(models.TextChoices):
         CREADO = 'CREADO', 'Creado'
         ASIGNADO = 'ASIGNADO', 'Asignado'
-        DESPACHADO = 'DESPACHADO', 'Despachado'
         EN_REPARTO = 'EN_REPARTO', 'En reparto'
         ENTREGADO = 'ENTREGADO', 'Entregado'
         DEVUELTO = 'DEVUELTO', 'Devuelto'
         PAGADO = 'PAGADO', 'Pagado'
-        REINTENTAR = 'REINTENTAR', 'Reintentar'
 
     class FormasPago(models.TextChoices):
         EFECTIVO = 'efectivo', 'Efectivo'
@@ -150,7 +146,6 @@ class Pedido(models.Model):
     pago_motivo = models.CharField(max_length=200, blank=True)
     pago_fecha = models.DateTimeField(null=True, blank=True)
     creado_por = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='pedidos_creados')
-    orden_entrega = models.PositiveIntegerField(null=True, blank=True, help_text='Orden de entrega asignado en despacho')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -305,20 +300,9 @@ class ConsultaWeb(models.Model):
         CONVERTIDA = 'CONVERTIDA', 'Convertida a cliente'
         DESCARTADA = 'DESCARTADA', 'Descartada'
 
-    class Motivos(models.TextChoices):
-        QUIERO_SER_CLIENTE = 'CLIENTE', 'Quiero ser cliente'
-        CONSULTA_PRECIOS = 'PRECIOS', 'Consulta de precios'
-        CONSULTA_GENERAL = 'GENERAL', 'Consulta general'
-        RECLAMO = 'RECLAMO', 'Reclamo / Problema'
-
     nombre = models.CharField(max_length=120)
     email = models.EmailField(blank=True)
     telefono = models.CharField(max_length=30)
-    motivo = models.CharField(
-        max_length=20,
-        choices=Motivos.choices,
-        default=Motivos.CONSULTA_GENERAL,
-    )
     mensaje = models.TextField()
     estado = models.CharField(
         max_length=20,
@@ -344,115 +328,3 @@ class ConsultaWeb(models.Model):
 
     def __str__(self):
         return f'Consulta #{self.pk} - {self.nombre}'
-
-
-class Despacho(models.Model):
-    """Lote de pedidos despachados en una camioneta para un día de reparto."""
-
-    class Estados(models.TextChoices):
-        ABIERTO = 'ABIERTO', 'Abierto'
-        EN_RUTA = 'EN_RUTA', 'En ruta'
-        CERRADO = 'CERRADO', 'Cerrado'
-
-    camioneta = models.ForeignKey(
-        Camioneta,
-        on_delete=models.PROTECT,
-        related_name='despachos',
-    )
-    fecha = models.DateField(default=date.today, help_text='Fecha de reparto')
-    estado = models.CharField(
-        max_length=20,
-        choices=Estados.choices,
-        default=Estados.ABIERTO,
-    )
-    creado_por = models.ForeignKey(
-        User,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='despachos_creados',
-    )
-    notas = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-fecha', '-created_at']
-        db_table = 'despacho'
-        # Nota: MySQL no soporta UniqueConstraint condicional (partial index).
-        # La regla de "un solo despacho activo por camioneta por día" se aplica
-        # en la view logistica_despacho antes de crear, no a nivel DB.
-
-
-    def __str__(self):
-        return f'Despacho #{self.id} — {self.camioneta.nombre} ({self.fecha})'
-
-    @property
-    def pedido_ids(self):
-        return list(self.items.values_list('pedido_id', flat=True))
-
-    @property
-    def total_pedidos(self):
-        return self.items.count()
-
-    @property
-    def pedidos_entregados(self):
-        from django.db.models import Q
-        return self.items.filter(
-            pedido__estado__in=[
-                'ENTREGADO', 'DEVUELTO', 'PAGADO',
-            ]
-        ).count()
-
-    @property
-    def esta_completo(self):
-        return self.total_pedidos > 0 and self.pedidos_entregados == self.total_pedidos
-
-
-class DespachoPedido(models.Model):
-    """Tabla intermedia que vincula un Pedido a un Despacho con su orden de entrega."""
-
-    despacho = models.ForeignKey(
-        Despacho,
-        on_delete=models.CASCADE,
-        related_name='items',
-    )
-    pedido = models.ForeignKey(
-        Pedido,
-        on_delete=models.CASCADE,
-        related_name='despacho_items',
-    )
-    orden_entrega = models.PositiveIntegerField(
-        default=0,
-        help_text='Posición en la ruta (1 = primero)',
-    )
-
-    class Meta:
-        ordering = ['orden_entrega']
-        unique_together = ('despacho', 'pedido')
-        db_table = 'despacho_pedido'
-
-    def __str__(self):
-        return f'{self.despacho} — #{self.orden_entrega} Pedido #{self.pedido_id}'
-
-
-class AuditLog(models.Model):
-    """Registro de auditoría para toda acción automática o relevante del sistema."""
-    usuario = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='audit_logs')
-    accion = models.CharField(max_length=50)
-    modelo = models.CharField(max_length=50)
-    objeto_id = models.IntegerField()
-    detalle = models.TextField(blank=True)
-    extra = models.JSONField(
-        default=dict,
-        blank=True,
-        help_text='Contexto estructurado: estado_anterior, estado_nuevo, despacho_id, etc.',
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-        db_table = 'audit_log'
-
-    def __str__(self):
-        return f'{self.accion} - {self.modelo}#{self.objeto_id} ({self.created_at:%d/%m %H:%M})'

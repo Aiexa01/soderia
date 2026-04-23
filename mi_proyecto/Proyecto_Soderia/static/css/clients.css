@@ -338,34 +338,6 @@
   gap: 12px;
 }
 
-/* Form alerts */
-.form-alert {
-  padding: .75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: .85rem;
-}
-
-.form-alert-info {
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  color: #3b82f6;
-}
-
-.form-alert-error {
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #dc2626;
-}
-
-.form-alert-error p {
-  margin: 0 0 .25rem 0;
-}
-
-.form-alert-error p:last-child {
-  margin-bottom: 0;
-}
-
 /* ============================================================
    RESPONSIVE
    ============================================================ */

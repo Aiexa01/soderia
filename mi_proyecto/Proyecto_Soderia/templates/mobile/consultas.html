@@ -1,0 +1,46 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Consultas Web - Tres Cerritos{% endblock %}
+{% block header_title %}Consultas{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+  <h2 style="margin: 0; font-size: 1.2rem;">Últimas Consultas</h2>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+  {% for consulta in consultas %}
+    <a href="{% url 'mobile_consulta_detail' consulta.id %}" class="card" style="display: block; text-decoration: none; color: inherit; position: relative;">
+      
+      <!-- Indicador visual de nueva -->
+      {% if consulta.estado == 'NUEVA' %}
+        <div style="position: absolute; top: 16px; right: 16px; width: 12px; height: 12px; background-color: var(--status-critical); border-radius: 50%;"></div>
+      {% endif %}
+      
+      <div style="margin-bottom: 8px;">
+        <h3 style="margin: 0; font-size: 1.1rem; padding-right: 24px;">{{ consulta.nombre }}</h3>
+        <p style="margin: 4px 0 0 0; font-size: 0.875rem; color: var(--text-muted);">
+          {{ consulta.created_at|date:"d/m/Y H:i" }}
+        </p>
+      </div>
+      
+      <p style="margin: 0 0 12px 0; font-size: 0.95rem; line-height: 1.4; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ consulta.mensaje }}
+      </p>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="badge {% if consulta.estado == 'NUEVA' %}badge-danger{% elif consulta.estado == 'LEIDA' %}badge-warning{% else %}badge-success{% endif %}">
+          {{ consulta.get_estado_display }}
+        </span>
+        <span style="font-size: 0.875rem; font-weight: 500; color: var(--primary);">Ver Detalle →</span>
+      </div>
+    </a>
+  {% empty %}
+    <div style="text-align: center; padding: 48px 16px;">
+      <div style="font-size: 3rem; margin-bottom: 16px;">📬</div>
+      <h3 style="margin: 0 0 8px 0; color: var(--text-main);">Sin mensajes</h3>
+      <p style="margin: 0; color: var(--text-muted);">No hay consultas web pendientes.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

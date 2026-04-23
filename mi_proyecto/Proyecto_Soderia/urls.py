@@ -1,5 +1,5 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import path, include
 
 from . import views
 
@@ -31,10 +31,6 @@ urlpatterns = [
     path('ventas/<int:order_id>/estado/', views.orders_status, name='orders_status'),
     path('ventas/<int:order_id>/pago/', views.orders_pay, name='orders_pay'),
     path('logistica/', views.logistica_panel, name='logistica_panel'),
-    path('logistica/despacho/<int:camioneta_id>/', views.logistica_despacho, name='logistica_despacho'),
-    path('logistica/despacho/<int:despacho_id>/cerrar/', views.logistica_cerrar_despacho, name='logistica_cerrar_despacho'),
-    path('logistica/camioneta/<int:camioneta_id>/hoja-ruta/', views.hoja_ruta_dias, name='hoja_ruta_dias'),
-    path('logistica/camioneta/<int:camioneta_id>/hoja-ruta/<int:despacho_id>/', views.hoja_ruta_pedidos, name='hoja_ruta_pedidos'),
     path('stock/', views.stock_general, name='stock_general'),
     path('stock/cargar/<int:camioneta_id>/', views.stock_cargar, name='stock_cargar'),
     path('stock/camioneta/<int:camioneta_id>/', views.stock_camioneta, name='stock_camioneta'),
@@ -42,8 +38,6 @@ urlpatterns = [
     path('stock/movimientos/', views.stock_movimientos, name='stock_movimientos'),
     path('mis-entregas/', views.mis_entregas, name='mis_entregas'),
     path('mis-entregas/<int:order_id>/', views.entrega_operacion, name='entrega_operacion'),
-    path('mis-entregas/<int:order_id>/entregar/', views.entrega_rapida, name='entrega_rapida'),
-    path('mis-entregas/<int:order_id>/devolver/', views.devolucion_rapida, name='devolucion_rapida'),
     path('mi-stock/', views.mi_stock, name='mi_stock'),
     path('mi-camioneta/', views.mi_camioneta, name='mi_camioneta'),
     path('admin-panel/roles/', views.roles_list, name='roles_list'),
@@ -70,4 +64,7 @@ urlpatterns = [
     path('consultas/<int:consulta_id>/', views.consulta_detail, name='consulta_detail'),
     path('consultas/<int:consulta_id>/estado/', views.consulta_estado, name='consulta_estado'),
     path('consultas/<int:consulta_id>/convertir/', views.consulta_convertir, name='consulta_convertir'),
+    
+    # Rutas mobile
+    path('m/', include('Proyecto_Soderia.urls_mobile')),
 ]

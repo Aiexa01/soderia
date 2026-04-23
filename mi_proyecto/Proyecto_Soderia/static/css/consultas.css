@@ -21,7 +21,7 @@
 .consultas-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #040a11;
+  color: #e8edf3;
   margin: 0;
 }
 
@@ -37,7 +37,7 @@
 }
 
 .consultas-stat {
-  background: #1e2e49;
+  background: #1a2332;
   border: 1px solid #253346;
   border-radius: 10px;
   padding: .5rem 1rem;
@@ -82,11 +82,6 @@
   flex-wrap: wrap;
 }
 
-.consultas-filter-form .cta {
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -104,10 +99,10 @@
 .filter-group select,
 .filter-group input {
   padding: .45rem .625rem;
-  border: 1px solid #c5cdd8;
+  border: 1px solid #253346;
   border-radius: 6px;
-  background: #ffffff;
-  color: #1a2332;
+  background: #0f1923;
+  color: #e8edf3;
   font-size: .85rem;
   font-family: inherit;
   min-width: 150px;
@@ -117,7 +112,6 @@
 .filter-group input:focus {
   border-color: #3b82f6;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
 /* ── Table ── */
@@ -133,7 +127,6 @@
   width: 100%;
   border-collapse: collapse;
   font-size: .85rem;
-  min-width: 650px;
 }
 
 .consultas-table th {
@@ -172,19 +165,12 @@
 }
 
 .col-mensaje {
-  max-width: 180px;
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: #8b95a5;
   font-size: .8rem;
-}
-
-.col-email {
-  max-width: 180px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .col-fecha {
@@ -241,31 +227,6 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* ── Motivo badges ── */
-.badge-motivo-cliente {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.badge-motivo-precios {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.badge-motivo-general {
-  background: rgba(168, 162, 158, 0.12);
-  color: #a3a3a3;
-  border: 1px solid rgba(168, 162, 158, 0.2);
-}
-
-.badge-motivo-reclamo {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-}
-
 /* ── WhatsApp links ── */
 .wa-link {
   display: inline-flex;
@@ -306,350 +267,203 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   CONSULTA DETAIL — Modern single-flow layout
+   CONSULTA DETAIL
    ═══════════════════════════════════════════════════════════ */
-.cd-page {
-  max-width: 780px;
+.consulta-detail-page {
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 1rem 2rem;
+  padding: 0 1rem;
 }
 
-/* ── Header row ── */
-.cd-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-bottom: .25rem;
-}
-
-.cd-header-left {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-
-.cd-title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.cd-time {
-  font-size: .8rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-/* ── Contextual hint ── */
-.cd-hint {
-  font-size: .82rem;
-  color: var(--text-muted);
-  margin: 0 0 1.25rem 0;
-  padding-left: 2px;
-}
-
-/* ── Converted banner ── */
-.cd-converted-banner {
-  padding: .65rem 1rem;
-  background: rgba(34, 197, 94, 0.06);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: var(--radius-md);
-  color: #15803d;
-  font-size: .85rem;
-  margin-bottom: 1.25rem;
-}
-
-.cd-converted-banner a {
-  color: #16a34a;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* ── Contact strip ── */
-.cd-contact-strip {
-  display: flex;
-  align-items: stretch;
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
-  padding: 0;
-  margin-bottom: 1.25rem;
-  overflow: hidden;
-}
-
-.cd-contact-item {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: .65rem;
-  padding: .9rem 1.1rem;
-}
-
-.cd-contact-icon {
-  font-size: 1.15rem;
-  flex-shrink: 0;
-  width: 24px;
-  text-align: center;
-}
-
-.cd-contact-divider {
-  width: 1px;
-  background: var(--border);
-  align-self: stretch;
-  flex-shrink: 0;
-}
-
-.cd-label {
-  display: block;
-  font-size: .68rem;
-  text-transform: uppercase;
-  letter-spacing: .6px;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-bottom: 1px;
-}
-
-.cd-value {
-  font-size: .9rem;
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.cd-value a {
-  color: var(--water-600);
-  text-decoration: none;
-  transition: color .15s;
-}
-
-.cd-value a:hover {
-  color: var(--water-700);
-  text-decoration: underline;
-}
-
-.cd-phone-link {
-  color: #16a34a !important;
-  font-weight: 600 !important;
-}
-
-.cd-phone-link:hover {
-  color: #15803d !important;
-}
-
-.cd-muted {
-  color: var(--text-muted);
-  font-style: italic;
-  font-weight: 400;
-}
-
-/* ── Message section ── */
-.cd-message-section {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
-  padding: 1.25rem 1.35rem;
-  margin-bottom: 1.25rem;
-}
-
-.cd-message-section > .cd-label {
-  margin-bottom: .5rem;
-}
-
-.cd-message-bubble {
-  padding: .85rem 1rem;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  line-height: 1.65;
-  font-size: .9rem;
-  margin-bottom: 1rem;
-  position: relative;
-}
-
-.cd-message-bubble::before {
-    content: "";
-    position: absolute;
-    /* Centrado vertical */
-    top: 50%;
-    transform: translateY(-50%); 
-    
-    left: 16px;
-    width: 3px;
-    /* Ajusta la altura a tu gusto, por ejemplo 60% o 70% */
-    height: 60%; 
-    
-    background:#0B4B82;
-    border-radius: 3px;
-}
-
-.cd-message-bubble {
-  padding-left: calc(1rem + 12px);
-}
-
-/* ── WhatsApp primary CTA ── */
-.cd-wa-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: .55rem;
-  width: 100%;
-  padding: .75rem 1.25rem;
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  color: #fff !important;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: .95rem;
-  font-weight: 600;
-  font-family: inherit;
-  text-decoration: none;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25);
-}
-
-.cd-wa-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
-}
-
-.cd-wa-btn:active {
-  transform: translateY(0);
-}
-
-/* ── Bottom row (notes + secondary actions) ── */
-.cd-bottom-row {
+.consulta-detail-grid {
   display: grid;
-  grid-template-columns: 1fr 260px;
+  grid-template-columns: 1fr 320px;
   gap: 1.25rem;
   align-items: start;
 }
 
-.cd-section-head {
-  margin-bottom: .5rem;
+.consulta-card-main {
+  padding: 1.5rem;
 }
 
-/* ── Notes ── */
-.cd-notes-section {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
-  padding: 1rem 1.25rem;
+.consulta-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: .25rem;
 }
 
-.cd-notes-form {
-  position: relative;
+.consulta-card-header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e8edf3;
+  margin: 0;
 }
 
-.cd-notes-textarea {
+.consulta-date {
+  color: #6b7a8d;
+  font-size: .8rem;
+  margin-bottom: 1.25rem;
+}
+
+.consulta-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.consulta-field {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.consulta-field-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #6b7a8d;
+  font-weight: 600;
+}
+
+.consulta-field-value {
+  font-size: .95rem;
+  color: #e8edf3;
+}
+
+.consulta-field-value a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.consulta-field-value a:hover {
+  text-decoration: underline;
+}
+
+.wa-link-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: #25d366 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+}
+
+.wa-link-detail:hover {
+  color: #4ade80 !important;
+}
+
+.consulta-message-block {
+  margin-bottom: 1.25rem;
+}
+
+.consulta-message {
+  margin-top: .4rem;
+  padding: 1rem;
+  background: #0f1923;
+  border: 1px solid #253346;
+  border-radius: 8px;
+  color: #c0c8d4;
+  line-height: 1.6;
+  font-size: .9rem;
+}
+
+.consulta-converted-banner {
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 8px;
+  color: #4ade80;
+  font-size: .875rem;
+}
+
+.consulta-converted-banner a {
+  color: #22c55e;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ── Sidebar ── */
+.consulta-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.consulta-action-card {
+  padding: 1rem;
+}
+
+.consulta-action-card h3 {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #6b7a8d;
+  margin: 0 0 .75rem 0;
+  font-weight: 600;
+}
+
+.consulta-estado-select {
   width: 100%;
-  padding: .65rem .75rem;
-  padding-right: 5.5rem;
-  background: var(--surface-base);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
+  padding: .5rem;
+  margin-bottom: .75rem;
+  background: #0f1923;
+  border: 1px solid #253346;
+  border-radius: 6px;
+  color: #e8edf3;
+  font-family: inherit;
+  font-size: .85rem;
+}
+
+.consulta-estado-select:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.consulta-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.consulta-actions-stack .cta {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+
+.wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: #25d366 !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.wa-btn:hover {
+  background: #22c55e !important;
+}
+
+.consulta-action-card textarea {
+  width: 100%;
+  padding: .5rem;
+  margin-bottom: .5rem;
+  background: #0f1923;
+  border: 1px solid #253346;
+  border-radius: 6px;
+  color: #e8edf3;
   font-family: inherit;
   font-size: .85rem;
   resize: vertical;
-  min-height: 64px;
-  line-height: 1.5;
-  transition: border-color .15s;
 }
 
-.cd-notes-textarea:focus {
-  border-color: var(--border-focus);
+.consulta-action-card textarea:focus {
+  border-color: #3b82f6;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(10, 167, 194, 0.1);
-  background: #fff;
-}
-
-.cd-notes-save {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  width: auto !important;
-  margin: 0 !important;
-  padding: 5px 14px !important;
-  font-size: .78rem !important;
-  background: var(--surface-base) !important;
-  color: var(--text-secondary) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 6px !important;
-  box-shadow: none !important;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-}
-
-.cd-notes-save:hover {
-  background: var(--border) !important;
-  color: var(--text-primary) !important;
-  transform: none !important;
-}
-
-/* ── Secondary actions ── */
-.cd-secondary-actions {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
-  padding: 1rem 1.25rem;
-}
-
-.cd-actions-list {
-  display: flex;
-  flex-direction: column;
-  gap: .4rem;
-}
-
-.cd-action-btn {
-  display: flex;
-  align-items: center;
-  gap: .45rem;
-  padding: .55rem .8rem;
-  border-radius: var(--radius-sm);
-  font-size: .82rem;
-  font-weight: 500;
-  font-family: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-  border: 1px solid transparent;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-}
-
-.cd-action-convert {
-  color: var(--water-700);
-}
-
-.cd-action-convert:hover {
-  background: rgba(10, 167, 194, 0.06);
-  border-color: rgba(10, 167, 194, 0.15);
-}
-
-.cd-action-discard {
-  color: var(--text-muted);
-}
-
-.cd-action-discard:hover {
-  color: #dc2626;
-  background: rgba(239, 68, 68, 0.04);
-  border-color: rgba(239, 68, 68, 0.12);
-}
-
-.cd-discard-form {
-  margin: 0;
 }
 
 /* ── Sidebar badge in base.html ── */
@@ -681,20 +495,6 @@
   background: rgba(59, 130, 246, 0.08);
   border: 1px solid rgba(59, 130, 246, 0.25);
   color: #93c5fd;
-}
-
-.form-alert-error {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #ef4444;
-}
-
-.form-alert-error p {
-  margin: 0 0 .25rem 0;
-}
-
-.form-alert-error p:last-child {
-  margin-bottom: 0;
 }
 
 /* ── Landing toast notification ── */
@@ -733,41 +533,14 @@
   color: #fff;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   RESPONSIVE — DETAIL
-   ═══════════════════════════════════════════════════════════ */
-
-/* Tablet / medium screens */
-@media (max-width: 1024px) {
-  .consulta-fields-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .consultas-table {
-    font-size: .8rem;
-  }
-
-  .consultas-table th,
-  .consultas-table td {
-    padding: .5rem .5rem;
-  }
-
-  .col-mensaje {
-    max-width: 140px;
-  }
-
-  .col-email {
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-/* Mobile */
+/* ── Responsive ── */
 @media (max-width: 768px) {
-  .consultas-page {
-    padding: 0 .5rem;
+  .consulta-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .consulta-fields {
+    grid-template-columns: 1fr;
   }
 
   .consultas-header {
@@ -784,67 +557,4 @@
     min-width: unset;
     width: 100%;
   }
-
-  .consultas-table {
-    font-size: .75rem;
-  }
-
-  .consultas-table th,
-  .consultas-table td {
-    padding: .45rem .4rem;
-  }
-
-  .col-mensaje {
-    max-width: 110px;
-  }
-
-  .col-email {
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .col-acciones {
-    flex-direction: column;
-    gap: .25rem;
-  }
-
-  /* Detail responsive */
-  .cd-contact-strip {
-    flex-direction: column;
-  }
-
-  .cd-contact-divider {
-    width: 100%;
-    height: 1px;
-  }
-
-  .cd-bottom-row {
-    grid-template-columns: 1fr;
-  }
-
-  .cd-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
-
-/* Small mobile */
-@media (max-width: 480px) {
-  .cd-header-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .3rem;
-  }
-
-  .cd-message-section {
-    padding: 1rem;
-  }
-
-  .consultas-stats {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
