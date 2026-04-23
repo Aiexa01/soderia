@@ -1,0 +1,64 @@
+.camionetas-grid {
+  grid-template-columns: 1fr 280px;
+  align-items: start;
+  gap: 24px;
+}
+
+.camionetas-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.camioneta-list {
+  display: grid;
+  gap: 16px;
+}
+
+.camioneta-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.camioneta-main {
+  display: grid;
+  gap: 6px;
+}
+
+.camioneta-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camioneta-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.camioneta-actions {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 860px) {
+  .camionetas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .camioneta-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

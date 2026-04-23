@@ -1,0 +1,29 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Inicio - Tres Cerritos{% endblock %}
+{% block header_title %}Mi Panel (EAC){% endblock %}
+{% block header_actions %}
+  <a href="{% url 'mobile_logout' %}" style="color: white; text-decoration: none; font-size: 0.875rem;">Cerrar</a>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+  <h2 style="margin: 0 0 4px 0; font-size: 1.5rem;">Hola, {{ request.user.first_name|default:request.user.username }}</h2>
+  <p style="margin: 0; color: var(--text-muted);">Atención al Cliente</p>
+</div>
+
+<div class="metrics-grid">
+  <div class="metric-card" style="border-color: {% if nuevas > 0 %}var(--status-critical){% else %}var(--border){% endif %};">
+    <div class="metric-value" style="color: {% if nuevas > 0 %}var(--status-critical){% endif %};">{{ nuevas }}</div>
+    <div class="metric-label">Consultas Sin Leer</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value" style="color: var(--status-info);">{{ pedidos_hoy }}</div>
+    <div class="metric-label">Pedidos de Hoy</div>
+  </div>
+</div>
+
+<a href="{% url 'mobile_consultas_list' %}" class="btn btn-primary" style="margin-top: 24px; {% if nuevas > 0 %}background-color: var(--status-critical);{% endif %}">
+  Ver Consultas Pendientes
+</a>
+{% endblock %}

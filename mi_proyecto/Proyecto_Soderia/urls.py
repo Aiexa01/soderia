@@ -1,5 +1,5 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import path, include
 
 from . import views
 
@@ -65,4 +65,7 @@ urlpatterns = [
     path('consultas/<int:consulta_id>/estado/', views.consulta_estado, name='consulta_estado'),
     path('consultas/<int:consulta_id>/convertir/', views.consulta_convertir, name='consulta_convertir'),
     path('stock/transferir/', views.stock_transferir, name='stock_transferir'),
+    
+    # Rutas mobile
+    path('m/', include('Proyecto_Soderia.urls_mobile')),
 ]

@@ -1,0 +1,44 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Stock - Tres Cerritos{% endblock %}
+{% block header_title %}Mi Stock{% endblock %}
+
+{% block content %}
+
+{% if camioneta %}
+  <div class="card" style="margin-bottom: 24px;">
+    <h3 style="margin:0 0 4px 0;">{{ camioneta.nombre }}</h3>
+    <p style="margin:0; color: var(--text-muted); font-size: 0.875rem;">Capacidad asignada en vehículo</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+    {% for item in stock %}
+      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 16px;">
+        <div style="flex: 1;">
+          <h4 style="margin:0 0 4px 0;">{{ item.producto.nombre }}</h4>
+          <span class="badge {% if item.producto.retornable %}badge-info{% else %}badge-warning{% endif %}" style="font-size: 0.65rem;">
+            {% if item.producto.retornable %}Retornable{% else %}No retornable{% endif %}
+          </span>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: {% if item.cantidad_actual > 5 %}var(--status-ok){% elif item.cantidad_actual > 0 %}var(--status-warning){% else %}var(--status-critical){% endif %};">
+            {{ item.cantidad_actual }}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Unidades</div>
+        </div>
+      </div>
+    {% empty %}
+      <div style="text-align: center; padding: 48px 16px;">
+        <h3 style="margin: 0 0 8px 0; color: var(--text-main);">Sin stock</h3>
+        <p style="margin: 0; color: var(--text-muted);">No tenés stock cargado en la camioneta.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+{% else %}
+  <div class="card" style="text-align: center; border-color: var(--status-warning);">
+    <p style="margin:0; color: var(--status-warning); font-weight: 500;">No tenés camioneta asignada hoy.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

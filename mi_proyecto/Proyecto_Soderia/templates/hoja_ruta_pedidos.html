@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Hoja de Ruta — {{ camioneta.nombre }} — {{ fecha|date:"d/m/Y" }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
+{% endblock %}
+
+{% block header_action %}
+  <a class="cta ghost" href="{% url 'hoja_ruta_dias' camioneta.id %}">← Volver al historial</a>
+{% endblock %}
+
+{% block content %}
+<div class="logistica-wrapper">
+
+  <!-- ── CABECERA ── -->
+  <div class="logistica-header">
+    <div>
+      <h1 class="logistica-title">📋 {{ camioneta.nombre }}</h1>
+      <div class="logistica-fecha">
+        {{ fecha|date:"l d \\d\\e F \\d\\e Y" }}
+        {% if despacho %}
+          &nbsp;·&nbsp; <span style="color:#64748b">Despacho #{{ despacho.id }}</span>
+          &nbsp;·&nbsp; <span class="logistica-cam-estado estado-{{ despacho.estado|lower }}">{{ despacho.get_estado_display }}</span>
+        {% else %}
+          &nbsp;·&nbsp; <span style="color:#94a3b8; font-size: 0.8rem;">Sin despacho formal</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="logistica-header-actions">
+      <a class="cta ghost" href="{% url 'orders_list' %}?camioneta={{ camioneta.id }}">Ver todos los pedidos</a>
+    </div>
+  </div>
+
+  <!-- ── RESUMEN DEL DÍA ── -->
+  <div class="logistica-metricas">
+    <div class="logistica-metrica">
+      <div class="logistica-metrica-num">{{ resumen.total }}</div>
+      <div class="logistica-metrica-label">Total pedidos</div>
+    </div>
+    <div class="logistica-metrica entregado">
+      <div class="logistica-metrica-num">{{ resumen.entregados }}</div>
+      <div class="logistica-metrica-label">Entregados</div>
+    </div>
+    <div class="logistica-metrica ruta">
+      <div class="logistica-metrica-num">{{ resumen.en_ruta }}</div>
+      <div class="logistica-metrica-label">En ruta / activos</div>
+    </div>
+    <div class="logistica-metrica devuelto">
+      <div class="logistica-metrica-num">{{ resumen.devueltos }}</div>
+      <div class="logistica-metrica-label">Devueltos</div>
+    </div>
+    <!-- Cobrado: dinero real ingresado (PAGADO) -->
+    <div class="logistica-metrica entregado" style="border-top-color:#16a34a;">
+      <div class="logistica-metrica-num" style="font-size:1.4rem; color:#16a34a;">
+        ${{ resumen.cobrado|floatformat:0 }}
+      </div>
+      <div class="logistica-metrica-label">Cobrado</div>
+    </div>
+    <!-- Pendiente: entregado pero sin cobrar todavía -->
+    {% if resumen.pendiente_cobro %}
+    <div class="logistica-metrica" style="border-top-color:#f97316;">
+      <div class="logistica-metrica-num" style="font-size:1.4rem; color:#ea580c;">
+        ${{ resumen.pendiente_cobro|floatformat:0 }}
+      </div>
+      <div class="logistica-metrica-label">Pendiente cobro</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── TABLA DE PEDIDOS ── -->
+  <section class="logistica-section" style="padding: 0; overflow: hidden;">
+
+    {% if pedidos %}
+    <div class="hr-table-wrap">
+      <table class="hr-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Dirección / Barrio</th>
+            <th>Productos</th>
+            <th>Estado</th>
+            <th class="text-right">Total</th>
+            <th class="text-right">Pago</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pedido in pedidos %}
+          <tr class="hr-row hr-row-{{ pedido.estado|lower }}">
+
+            <!-- # ID -->
+            <td>
+              <span class="hr-pedido-id">#{{ pedido.id }}</span>
+            </td>
+
+            <!-- Cliente -->
+            <td>
+              <div class="hr-cliente-nombre">{{ pedido.cliente.name }}</div>
+              {% if pedido.cliente.telefono %}
+                <div class="hr-cliente-sub">📞 {{ pedido.cliente.telefono }}</div>
+              {% endif %}
+            </td>
+
+            <!-- Dirección / Barrio -->
+            <td>
+              {% if pedido.cliente.direccion %}
+                <div class="hr-dir">{{ pedido.cliente.direccion }}</div>
+              {% endif %}
+              {% if pedido.cliente.barrio %}
+                <div class="hr-dir-barrio">{{ pedido.cliente.barrio.nombre }}</div>
+              {% elif pedido.cliente.zona %}
+                <div class="hr-dir-barrio">{{ pedido.cliente.zona.nombre }}</div>
+              {% endif %}
+            </td>
+
+            <!-- Productos -->
+            <td>
+              <div class="hr-productos">
+                {% for det in pedido.detalles.all %}
+                  <span class="despacho-prod-tag">{{ det.cantidad }}× {{ det.producto.nombre }}</span>
+                {% empty %}
+                  <span style="color:#94a3b8; font-size: 0.8rem">—</span>
+                {% endfor %}
+              </div>
+            </td>
+
+            <!-- Estado badge -->
+            <td>
+              <span class="logistica-cam-estado estado-{{ pedido.estado|lower }}">
+                {{ pedido.get_estado_display }}
+              </span>
+            </td>
+
+            <!-- Total -->
+            <td class="text-right hr-total">
+              ${{ pedido.total|floatformat:0 }}
+            </td>
+
+            <!-- Pago -->
+            <td class="text-right">
+              {% if pedido.estado == 'PAGADO' %}
+                <span class="hr-pago-badge hr-pago-cobrado">
+                  ✔ ${{ pedido.pago_monto|floatformat:0 }}
+                </span>
+              {% elif pedido.estado == 'ENTREGADO' %}
+                <span class="hr-pago-badge hr-pago-pendiente">⏳ Pendiente</span>
+              {% elif pedido.estado == 'DEVUELTO' %}
+                <span class="hr-pago-badge hr-pago-devuelto">× No cobrado</span>
+              {% else %}
+                <span style="color:#94a3b8; font-size:0.75rem">—</span>
+              {% endif %}
+            </td>
+
+            <!-- Acciones -->
+            <td class="text-right">
+              <div class="hr-acciones">
+                <a class="hr-btn-detalle" href="{% url 'orders_detail' pedido.id %}" title="Ver detalle completo">
+                  👁 Detalle
+                </a>
+                <!-- Cambio de estado rápido -->
+                {% if pedido.estado != 'ENTREGADO' and pedido.estado != 'PAGADO' %}
+                <form method="post" class="hr-estado-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
+                  <select name="estado" class="hr-estado-select" onchange="this.form.submit()" title="Cambiar estado">
+                    <option value="">Estado…</option>
+                    {% for val, label in estado_choices %}
+                      <option value="{{ val }}" {% if val == pedido.estado %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+                {% else %}
+                  <span style="font-size:0.78rem; color:#15803d; font-weight:600;">✓ Finalizado</span>
+                {% endif %}
+              </div>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+      <div class="empty-state-premium" style="padding: 40px;">
+        <div style="font-size: 2rem; margin-bottom: 10px;">📭</div>
+        <h3>Sin pedidos para este día</h3>
+        <p>No hay pedidos registrados para <strong>{{ camioneta.nombre }}</strong> el {{ fecha|date:"d/m/Y" }}.</p>
+      </div>
+    {% endif %}
+
+  </section>
+
+</div>
+{% endblock %}

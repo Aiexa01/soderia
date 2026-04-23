@@ -1,0 +1,58 @@
+{% extends 'mobile/base_mobile.html' %}
+
+{% block title %}Consulta #{{ consulta.id }}{% endblock %}
+{% block header_title %}Detalle Consulta{% endblock %}
+
+{% block header_actions %}
+  <a href="{% url 'mobile_consultas_list' %}" style="color: white; text-decoration: none; font-size: 0.875rem;">Volver</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="border-top: 4px solid var(--primary);">
+  <h2 style="margin: 0 0 4px 0;">{{ consulta.nombre }}</h2>
+  <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">{{ consulta.created_at|date:"d/m/Y H:i" }}</p>
+  
+  <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
+  
+  <div style="margin-bottom: 16px;">
+    <p style="margin: 0 0 4px 0; font-size: 0.875rem; color: var(--text-muted);">Teléfono</p>
+    <p style="margin: 0; font-weight: 500;">{{ consulta.telefono }}</p>
+  </div>
+  
+  {% if consulta.email %}
+  <div style="margin-bottom: 16px;">
+    <p style="margin: 0 0 4px 0; font-size: 0.875rem; color: var(--text-muted);">Email</p>
+    <p style="margin: 0; font-weight: 500;">{{ consulta.email }}</p>
+  </div>
+  {% endif %}
+  
+  <div>
+    <p style="margin: 0 0 8px 0; font-size: 0.875rem; color: var(--text-muted);">Mensaje</p>
+    <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5;">
+      {{ consulta.mensaje|linebreaksbr }}
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 24px;">
+  <!-- Link directo a WhatsApp con mensaje prearmado -->
+  <a href="https://wa.me/{{ consulta.telefono }}?text=Hola%20{{ consulta.nombre|urlencode }},%20somos%20de%20Soda%20y%20Agua%20Tres%20Cerritos.%20Recibimos%20tu%20consulta:%20" target="_blank" class="btn" style="background-color: #25D366; color: white; display: flex; gap: 8px;">
+    <span>📱</span> Responder por WhatsApp
+  </a>
+</div>
+
+<div class="card">
+  <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Estado de la Consulta</h3>
+  <form method="post" action="{% url 'mobile_consulta_detail' consulta.id %}">
+    {% csrf_token %}
+    <select name="estado" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; margin-bottom: 16px; background-color: var(--surface);">
+      <!-- Solo iteramos algunos estados útiles para mobile -->
+      <option value="LEIDA" {% if consulta.estado == 'LEIDA' %}selected{% endif %}>Leída (Sin responder)</option>
+      <option value="CONTACTADA" {% if consulta.estado == 'CONTACTADA' %}selected{% endif %}>Contactada</option>
+      <option value="DESCARTADA" {% if consulta.estado == 'DESCARTADA' %}selected{% endif %}>Descartada / Spam</option>
+    </select>
+    
+    <button type="submit" class="btn btn-ghost">Actualizar Estado</button>
+  </form>
+</div>
+{% endblock %}
