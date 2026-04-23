@@ -71,6 +71,7 @@
           <span class="side-icon">🚚</span> Logistica
         </a>
         {% endif %}
+        {# TODO: habilitar cuando se implementen estas rutas
         {% if is_admin or is_eac %}
         <a class="side-link" href="/instalaciones/"><span class="side-icon">🛠</span> Servicios / Instalaciones</a>
         {% endif %}
@@ -80,6 +81,7 @@
         {% if is_repartidor %}
         <a class="side-link" href="/servicios-asignados/"><span class="side-icon">🧾</span> Servicios asignados</a>
         {% endif %}
+        #}
         {% if is_admin %}
         <div class="side-section">Administracion</div>
         <a class="side-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"
@@ -110,7 +112,7 @@
           href="{% url 'barrios_list' %}">
           <span class="side-icon">🗺️</span> Barrios
         </a>
-        <a class="side-link" href="/configuracion/"><span class="side-icon">⚙️</span> Configuracion</a>
+        {# TODO: <a class="side-link" href="/configuracion/"><span class="side-icon">⚙️</span> Configuracion</a> #}
         {% endif %}
       </nav>
       <div class="side-footer">
