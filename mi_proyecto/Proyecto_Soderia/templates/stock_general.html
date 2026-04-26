@@ -13,16 +13,25 @@
 
 {% block content %}
   <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
-    
-    <!-- Stock General Full Width -->
-    <section class="card" style="padding: 24px; display: flex; flex-direction: column; align-items: flex-start;">
-      <h1 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: #0f172a;">Stock General</h1>
-      <p class="hint" style="font-size: 15px; margin: 0 0 16px 0; color: #475569;">
-        Total: <strong style="color: #0f172a; font-weight: 700;">320 productos</strong>
-      </p>
-      <a href="#" style="display: inline-flex; align-items: center; gap: 8px; background: #fef9c3; color: #854d0e; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid #fde047; font-size: 13.5px; transition: opacity .2s;">
-        ⚠️ Ver productos con bajo stock ⚠️ <span style="font-size: 12px; margin-left: 2px;">&gt;</span>
-      </a>
+
+    {% if is_admin %}
+    <!-- Tarjeta de Stock General -->
+    <section class="card" style="padding: 24px;">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: flex-start; gap: 16px; flex: 1; min-width: 250px;">
+          <div class="avatar-placeholder" style="width: 56px; height: 56px; font-size: 28px; background: #e0f2fe; border-color: #bae6fd; color: #0284c7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">📦</div>
+          <div>
+            <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #0f172a;">Stock General</h2>
+            <p class="hint" style="margin: 0 0 16px 0; font-size: 13px; color: #64748b;">Consolidado de mercadería.</p>
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; line-height: 1;"><span id="total-stock-general">{{ deposito_stock|length|default:"0" }}</span> <span style="font-size: 14px; font-weight: 600; color: #64748b;">productos</span></div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; min-width: 200px; justify-content: center;">
+          <a class="cta js-open-detalle-general" href="#" style="justify-content: center; width: 100%;">Ver stock detallado</a>
+          <a class="cta ghost js-open-historial" href="#" style="justify-content: center; width: 100%;">Historial de movimientos</a>
+        </div>
+      </div>
+
     </section>
 
     <!-- Depósitos Grid -->
@@ -36,9 +45,15 @@
             <p class="hint" style="margin: 0; font-size: 12.5px; color: #64748b;">{{ deposito.direccion|default:"Las Heras 1443, Salta Capital" }}</p>
           </div>
         </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border);">
-          <div style="font-size: 15px; color: #475569;">Total: <strong style="color: #0f172a; font-size: 16px;">150</strong></div>
-          <a class="cta" href="{% if puede_editar %}{% url 'stock_deposito_cargar' %}{% else %}#{% endif %}" style="padding: 8px 16px; font-size: 13px; background: #3b82f6; color: #fff; border-color: #3b82f6; border-radius: 8px; font-weight: 600; text-decoration: none;">Ver detalle</a>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border);">
+          <div style="font-size: 14px; color: #475569; white-space: nowrap; margin-right: 8px;">Total: <strong id="total-deposito-central" style="color: #0f172a; font-size: 15px;">0</strong></div>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="cta js-open-detalle-deposito" data-nombre="Depósito Central" style="padding: 6px 10px; font-size: 12px; background: #3b82f6; color: #fff; border-color: #3b82f6; border-radius: 8px; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap;">Ver detalle</button>
+            <button type="button" class="cta ghost js-open-carga-deposito" data-nombre="Depósito Central" style="padding: 6px 10px; font-size: 12px; border-radius: 8px; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap;">Cargar</button>
+            <button type="button" class="cta ghost js-open-transferir" style="padding: 6px 10px; font-size: 12px; border-radius: 8px; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap;">Transferir</button>
+          </div>
+
         </div>
       </section>
 
@@ -138,7 +153,212 @@
         </div>
       </form>
     </div>
+
+
+    <!-- Modal Carga Depósito -->
+    <div class="modal-backdrop" id="carga-deposito-backdrop"></div>
+    <div class="modal" id="carga-deposito-modal" role="dialog" aria-modal="true" aria-labelledby="carga-deposito-title">
+      <form method="post" id="carga-deposito-form" action="#">
+        {% csrf_token %}
+        <div class="modal-header">
+          <div>
+            <h2 id="carga-deposito-title">Cargar stock - Depósito Central</h2>
+            <p class="hint">Registar ingreso de mercadería.</p>
+          </div>
+          <button class="icon-action" type="button" id="carga-deposito-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Producto</label>
+            <select id="carga-deposito-producto" name="producto" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;" required>
+              <option value="" disabled selected>▼ seleccionar</option>
+              <option value="1" data-stock="50">Bidón azul 10L</option>
+              <option value="2" data-stock="40">Bidón azul 20L</option>
+              <option value="3" data-stock="10">Baja en sodio 10L</option>
+              <option value="4" data-stock="15">Baja en sodio 20L</option>
+              <option value="5" data-stock="30">Sifones de soda</option>
+              <option value="6" data-stock="100">Agua 500ml</option>
+              <option value="7" data-stock="5">Dispenser común</option>
+              <option value="8" data-stock="2">Dispenser frío/calor</option>
+              <option value="9" data-stock="20">Bidón 8L</option>
+            </select>
+            <div id="carga-deposito-stock-actual" class="hint" style="margin-top: 4px; font-size: 12.5px;">Stock actual: -</div>
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Cantidad</label>
+            <input type="number" name="cantidad" value="10" min="1" step="1" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;" required />
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">Tipo</label>
+            <div style="display: flex; gap: 16px; font-size: 14px; align-items: center;">
+              <label style="display: flex; align-items: center; gap: 4px;"><input type="radio" name="tipo" value="retornable" required> Retornable</label>
+              <label style="display: flex; align-items: center; gap: 4px;"><input type="radio" name="tipo" value="no_retornable" required> No retornable</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="cta">Guardar</button>
+          <button type="button" class="cta ghost" id="carga-deposito-cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal Detalle Depósito -->
+    <div class="modal-backdrop" id="detalle-deposito-backdrop"></div>
+    <div class="modal" id="detalle-deposito-modal" role="dialog" aria-modal="true" aria-labelledby="detalle-deposito-title" style="max-width: 500px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="detalle-deposito-title">Detalle - Depósito Central</h2>
+          <p class="hint">Inventario actual del depósito.</p>
+        </div>
+        <button class="icon-action" type="button" id="detalle-deposito-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div style="padding: 24px; max-height: 60vh; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border);">
+              <th style="padding: 8px 4px; font-weight: 600; color: #475569;">Producto</th>
+              <th style="padding: 8px 4px; font-weight: 600; color: #475569; width: 100px;">Cantidad</th>
+              <th style="padding: 8px 4px; font-weight: 600; color: #475569; width: 80px;"></th>
+            </tr>
+          </thead>
+          <tbody id="detalle-deposito-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Detalle General -->
+    <div class="modal-backdrop" id="detalle-general-backdrop"></div>
+    <div class="modal" id="detalle-general-modal" role="dialog" aria-modal="true" aria-labelledby="detalle-general-title" style="width: 95%; max-width: 900px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="detalle-general-title">Stock Detallado</h2>
+          <p class="hint">Estado consolidado de toda la mercadería.</p>
+        </div>
+        <button class="icon-action" type="button" id="detalle-general-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div style="padding: 24px; max-height: 60vh; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+          <thead>
+            <tr style="background: #e2e8f0;">
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Producto</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Depósito</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1; width: 100px;">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody id="detalle-general-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Transferir Stock -->
+    <div class="modal-backdrop" id="transferir-backdrop"></div>
+    <div class="modal" id="transferir-modal" role="dialog" aria-modal="true" aria-labelledby="transferir-title" style="max-width: 500px;">
+      <form id="transferir-form">
+        <div class="modal-header">
+          <div>
+            <h2 id="transferir-title">Transferir stock</h2>
+            <p class="hint">Mover stock entre depósitos.</p>
+          </div>
+          <button class="icon-action" type="button" id="transferir-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+          
+          <div style="display: flex; gap: 16px; align-items: center;">
+             <div style="flex: 1;">
+               <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 2px; color: #0f172a;">Desde:</label>
+               <input type="text" value="Depósito Central" disabled style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: #f8fafc; font-size: 13px; color: #64748b; font-weight: 600;" />
+             </div>
+             <div style="margin-top: 16px; color: #94a3b8;">➡️</div>
+             <div style="flex: 1;">
+               <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 2px; color: #0f172a;">Hacia:</label>
+               <input type="text" value="Depósito Frontal" disabled style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: #f8fafc; font-size: 13px; color: #64748b; font-weight: 600;" />
+             </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #0f172a;">Producto:</label>
+            <select id="transferir-producto" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;" required>
+              <option value="" disabled selected>▼ seleccionar</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: flex-end;">
+            <div style="flex: 2;">
+              <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #0f172a;">Cantidad a transferir:</label>
+              <input type="number" id="transferir-cantidad" step="1" min="1" value="0" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;" disabled required />
+            </div>
+            <div style="font-size: 13px; color: #475569; margin-bottom: 8px; flex: 1.5;">
+               Stock disponible: <strong id="transferir-stock-disp" style="color: #0f172a">0</strong><br/>
+               <span class="hint" id="transferir-max-hin" style="font-size: 11.5px;">(máximo: 0)</span>
+            </div>
+          </div>
+          
+          <div id="transferir-msg" style="display: none; padding: 10px; border-radius: 6px; font-size: 13.5px; font-weight: 600;"></div>
+
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="cta">Transferir</button>
+          <button type="button" class="cta ghost" id="transferir-cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal Historial de Movimientos -->
+    <div class="modal-backdrop" id="historial-backdrop"></div>
+    <div class="modal" id="historial-modal" role="dialog" aria-modal="true" aria-labelledby="historial-title" style="width: 95%; max-width: 1000px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="historial-title">Historial de Movimientos</h2>
+          <p class="hint">Registro de cargas y salidas de productos.</p>
+        </div>
+        <button class="icon-action" type="button" id="historial-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div style="padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; background: #f8fafc;">
+        <span style="font-weight: 600; font-size: 13px; color: #475569; white-space: nowrap;">Filtrar por:</span>
+        <div style="display: flex; gap: 8px; flex: 1;">
+          <select id="historial-filter-deposito" style="flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px;">
+            <option value="">Todos los depósitos</option>
+            <option value="Depósito Central">Depósito Central</option>
+            <option value="Depósito Frontal">Depósito Frontal</option>
+          </select>
+          <select id="historial-filter-producto" style="flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px;">
+            <option value="">Todos los productos</option>
+            <option value="Bidón azul 10L">Bidón azul 10L</option>
+            <option value="Bidón azul 20L">Bidón azul 20L</option>
+            <option value="Baja en sodio 10L">Baja en sodio 10L</option>
+            <option value="Baja en sodio 20L">Baja en sodio 20L</option>
+            <option value="Sifones de soda">Sifones de soda</option>
+            <option value="Agua 500ml">Agua 500ml</option>
+            <option value="Dispenser común">Dispenser común</option>
+            <option value="Dispenser frío/calor">Dispenser frío/calor</option>
+            <option value="Bidón 8L">Bidón 8L</option>
+          </select>
+          <input type="date" id="historial-filter-fecha" style="flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px;" title="Filtrar por fecha" />
+        </div>
+      </div>
+      <div style="padding: 0 24px 24px 24px; max-height: 50vh; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; margin-top: 16px;">
+          <thead>
+            <tr style="background: #e2e8f0;">
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Fecha y Hora</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Usuario</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Acción</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Producto</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1; width: 60px;">Cant.</th>
+              <th style="padding: 10px 12px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #cbd5e1;">Depósito</th>
+            </tr>
+          </thead>
+          <tbody id="historial-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
+  {% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -207,6 +427,615 @@
       if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
       if (backdrop) backdrop.addEventListener("click", closeModal);
       if (form) form.addEventListener("input", updateTotals);
+
+
+      // Carga Camioneta form interception (Salidas)
+      if (form) {
+          form.addEventListener("submit", function(e) {
+              var rows = Array.prototype.slice.call(document.querySelectorAll(".carga-row"));
+              rows.forEach(function(row) {
+                  var input = row.querySelector("input");
+                  var prodEl = row.querySelector("strong");
+                  if (input && prodEl) {
+                      var qty = parseInt(input.value || "0", 10);
+                      if (qty > 0) {
+                          var prodName = prodEl.textContent.trim();
+                          historialDB.push({
+                              fecha: new Date().toISOString(),
+                              usuario: currentUser,
+                              accion: "Salida",
+                              producto: prodName,
+                              cantidad: qty,
+                              deposito: "Depósito Central"
+                          });
+                          if(depositosDB["Depósito Central"] && depositosDB["Depósito Central"][prodName]) {
+                              var prev = depositosDB["Depósito Central"][prodName];
+                              var cQty = typeof prev === 'number' ? prev : (prev ? prev.qty : 0);
+                              depositosDB["Depósito Central"][prodName] = {
+                                  qty: Math.max(0, cQty - qty),
+                                  tipo: prev.tipo || null
+                              };
+                          }
+                      }
+                  }
+              });
+              saveHistorial();
+              saveDB();
+          });
+      }
+
+      // INITIALIZE LOCAL STORAGE MOCK DB
+      var currentUser = "{{ request.user.username|default:'Administrador' }}";
+      var historialDB = JSON.parse(localStorage.getItem('historialDB')) || [];
+      function saveHistorial() {
+          localStorage.setItem('historialDB', JSON.stringify(historialDB));
+      }
+
+      var depositosDB = JSON.parse(localStorage.getItem('depositosDB')) || {
+        'Depósito Central': {},
+        'Depósito Frontal': {}
+      };
+
+      function saveDB() {
+        localStorage.setItem('depositosDB', JSON.stringify(depositosDB));
+      }
+
+      function updateDashboardTotals() {
+        var totalGeneral = 0;
+        ['Depósito Central', 'Depósito Frontal'].forEach(function(dep) {
+          var totalID = dep === 'Depósito Central' ? 'total-deposito-central' : 'total-deposito-frontal';
+          var totalEl = document.getElementById(totalID);
+          var sum = 0;
+          for(var prod in depositosDB[dep]) {
+            var val = depositosDB[dep][prod];
+            sum += (typeof val === 'number') ? val : (val.qty || 0);
+          }
+          if (totalEl) {
+            totalEl.textContent = sum;
+          }
+          totalGeneral += sum;
+        });
+        var generalEl = document.getElementById('total-stock-general');
+        if (generalEl) {
+          generalEl.textContent = totalGeneral;
+        }
+      }
+      updateDashboardTotals();
+
+      // Lógica para el modal de Cargar Depósito
+      var depModal = document.getElementById("carga-deposito-modal");
+      var depBackdrop = document.getElementById("carga-deposito-backdrop");
+      var depCloseBtn = document.getElementById("carga-deposito-close");
+      var depCancelBtn = document.getElementById("carga-deposito-cancel");
+      var depTitle = document.getElementById("carga-deposito-title");
+      var depSelect = document.getElementById("carga-deposito-producto");
+      var depStockLbl = document.getElementById("carga-deposito-stock-actual");
+      var cargaDepForm = document.getElementById("carga-deposito-form");
+
+      function openDepModal(nombre, preselectedProd) {
+        if (depTitle) depTitle.textContent = "Cargar stock - " + nombre;
+        if (depSelect) {
+            depSelect.value = "";
+            var lblValue = "-";
+            var typeRadios = document.querySelectorAll('#carga-deposito-form input[name="tipo"]');
+            if (preselectedProd) {
+                depSelect.disabled = true;
+                typeRadios.forEach(function(r) { r.disabled = true; });
+                for (var i = 0; i < depSelect.options.length; i++) {
+                    if (depSelect.options[i].text === preselectedProd) {
+                        depSelect.selectedIndex = i;
+                        var prev = depositosDB[nombre] && depositosDB[nombre][preselectedProd];
+                        lblValue = typeof prev === 'number' ? prev : (prev ? prev.qty : 0);
+                        if (prev && prev.tipo) {
+                            typeRadios.forEach(function(r) { r.checked = (r.value === prev.tipo); });
+                        } else {
+                            typeRadios.forEach(function(r) { r.checked = false; });
+                        }
+                        break;
+                    }
+                }
+            } else {
+                depSelect.disabled = false;
+                typeRadios.forEach(function(r) { 
+                    r.disabled = false; 
+                    r.checked = false; 
+                });
+            }
+            if (depStockLbl) depStockLbl.textContent = "Stock actual: " + lblValue;
+        }
+        if (depModal) depModal.classList.add("open");
+        if (depBackdrop) depBackdrop.classList.add("open");
+      }
+
+      function closeDepModal() {
+        if (depModal) depModal.classList.remove("open");
+        if (depBackdrop) depBackdrop.classList.remove("open");
+      }
+
+      document.querySelectorAll(".js-open-carga-deposito").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          openDepModal(btn.getAttribute("data-nombre"));
+        });
+      });
+
+      if (depCloseBtn) depCloseBtn.addEventListener("click", closeDepModal);
+      if (depCancelBtn) depCancelBtn.addEventListener("click", closeDepModal);
+      if (depBackdrop) depBackdrop.addEventListener("click", closeDepModal);
+      
+      if (depSelect) {
+        depSelect.addEventListener("change", function() {
+            var opt = depSelect.options[depSelect.selectedIndex];
+            var currentDepName = depTitle.textContent.replace("Cargar stock - ", "");
+            if(opt && opt.value !== "") {
+                var prodName = opt.text;
+                var prev = depositosDB[currentDepName] && depositosDB[currentDepName][prodName];
+                var stock = typeof prev === 'number' ? prev : (prev ? prev.qty : 0);
+                if (depStockLbl) depStockLbl.textContent = "Stock actual: " + stock;
+                
+                var typeRadios = document.querySelectorAll('#carga-deposito-form input[name="tipo"]');
+                if (prev && prev.tipo) {
+                    typeRadios.forEach(function(r) { r.checked = (r.value === prev.tipo); });
+                } else {
+                    typeRadios.forEach(function(r) { r.checked = false; });
+                }
+            } else {
+                if (depStockLbl) depStockLbl.textContent = "Stock actual: -";
+                var typeRadios = document.querySelectorAll('#carga-deposito-form input[name="tipo"]');
+                typeRadios.forEach(function(r) { r.checked = false; });
+            }
+        });
+      }
+
+      if (cargaDepForm) {
+        cargaDepForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            var formData = new FormData(cargaDepForm);
+            if (depSelect.selectedIndex <= 0) return; // Prevent if nothing selected
+            var prodName = depSelect.options[depSelect.selectedIndex].text;
+            var cantidad = parseInt(formData.get("cantidad"), 10) || 0;
+            var tipoVal = null;
+            document.querySelectorAll('#carga-deposito-form input[name="tipo"]').forEach(function(r) {
+                if (r.checked) tipoVal = r.value;
+            });
+            var currentDepName = depTitle.textContent.replace("Cargar stock - ", "");
+
+            if (!depositosDB[currentDepName]) depositosDB[currentDepName] = {};
+            var prev = depositosDB[currentDepName][prodName];
+            var currentQty = typeof prev === 'number' ? prev : (prev ? prev.qty : 0);
+            
+            depositosDB[currentDepName][prodName] = {
+                qty: currentQty + cantidad,
+                tipo: tipoVal
+            };
+
+            historialDB.push({
+                fecha: new Date().toISOString(),
+                usuario: currentUser,
+                accion: "Carga",
+                producto: prodName,
+                cantidad: cantidad,
+                deposito: currentDepName
+            });
+
+            saveHistorial();
+            saveDB();
+            updateDashboardTotals();
+            closeDepModal();
+            cargaDepForm.reset();
+        });
+      }
+
+      // Lógica para el modal de Detalle Depósito
+      var detModal = document.getElementById("detalle-deposito-modal");
+      var detBackdrop = document.getElementById("detalle-deposito-backdrop");
+      var detCloseBtn = document.getElementById("detalle-deposito-close");
+      var detTitle = document.getElementById("detalle-deposito-title");
+
+      function openDetModal(nombre) {
+        if (detTitle) detTitle.textContent = "Detalle - " + nombre;
+        
+        var tbody = document.getElementById('detalle-deposito-tbody');
+        if (tbody) {
+          tbody.innerHTML = '';
+          var items = depositosDB[nombre] || {};
+          var keys = Object.keys(items);
+          if (keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="padding: 12px 4px; color: #475569; text-align: center;">No hay productos cargados</td></tr>';
+          } else {
+            var sortedItems = keys.map(function(k) { 
+                var v = items[k];
+                return { prod: k, qty: typeof v === 'number' ? v : v.qty }; 
+            });
+            sortedItems.sort(function(a, b) { return a.qty - b.qty; });
+
+            sortedItems.forEach(function(item) {
+              var prod = item.prod;
+              var qty = item.qty;
+              var bg = '#dcfce7'; var color = '#166534';
+              if (qty < 5) { bg = '#fee2e2'; color = '#991b1b'; }
+              else if (qty < 10) { bg = '#fef08a'; color = '#854d0e'; }
+              
+              var tr = document.createElement('tr');
+              tr.style.borderBottom = '1px solid var(--border)';
+              
+              var tdProd = document.createElement('td');
+              tdProd.style.padding = '12px 4px';
+              tdProd.textContent = prod;
+              
+              var tdQty = document.createElement('td');
+              tdQty.style.padding = '12px 4px';
+              tdQty.innerHTML = '<span style="display: inline-block; padding: 4px 8px; border-radius: 99px; background: ' + bg + '; color: ' + color + '; font-weight: 600; font-size: 13px;">' + qty + '</span>';
+              
+              var tdAction = document.createElement('td');
+              tdAction.style.padding = '12px 4px';
+              tdAction.style.textAlign = 'right';
+              
+              var btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'cta ghost';
+              btn.style.padding = '4px 8px';
+              btn.style.fontSize = '12px';
+              btn.textContent = 'Agregar';
+              btn.addEventListener('click', function() {
+                  closeDetModal();
+                  openDepModal(nombre, prod);
+              });
+              tdAction.appendChild(btn);
+
+              tr.appendChild(tdProd);
+              tr.appendChild(tdQty);
+              tr.appendChild(tdAction);
+              tbody.appendChild(tr);
+            });
+          }
+        }
+
+        if (detModal) detModal.classList.add("open");
+        if (detBackdrop) detBackdrop.classList.add("open");
+      }
+
+      function closeDetModal() {
+        if (detModal) detModal.classList.remove("open");
+        if (detBackdrop) detBackdrop.classList.remove("open");
+      }
+
+      document.querySelectorAll(".js-open-detalle-deposito").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          openDetModal(btn.getAttribute("data-nombre"));
+        });
+      });
+
+      if (detCloseBtn) detCloseBtn.addEventListener("click", closeDetModal);
+      if (detBackdrop) detBackdrop.addEventListener("click", closeDetModal);
+
+      // Lógica para el modal de Detalle General
+      var genModal = document.getElementById("detalle-general-modal");
+      var genBackdrop = document.getElementById("detalle-general-backdrop");
+      var genCloseBtn = document.getElementById("detalle-general-close");
+
+      function openGenModal() {
+        var tbody = document.getElementById('detalle-general-tbody');
+        if (tbody) {
+          tbody.innerHTML = '';
+          var allItems = [];
+          
+          ['Depósito Central', 'Depósito Frontal'].forEach(function(dep) {
+            var items = depositosDB[dep] || {};
+            Object.keys(items).forEach(function(k) {
+                var v = items[k];
+                allItems.push({
+                    prod: k,
+                    dep: dep,
+                    qty: typeof v === 'number' ? v : v.qty
+                });
+            });
+          });
+
+          if (allItems.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="padding: 12px 4px; color: #475569; text-align: center;">No hay productos cargados</td></tr>';
+          } else {
+            allItems.sort(function(a, b) { return a.qty - b.qty; });
+
+            allItems.forEach(function(item) {
+              var prod = item.prod;
+              var dep = item.dep;
+              var qty = item.qty;
+              var bg = '#dcfce7'; var color = '#166534';
+              if (qty < 5) { bg = '#fee2e2'; color = '#991b1b'; }
+              else if (qty < 10) { bg = '#fef08a'; color = '#854d0e'; }
+              
+              var tr = document.createElement('tr');
+              tr.style.borderBottom = '1px solid var(--border)';
+              
+              var tdProd = document.createElement('td');
+              tdProd.style.padding = '10px 12px';
+              tdProd.textContent = prod;
+              
+              var tdDep = document.createElement('td');
+              tdDep.style.padding = '10px 12px';
+              tdDep.textContent = dep;
+
+              var tdQty = document.createElement('td');
+              tdQty.style.padding = '10px 12px';
+              tdQty.innerHTML = '<span style="display: inline-block; padding: 4px 8px; border-radius: 99px; background: ' + bg + '; color: ' + color + '; font-weight: 600; font-size: 13px;">' + qty + '</span>';
+              
+              tr.appendChild(tdProd);
+              tr.appendChild(tdDep);
+              tr.appendChild(tdQty);
+              tbody.appendChild(tr);
+            });
+          }
+        }
+
+        if (genModal) genModal.classList.add("open");
+        if (genBackdrop) genBackdrop.classList.add("open");
+      }
+
+      function closeGenModal() {
+        if (genModal) genModal.classList.remove("open");
+        if (genBackdrop) genBackdrop.classList.remove("open");
+      }
+
+      var btnGen = document.querySelector(".js-open-detalle-general");
+      if (btnGen) {
+        btnGen.addEventListener("click", function (e) {
+          e.preventDefault();
+          openGenModal();
+        });
+      }
+
+      if (genCloseBtn) genCloseBtn.addEventListener("click", closeGenModal);
+      if (genBackdrop) genBackdrop.addEventListener("click", closeGenModal);
+
+      // Lógica para el modal de Historial
+      var histModal = document.getElementById("historial-modal");
+      var histBackdrop = document.getElementById("historial-backdrop");
+      var histCloseBtn = document.getElementById("historial-close");
+      var histFilterDep = document.getElementById("historial-filter-deposito");
+      var histFilterProd = document.getElementById("historial-filter-producto");
+      var histFilterFecha = document.getElementById("historial-filter-fecha");
+
+      function renderHistorial() {
+         var tbody = document.getElementById('historial-tbody');
+         if (!tbody) return;
+         tbody.innerHTML = '';
+         
+         var selDep = histFilterDep.value;
+         var selProd = histFilterProd.value;
+         var selFecha = histFilterFecha.value;
+
+         var filtrado = historialDB.filter(function(h) {
+            if (selDep && h.deposito !== selDep) return false;
+            if (selProd && h.producto !== selProd) return false;
+            if (selFecha) {
+                var hd = new Date(h.fecha);
+                var isodate = hd.getFullYear() + "-" + String(hd.getMonth()+1).padStart(2,'0') + "-" + String(hd.getDate()).padStart(2,'0');
+                if (isodate !== selFecha) return false;
+            }
+            return true;
+         });
+
+         filtrado.sort(function(a, b) { return new Date(b.fecha) - new Date(a.fecha); });
+
+         if (filtrado.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding: 16px; text-align: center; color: #64748b;">No hay movimientos registrados con estos filtros.</td></tr>';
+            return;
+         }
+
+         filtrado.forEach(function(item) {
+             var tr = document.createElement("tr");
+             tr.style.borderBottom = "1px solid var(--border)";
+             
+             var dt = new Date(item.fecha);
+             var tdDt = document.createElement("td");
+             tdDt.style.padding = "10px 12px";
+             tdDt.textContent = dt.toLocaleString("es-AR", {dateStyle: 'short', timeStyle: 'short'});
+             
+             var tdUsr = document.createElement("td");
+             tdUsr.style.padding = "10px 12px";
+             tdUsr.textContent = item.usuario;
+
+             var tdAcc = document.createElement("td");
+             tdAcc.style.padding = "10px 12px";
+             
+             var badgeColor = "#f1f5f9";
+             var badgeTextCol = "#475569";
+             var prefix = "";
+             if (item.accion === "Carga") {
+                 badgeColor = "#dcfce7"; badgeTextCol = "#166534"; prefix = "+ ";
+             } else if (item.accion === "Salida") {
+                 badgeColor = "#fee2e2"; badgeTextCol = "#991b1b"; prefix = "- ";
+             } else if (item.accion === "Transferencia") {
+                 badgeColor = "#e0f2fe"; badgeTextCol = "#0369a1"; prefix = "↔ ";
+             }
+
+             tdAcc.innerHTML = '<span style="display: inline-block; padding: 2px 6px; border-radius: 4px; background: ' + badgeColor + '; color: ' + badgeTextCol + '; font-weight: 600; font-size: 11px; text-transform: uppercase;">' + item.accion + '</span>';
+
+             var tdProd = document.createElement("td");
+             tdProd.style.padding = "10px 12px";
+             tdProd.textContent = item.producto;
+
+             var tdQty = document.createElement("td");
+             tdQty.style.padding = "10px 12px";
+             tdQty.style.fontWeight = "700";
+             tdQty.style.fontSize = "14px";
+             tdQty.textContent = prefix + item.cantidad;
+
+             var tdDep = document.createElement("td");
+             tdDep.style.padding = "10px 12px";
+             tdDep.textContent = item.deposito;
+
+             tr.appendChild(tdDt);
+             tr.appendChild(tdUsr);
+             tr.appendChild(tdAcc);
+             tr.appendChild(tdProd);
+             tr.appendChild(tdQty);
+             tr.appendChild(tdDep);
+
+             tbody.appendChild(tr);
+         });
+      }
+
+      function openHistModal() {
+         renderHistorial();
+         if (histModal) histModal.classList.add("open");
+         if (histBackdrop) histBackdrop.classList.add("open");
+      }
+
+      function closeHistModal() {
+         if (histModal) histModal.classList.remove("open");
+         if (histBackdrop) histBackdrop.classList.remove("open");
+      }
+
+      var btnHist = document.querySelector(".js-open-historial");
+      if (btnHist) {
+          btnHist.addEventListener("click", function(e) {
+              e.preventDefault();
+              openHistModal();
+          });
+      }
+
+      if (histCloseBtn) histCloseBtn.addEventListener("click", closeHistModal);
+      if (histBackdrop) histBackdrop.addEventListener("click", closeHistModal);
+      
+      if (histFilterDep) histFilterDep.addEventListener("change", renderHistorial);
+      if (histFilterProd) histFilterProd.addEventListener("change", renderHistorial);
+      if (histFilterFecha) histFilterFecha.addEventListener("change", renderHistorial);
+
+      // Lógica Modal de Transferencia
+      var transModal = document.getElementById("transferir-modal");
+      var transBackdrop = document.getElementById("transferir-backdrop");
+      var transCloseBtn = document.getElementById("transferir-close");
+      var transCancelBtn = document.getElementById("transferir-cancel");
+      var transForm = document.getElementById("transferir-form");
+      var transProducto = document.getElementById("transferir-producto");
+      var transCantidad = document.getElementById("transferir-cantidad");
+      var transStockDisp = document.getElementById("transferir-stock-disp");
+      var transMaxHint = document.getElementById("transferir-max-hin");
+      var transMsg = document.getElementById("transferir-msg");
+
+      function openTransModal() {
+          transMsg.style.display = 'none';
+          transCantidad.value = "";
+          transCantidad.disabled = true;
+          transStockDisp.textContent = "0";
+          transMaxHint.textContent = "(máximo: 0)";
+          
+          transProducto.innerHTML = '<option value="" disabled selected>▼ seleccionar</option>';
+          var items = depositosDB["Depósito Central"] || {};
+          var availableItems = 0;
+          Object.keys(items).forEach(function(k) {
+              var qty = typeof items[k] === 'number' ? items[k] : items[k].qty;
+              if (qty > 0) {
+                  availableItems++;
+                  var opt = document.createElement("option");
+                  opt.value = k; opt.textContent = k;
+                  opt.setAttribute("data-max", qty);
+                  transProducto.appendChild(opt);
+              }
+          });
+          
+          if (availableItems === 0) {
+              var opt = document.createElement("option");
+              opt.value = ""; opt.disabled = true;
+              opt.textContent = "No hay productos con stock para transferir";
+              transProducto.appendChild(opt);
+          }
+          
+          if (transModal) transModal.classList.add("open");
+          if (transBackdrop) transBackdrop.classList.add("open");
+      }
+
+      function closeTransModal() {
+          if (transModal) transModal.classList.remove("open");
+          if (transBackdrop) transBackdrop.classList.remove("open");
+      }
+
+      if (transProducto) {
+          transProducto.addEventListener("change", function() {
+              transMsg.style.display = "none";
+              var opt = transProducto.options[transProducto.selectedIndex];
+              if (opt && opt.value) {
+                  var maxQty = parseInt(opt.getAttribute("data-max"), 10);
+                  transStockDisp.textContent = maxQty;
+                  transMaxHint.textContent = "(máximo: " + maxQty + ")";
+                  transCantidad.disabled = false;
+                  transCantidad.max = maxQty;
+                  transCantidad.value = parseInt(maxQty > 0 ? 1 : 0);
+              } else {
+                  transStockDisp.textContent = "0";
+                  transMaxHint.textContent = "(máximo: 0)";
+                  transCantidad.disabled = true;
+                  transCantidad.value = "";
+              }
+          });
+      }
+
+      if (transForm) {
+          transForm.addEventListener("submit", function(e) {
+              e.preventDefault();
+              var prodName = transProducto.value;
+              var qty = parseInt(transCantidad.value, 10);
+              var maxQty = parseInt(transStockDisp.textContent, 10);
+              
+              if (!prodName || qty <= 0) return;
+
+              if (qty > maxQty) {
+                  transMsg.style.display = 'block';
+                  transMsg.style.background = '#fee2e2';
+                  transMsg.style.color = '#991b1b';
+                  transMsg.textContent = '⚠️ No puedes transferir más de lo disponible.';
+                  return;
+              }
+              
+              var prevCentral = depositosDB["Depósito Central"][prodName];
+              var centralTipo = typeof prevCentral === 'object' ? prevCentral.tipo : null;
+              depositosDB["Depósito Central"][prodName] = { qty: maxQty - qty, tipo: centralTipo };
+              
+              if (!depositosDB["Depósito Frontal"]) depositosDB["Depósito Frontal"] = {};
+              var prevFrontal = depositosDB["Depósito Frontal"][prodName];
+              var fQty = typeof prevFrontal === 'number' ? prevFrontal : (prevFrontal ? prevFrontal.qty : 0);
+              depositosDB["Depósito Frontal"][prodName] = { qty: fQty + qty, tipo: centralTipo };
+
+              historialDB.push({
+                  fecha: new Date().toISOString(),
+                  usuario: currentUser,
+                  accion: "Transferencia",
+                  producto: prodName,
+                  cantidad: qty,
+                  deposito: "Central ➡️ Frontal"
+              });
+
+              saveHistorial();
+              saveDB();
+              updateDashboardTotals();
+              
+              transMsg.style.display = 'block';
+              transMsg.style.background = '#dcfce7';
+              transMsg.style.color = '#166534';
+              transMsg.innerHTML = '✔ Transferencia realizada correctamente.<br/>' + qty + ' unidades enviadas a Depósito Frontal.';
+              
+              setTimeout(function() {
+                  closeTransModal();
+              }, 1800);
+          });
+      }
+
+      var btnTransList = document.querySelectorAll(".js-open-transferir");
+      btnTransList.forEach(function(btn) {
+          btn.addEventListener("click", function(e) {
+              e.preventDefault();
+              openTransModal();
+          });
+      });
+      
+      if (transCloseBtn) transCloseBtn.addEventListener("click", closeTransModal);
+      if (transCancelBtn) transCancelBtn.addEventListener("click", closeTransModal);
+      if (transBackdrop) transBackdrop.addEventListener("click", closeTransModal);
+
+
     })();
   </script>
 {% endblock %}
