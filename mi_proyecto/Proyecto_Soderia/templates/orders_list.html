@@ -5,25 +5,6 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
-  <style>
-    .modal-backdrop {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
-      display: none; z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
-    }
-    .modal-backdrop.open { display: block; opacity: 1; }
-    .modal {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
-      background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-      display: none; z-index: 1001; flex-direction: column; opacity: 0; transition: all 0.3s ease;
-      overflow: hidden; width: 90%;
-    }
-    .modal.open { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
-    .close-modal { background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; }
-    .modal-body { padding: 0; overflow-y: auto; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); background: #f8fafc; }
-  </style>
 {% endblock %}
 
 {% block header_action %}
@@ -42,9 +23,9 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Crear pedido
         </a>
-        <button type="button" class="cta ghost js-open-historial-pedidos" style="margin-left:.5rem">
+        <a class="cta ghost" href="{% url 'orders_list' %}?status=ENTREGADO" style="margin-left:.5rem">
           📋 Ver historial
-        </button>
+        </a>
       </div>
 
       <form class="client-filters" method="get">
@@ -132,104 +113,4 @@
       </section>
     </aside>
   </div>
- 
-  <!-- Modal Historial de Pedidos -->
-  <div class="modal-backdrop" id="historial-pedidos-backdrop"></div>
-  <div class="modal" id="historial-pedidos-modal" style="max-width: 900px;">
-    <div class="modal-header">
-      <div>
-        <h2 id="historial-title">Historial de Pedidos</h2>
-        <p class="hint">Listado completo de ventas y sus estados.</p>
-      </div>
-      <button class="close-modal" id="historial-pedidos-close">&times;</button>
-    </div>
-    <div class="modal-body" style="padding: 20px;">
-      <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-        <label for="hist-ped-filter" style="font-weight: 600; font-size: 14px;">Filtrar por estado:</label>
-        <select id="hist-ped-filter" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
-            <option value="all">Todos</option>
-            {% for val, lab in estado_choices %}
-            <option value="{{ val }}">{{ lab }}</option>
-            {% endfor %}
-        </select>
-      </div>
-      <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-          <thead>
-            <tr style="background: #f8fafc; border-bottom: 2px solid var(--border); position: sticky; top: 0;">
-              <th style="padding: 12px; text-align: left;">ID</th>
-              <th style="padding: 12px; text-align: left;">Cliente</th>
-              <th style="padding: 12px; text-align: left;">Fecha</th>
-              <th style="padding: 12px; text-align: left;">Estado</th>
-              <th style="padding: 12px; text-align: left;">Total</th>
-            </tr>
-          </thead>
-          <tbody id="hist-ped-tbody">
-            {% for p in all_orders %}
-            <tr class="hist-ped-row" data-status="{{ p.estado }}" style="border-bottom: 1px solid var(--border);">
-              <td style="padding: 10px 12px; font-weight: 600;">#{{ p.id }}</td>
-              <td style="padding: 10px 12px;">{{ p.cliente.name }}</td>
-              <td style="padding: 10px 12px;">{{ p.created_at|date:"d/m/Y H:i" }}</td>
-              <td style="padding: 10px 12px;">
-                {% if p.estado == 'ENTREGADO' %}
-                  <span style="background:#dcfce7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:600; font-size:11px;">ENTREGADO</span>
-                {% elif p.estado == 'EN_REPARTO' %}
-                  <span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:600; font-size:11px;">EN REPARTO</span>
-                {% else %}
-                  <span style="background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; font-size:11px;">{{ p.get_estado_display|upper }}</span>
-                {% endif %}
-              </td>
-              <td style="padding: 10px 12px; font-weight: 700;">${{ p.total }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="modal-footer" style="padding: 15px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end;">
-      <button type="button" class="cta ghost" id="historial-pedidos-cancel">Cerrar</button>
-    </div>
-  </div>
-{% endblock %}
- 
-{% block extra_js %}
-<script>
-    (function() {
-        var modal = document.getElementById('historial-pedidos-modal');
-        var backdrop = document.getElementById('historial-pedidos-backdrop');
-        var closeBtn = document.getElementById('historial-pedidos-close');
-        var cancelBtn = document.getElementById('historial-pedidos-cancel');
-        var openBtn = document.querySelector('.js-open-historial-pedidos');
-        var filter = document.getElementById('hist-ped-filter');
-        var rows = document.querySelectorAll('.hist-ped-row');
-
-        function openModal() {
-            modal.classList.add('open');
-            backdrop.classList.add('open');
-        }
-
-        function closeModal() {
-            modal.classList.remove('open');
-            backdrop.classList.remove('open');
-        }
-
-        if (openBtn) openBtn.addEventListener('click', openModal);
-        if (closeBtn) closeBtn.addEventListener('click', closeModal);
-        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-        if (backdrop) backdrop.addEventListener('click', closeModal);
-
-        if (filter) {
-            filter.addEventListener('change', function() {
-                var val = this.value;
-                rows.forEach(function(row) {
-                    if (val === 'all' || row.getAttribute('data-status') === val) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-        }
-    })();
-</script>
 {% endblock %}

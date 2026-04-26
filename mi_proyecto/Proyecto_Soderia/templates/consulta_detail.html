@@ -8,106 +8,161 @@
 {% endblock %}
 
 {% block header_action %}
-  <a class="cta ghost" href="{% url 'consultas_list' %}">Volver a consultas</a>
+  <a class="cta ghost" href="{% url 'consultas_list' %}">← Volver a consultas</a>
 {% endblock %}
 
 {% block content %}
-<div class="consulta-detail-page">
+<div class="cd-page">
 
-  <!-- Main info -->
-  <div class="consulta-detail-grid">
-    <section class="card consulta-card-main">
-      <div class="consulta-card-header">
-        <h1>📩 Consulta #{{ consulta.pk }}</h1>
-        <span class="badge badge-{{ consulta.estado|lower }}">{{ consulta.get_estado_display }}</span>
-      </div>
-      <p class="consulta-date">Recibida el {{ consulta.created_at|date:"d/m/Y" }} a las {{ consulta.created_at|date:"H:i" }} hs</p>
+  <!-- ─── Top bar: ID + badge + date ─── -->
+  <header class="cd-header">
+    <div class="cd-header-left">
+      <h1 class="cd-title">Consulta #{{ consulta.pk }}</h1>
+      <span class="badge badge-{{ consulta.estado|lower }}" id="badge-estado">{{ consulta.get_estado_display }}</span>
+      <span class="badge badge-motivo-{{ consulta.motivo|lower }}">{{ consulta.get_motivo_display }}</span>
+    </div>
+    <time class="cd-time">{{ consulta.created_at|date:"d/m/Y" }} · {{ consulta.created_at|date:"H:i" }} hs</time>
+  </header>
 
-      <div class="consulta-fields">
-        <div class="consulta-field">
-          <span class="consulta-field-label">Nombre</span>
-          <span class="consulta-field-value">{{ consulta.nombre }}</span>
-        </div>
-        <div class="consulta-field">
-          <span class="consulta-field-label">Teléfono</span>
-          <span class="consulta-field-value">
-            <a href="https://wa.me/549{{ consulta.telefono|cut:'-'|cut:' '|cut:'+' }}" target="_blank" rel="noopener" class="wa-link-detail">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
-              {{ consulta.telefono }}
-            </a>
-          </span>
-        </div>
-        <div class="consulta-field">
-          <span class="consulta-field-label">Email</span>
-          <span class="consulta-field-value">
-            {% if consulta.email %}
-              <a href="mailto:{{ consulta.email }}">{{ consulta.email }}</a>
-            {% else %}
-              <em>No proporcionado</em>
-            {% endif %}
-          </span>
-        </div>
-      </div>
+  <!-- ─── Hint contextual ─── -->
+  <p class="cd-hint" id="cd-hint">
+    {% if consulta.estado == 'NUEVA' %}Esta consulta se marcó como leída automáticamente.
+    {% elif consulta.estado == 'LEIDA' %}Enviá un WhatsApp para marcarla como contactada.
+    {% elif consulta.estado == 'CONTACTADA' %}Convertí en cliente o descartá la consulta.
+    {% elif consulta.estado == 'CONVERTIDA' %}✅ Esta consulta ya fue convertida a cliente.
+    {% elif consulta.estado == 'DESCARTADA' %}Esta consulta fue descartada.
+    {% endif %}
+  </p>
 
-      <div class="consulta-message-block">
-        <span class="consulta-field-label">Mensaje</span>
-        <div class="consulta-message">{{ consulta.mensaje|linebreaksbr }}</div>
-      </div>
+  {% if consulta.cliente_convertido %}
+  <div class="cd-converted-banner">
+    ✅ Convertida en cliente:
+    <a href="{% url 'clients_edit' consulta.cliente_convertido.pk %}">{{ consulta.cliente_convertido.name }}</a>
+  </div>
+  {% endif %}
 
-      {% if consulta.cliente_convertido %}
-      <div class="consulta-converted-banner">
-        ✅ Convertida en cliente:
-        <a href="{% url 'clients_edit' consulta.cliente_convertido.pk %}">
-          {{ consulta.cliente_convertido.name }}
-        </a>
+  <!-- ─── Contact info strip ─── -->
+  <section class="cd-contact-strip">
+    <div class="cd-contact-item">
+      <span class="cd-contact-icon">👤</span>
+      <div>
+        <span class="cd-label">Nombre</span>
+        <span class="cd-value">{{ consulta.nombre }}</span>
       </div>
-      {% endif %}
+    </div>
+    <div class="cd-contact-divider"></div>
+    <div class="cd-contact-item">
+      <span class="cd-contact-icon">📱</span>
+      <div>
+        <span class="cd-label">Teléfono</span>
+        <span class="cd-value">
+          <a href="https://wa.me/549{{ consulta.telefono|cut:'-'|cut:' '|cut:'+' }}" target="_blank" rel="noopener" class="cd-phone-link">
+            {{ consulta.telefono }}
+          </a>
+        </span>
+      </div>
+    </div>
+    <div class="cd-contact-divider"></div>
+    <div class="cd-contact-item">
+      <span class="cd-contact-icon">✉️</span>
+      <div>
+        <span class="cd-label">Email</span>
+        <span class="cd-value">
+          {% if consulta.email %}
+            <a href="mailto:{{ consulta.email }}">{{ consulta.email }}</a>
+          {% else %}
+            <em class="cd-muted">No proporcionado</em>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Message + Primary Action ─── -->
+  <section class="cd-message-section">
+    <span class="cd-label">Mensaje</span>
+    <div class="cd-message-bubble">{{ consulta.mensaje|linebreaksbr }}</div>
+
+    {% if consulta.estado != 'CONVERTIDA' and consulta.estado != 'DESCARTADA' %}
+    <a href="https://wa.me/549{{ consulta.telefono|cut:'-'|cut:' '|cut:'+' }}?text=Hola%20{{ consulta.nombre|urlencode }}%2C%20recibimos%20tu%20consulta%20en%20Tres%20Cerritos.%20%C2%BFEn%20qu%C3%A9%20podemos%20ayudarte%3F"
+       target="_blank" rel="noopener"
+       class="cd-wa-btn"
+       id="btn-whatsapp"
+       data-estado-url="{% url 'consulta_estado' consulta.pk %}">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
+      Responder por WhatsApp
+    </a>
+    {% endif %}
+  </section>
+
+  <!-- ─── Bottom row: Notes + Secondary actions ─── -->
+  <div class="cd-bottom-row">
+    <!-- Notes -->
+    <section class="cd-notes-section">
+      <div class="cd-section-head">
+        <span class="cd-label">📝 Notas internas</span>
+      </div>
+      <form method="post" class="cd-notes-form">
+        {% csrf_token %}
+        <textarea name="notas_internas" rows="3" placeholder="Agregá anotaciones sobre esta consulta…" class="cd-notes-textarea">{{ consulta.notas_internas }}</textarea>
+        <button type="submit" class="cd-notes-save">Guardar</button>
+      </form>
     </section>
 
-    <!-- Actions sidebar -->
-    <aside class="consulta-sidebar">
-      <!-- Status change -->
-      <div class="card consulta-action-card">
-        <h3>Cambiar estado</h3>
-        <form method="post" action="{% url 'consulta_estado' consulta.pk %}">
+    <!-- Secondary actions -->
+    <section class="cd-secondary-actions">
+      <div class="cd-section-head">
+        <span class="cd-label">Más acciones</span>
+      </div>
+      <div class="cd-actions-list">
+        {% if consulta.estado != 'CONVERTIDA' and consulta.estado != 'DESCARTADA' and not client_exists %}
+        <a href="{% url 'consulta_convertir' consulta.pk %}" class="cd-action-btn cd-action-convert">
+          <span>👤</span> Convertir en cliente
+        </a>
+        {% endif %}
+        {% if consulta.estado != 'CONVERTIDA' and consulta.estado != 'DESCARTADA' %}
+        <form method="post" action="{% url 'consulta_estado' consulta.pk %}" class="cd-discard-form">
           {% csrf_token %}
-          <select name="estado" class="consulta-estado-select">
-            {% for val, label in estado_choices %}
-              <option value="{{ val }}" {% if consulta.estado == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit" class="cta">Actualizar</button>
+          <input type="hidden" name="estado" value="DESCARTADA">
+          <button type="submit" class="cd-action-btn cd-action-discard">
+            <span>🗑️</span> Descartar consulta
+          </button>
         </form>
+        {% endif %}
       </div>
-
-      <!-- Quick actions -->
-      <div class="card consulta-action-card">
-        <h3>Acciones rápidas</h3>
-        <div class="consulta-actions-stack">
-          <a href="https://wa.me/549{{ consulta.telefono|cut:'-'|cut:' '|cut:'+' }}?text=Hola%20{{ consulta.nombre|urlencode }}%2C%20recibimos%20tu%20consulta%20en%20Tres%20Cerritos.%20%C2%BFEn%20qu%C3%A9%20podemos%20ayudarte%3F"
-             target="_blank" rel="noopener"
-             class="cta wa-btn">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 14.4l-2-1c-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.3.3-.6.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.1-.5 0-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3 0-.2-.2-.3-.4-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.6 1 1-3.7-.2-.4A9.8 9.8 0 1112 21.8zM12 0a12 12 0 00-8.5 20.5L1.2 24l3.6-2.3A12 12 0 1012 0z"/></svg>
-            Enviar WhatsApp
-          </a>
-          {% if consulta.estado != 'CONVERTIDA' and consulta.estado != 'DESCARTADA' %}
-          <a href="{% url 'consulta_convertir' consulta.pk %}" class="cta accent">
-            👤 Convertir en Cliente
-          </a>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Internal notes -->
-      <div class="card consulta-action-card">
-        <h3>Notas internas</h3>
-        <form method="post">
-          {% csrf_token %}
-          <textarea name="notas_internas" rows="4" placeholder="Anotaciones sobre esta consulta...">{{ consulta.notas_internas }}</textarea>
-          <button type="submit" class="cta ghost">Guardar notas</button>
-        </form>
-      </div>
-    </aside>
+    </section>
   </div>
+
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var btnWa = document.getElementById('btn-whatsapp');
+  if (btnWa) {
+    btnWa.addEventListener('click', function() {
+      var url = this.getAttribute('data-estado-url');
+      var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: 'estado=CONTACTADA'
+      }).then(function() {
+        var badge = document.getElementById('badge-estado');
+        if (badge) {
+          badge.textContent = 'Contactada';
+          badge.className = 'badge badge-contactada';
+        }
+        var hint = document.getElementById('cd-hint');
+        if (hint) {
+          hint.textContent = 'Convertí en cliente o descartá la consulta.';
+        }
+      });
+    });
+  }
+});
+</script>
 {% endblock %}

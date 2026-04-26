@@ -41,10 +41,6 @@
           <span>{% if pedido.repartidor %}{{ pedido.repartidor.username }}{% else %}-{% endif %}</span>
         </div>
         <div>
-          <span class="meta-label">Depósito de origen</span>
-          <span>{{ pedido.deposito|default:"-" }}</span>
-        </div>
-        <div>
           <span class="meta-label">Forma de pago</span>
           <span>{{ pedido.forma_pago|default:"-" }}</span>
         </div>

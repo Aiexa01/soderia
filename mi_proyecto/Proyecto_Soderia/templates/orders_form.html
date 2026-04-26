@@ -13,30 +13,14 @@
       <p>Registra el pedido y su primer detalle. El precio se toma automaticamente desde el producto.</p>
       <form method="post">
         {% csrf_token %}
-        {% if form.non_field_errors %}
-          <div class="error-box">
-            {{ form.non_field_errors }}
-          </div>
-        {% endif %}
+        {{ form.non_field_errors }}
 
         <label for="{{ form.cliente.id_for_label }}">Cliente</label>
         {{ form.cliente }}
         {{ form.cliente.errors }}
 
-        <label for="{{ form.deposito.id_for_label }}">Seleccionar depósito</label>
-        {{ form.deposito }}
-        {{ form.deposito.errors }}
-
         <label for="{{ form.producto.id_for_label }}">Producto</label>
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-          <div style="flex: 1;">
-            {{ form.producto }}
-          </div>
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 500; cursor: pointer; white-space: nowrap;">
-            <input type="checkbox" name="es_retornable" style="width: 18px; height: 18px;">
-            ¿Es retornable?
-          </label>
-        </div>
+        {{ form.producto }}
         {{ form.producto.errors }}
 
         <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
@@ -69,12 +53,6 @@
       var subtotal = document.getElementById("id_subtotal");
       if (!producto || !precio || !cantidad || !subtotal) return;
 
-      var preciosMap = {
-        {% for p in productos %}
-        "{{ p.id }}": "{{ p.precio }}".replace(",", "."),
-        {% endfor %}
-      };
-
       function updateSubtotal() {
         var precioValue = parseFloat(precio.value || "0");
         var cantidadValue = parseInt(cantidad.value || "0", 10);
@@ -83,15 +61,20 @@
       }
 
       function updatePrice() {
-        var val = producto.value;
-        precio.value = preciosMap[val] || "";
+        var option = producto.options[producto.selectedIndex];
+        precio.value = option ? (option.getAttribute("data-precio") || "") : "";
         updateSubtotal();
       }
 
+      Array.prototype.forEach.call(producto.options, function (option) {
+        if (!option.value) return;
+        if (!option.getAttribute("data-precio") && option.textContent.indexOf(" - $") > -1) {
+          option.setAttribute("data-precio", option.textContent.split(" - $").pop().trim());
+        }
+      });
+
       producto.addEventListener("change", updatePrice);
       cantidad.addEventListener("input", updateSubtotal);
-      
-      // Initialize on load
       updatePrice();
     })();
   </script>

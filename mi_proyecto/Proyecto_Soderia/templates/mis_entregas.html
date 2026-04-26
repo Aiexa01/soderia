@@ -1,65 +1,167 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Mis entregas{% endblock %}
+{% block title %}Mi ruta del día{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/orders.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/logistica.css' %}" />
 {% endblock %}
 
 {% block header_action %}
-  <a class="cta" href="{% url 'home' %}">Volver</a>
+  <a class="cta ghost" href="{% url 'home' %}">Inicio</a>
 {% endblock %}
 
 {% block content %}
-  <div class="grid">
-    <section class="card">
-      <h1>Mis entregas</h1>
+<div class="logistica-wrapper">
+
+  <!-- CABECERA REPARTIDOR -->
+  <div class="logistica-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="logistica-title">Mi ruta de hoy</h1>
       {% if camioneta %}
-        <p>Camioneta asignada: {{ camioneta.nombre }} ({{ camioneta.patente }})</p>
-        <h3>Pedidos actuales</h3>
-        <div class="order-list">
-          {% for pedido in pedidos %}
-            <article class="order-card">
-              <div class="order-main">
-                <div class="order-id">Pedido #{{ pedido.id }}</div>
-                <div class="order-client">{{ pedido.cliente.name }}</div>
-                <div class="order-meta">
-                  <span>Estado: {{ pedido.get_estado_display }}</span>
-                  <span>Direccion: {{ pedido.cliente.direccion|default:"-" }}</span>
-                </div>
-              </div>
-              <div class="order-actions">
-                <a class="cta ghost" href="{% url 'entrega_operacion' pedido.id %}">Operar</a>
-              </div>
-            </article>
-          {% empty %}
-            <p class="hint">No hay entregas asignadas.</p>
-          {% endfor %}
-        </div>
-        <h3>Historial (ultimos 7 dias)</h3>
-        <div class="order-list">
-          {% for pedido in historial %}
-            <article class="order-card">
-              <div class="order-main">
-                <div class="order-id">Pedido #{{ pedido.id }}</div>
-                <div class="order-client">{{ pedido.cliente.name }}</div>
-                <div class="order-meta">
-                  <span>Estado: {{ pedido.get_estado_display }}</span>
-                  <span>Direccion: {{ pedido.cliente.direccion|default:"-" }}</span>
-                </div>
-              </div>
-              <div class="order-actions">
-                <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Ver</a>
-              </div>
-            </article>
-          {% empty %}
-            <p class="hint">Sin historial reciente.</p>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="hint">No tenes camioneta asignada.</p>
+        <span class="logistica-fecha">
+          🚚 {{ camioneta.nombre }} ({{ camioneta.patente }}) — {{ hoy|date:"d/m/Y" }}
+        </span>
+      {% elif is_admin %}
+        <span class="logistica-fecha">Vista administrador — todos los pedidos activos</span>
       {% endif %}
-    </section>
+    </div>
+    
+    {% if camioneta %}
+    <div>
+      <a href="{% url 'logistica_despacho' camioneta.id %}" class="cta main">
+        🚚 Panel de Despacho (Armar / Iniciar / Cerrar ruta)
+      </a>
+    </div>
+    {% endif %}
   </div>
+
+  {% if not camioneta and not is_admin %}
+  <!-- SIN CAMIONETA -->
+  <div class="empty-state-premium">
+    <h3>No tenés camioneta asignada</h3>
+    <p>Contactá al administrador para que te asigne una camioneta.</p>
+  </div>
+
+  {% else %}
+
+  <!-- RESUMEN DEL DÍA -->
+  {% if resumen %}
+  <div class="logistica-metricas repartidor-metricas">
+    <div class="logistica-metrica pendiente">
+      <div class="logistica-metrica-num">{{ resumen.pendientes }}</div>
+      <div class="logistica-metrica-label">Pendientes</div>
+    </div>
+    <div class="logistica-metrica entregado">
+      <div class="logistica-metrica-num">{{ resumen.entregados }}</div>
+      <div class="logistica-metrica-label">Entregados</div>
+    </div>
+    <div class="logistica-metrica devuelto">
+      <div class="logistica-metrica-num">{{ resumen.devueltos }}</div>
+      <div class="logistica-metrica-label">Devueltos</div>
+    </div>
+    <div class="logistica-metrica tasa">
+      <div class="logistica-metrica-num">{{ resumen.total }}</div>
+      <div class="logistica-metrica-label">Total del día</div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- RUTA ACTIVA -->
+  {% if pedidos %}
+  <section class="logistica-section">
+    <h2 class="logistica-section-title">Pedidos a entregar</h2>
+    <div class="ruta-lista">
+      {% for pedido in pedidos %}
+      <article class="ruta-pedido-card {% if pedido.estado == 'REINTENTAR' %}ruta-pedido-reintentar{% endif %}">
+        <div class="ruta-pedido-num {% if pedido.estado == 'REINTENTAR' %}ruta-num-reintentar{% endif %}">
+          {% if pedido.estado == 'REINTENTAR' %}⟳{% else %}{{ forloop.counter }}{% endif %}
+        </div>
+        <div class="ruta-pedido-body">
+          <div class="ruta-pedido-cliente">
+            <strong>{{ pedido.cliente.name }}</strong>
+            <span class="ruta-estado estado-{{ pedido.estado|lower }}">
+              {% if pedido.estado == 'REINTENTAR' %}⟳ Reintentar{% else %}{{ pedido.get_estado_display }}{% endif %}
+            </span>
+            <div style="color: #ef4444; font-weight: 600; font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 1rem;">🔴</span> Sin entregar (Hace {{ pedido.created_at|timesince }})
+            </div>
+          </div>
+          {% if pedido.cliente.direccion %}
+          <div class="ruta-pedido-dir">
+            📍 {{ pedido.cliente.direccion }}{% if pedido.cliente.barrio %}, {{ pedido.cliente.barrio.nombre }}{% endif %}
+          </div>
+          {% endif %}
+          {% if pedido.cliente.telefono %}
+          <div class="ruta-pedido-tel">📞 {{ pedido.cliente.telefono }}</div>
+          {% endif %}
+          {% if pedido.cliente.referencias %}
+          <div class="ruta-pedido-ref hint">{{ pedido.cliente.referencias }}</div>
+          {% endif %}
+          <div class="ruta-pedido-productos">
+            {% for det in pedido.detalles.all %}
+              <span class="despacho-prod-tag">{{ det.producto.nombre }} ×{{ det.cantidad }}</span>
+            {% endfor %}
+          </div>
+          <div class="ruta-pedido-total">Total: <strong>${{ pedido.total }}</strong></div>
+        </div>
+        <div class="ruta-pedido-acciones">
+          <form method="post" action="{% url 'entrega_rapida' pedido.id %}"
+                onsubmit="return confirm('¿Confirmar entrega del pedido #{{ pedido.id }} a {{ pedido.cliente.name }}?');">
+            {% csrf_token %}
+            <button type="submit" class="ruta-btn-entregar">✔ Entregado</button>
+          </form>
+          <a class="ruta-btn-devolver" href="{% url 'devolucion_rapida' pedido.id %}">✗ / ⟳</a>
+          <a class="ruta-btn-detalle" href="{% url 'entrega_operacion' pedido.id %}">Detalle</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+  </section>
+
+  {% else %}
+    {% if despacho_activo %}
+    <div class="logistica-alert logistica-alert-success">
+      ✅ Todos los pedidos del día están resueltos. ¡Excelente trabajo!
+    </div>
+    {% else %}
+    <div class="empty-state-premium">
+      <h3>No hay pedidos para hoy</h3>
+      <p>Cuando el despacho esté listo, aparecerán acá tus entregas.</p>
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <!-- HISTORIAL -->
+  {% if historial %}
+  <section class="logistica-section">
+    <details class="ruta-historial">
+      <summary class="logistica-section-title" style="cursor:pointer;">
+        Historial reciente (últimos 7 días)
+      </summary>
+      <div class="logistica-pendientes" style="margin-top:12px;">
+        {% for pedido in historial %}
+        <article class="logistica-pendiente-card">
+          <div class="logistica-pend-info">
+            <div class="logistica-pend-id">
+              Pedido #{{ pedido.id }}
+              <span class="ruta-estado estado-{{ pedido.estado|lower }}">{{ pedido.get_estado_display }}</span>
+            </div>
+            <div class="logistica-pend-cliente">{{ pedido.cliente.name }}</div>
+            <div class="logistica-pend-meta">{{ pedido.updated_at|date:"d/m H:i" }}</div>
+          </div>
+          <div class="logistica-pend-acciones">
+            <a class="cta ghost" href="{% url 'orders_detail' pedido.id %}">Ver</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </details>
+  </section>
+  {% endif %}
+
+  {% endif %}
+</div>
 {% endblock %}

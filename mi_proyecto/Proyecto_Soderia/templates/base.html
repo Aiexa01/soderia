@@ -30,12 +30,10 @@
       </div>
       <div class="side-section">Menu principal</div>
       <nav class="side-nav">
-        {% if not is_encargado_stock %}
         <a class="side-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
           href="{% url 'home' %}">
           <span class="side-icon">🏠</span> Inicio
         </a>
-        {% endif %}
         {% if is_admin or is_eac %}
         <a class="side-link {% if request.resolver_match.url_name == 'clients_list' %}active{% endif %}"
           href="{% url 'clients_list' %}">
@@ -59,19 +57,12 @@
           <span class="side-icon">📦</span> Stock
         </a>
         {% endif %}
-        {% if is_repartidor or is_admin %}
-        <a class="side-link side-sublink {% if request.resolver_match.url_name == 'mi_stock' %}active{% endif %}"
-          href="{% url 'mi_stock' %}">
-          <span class="side-icon">📦</span> Stock asignado
-        </a>
-        {% endif %}
         {% if is_admin %}
         <a class="side-link {% if request.resolver_match.url_name == 'logistica_panel' %}active{% endif %}"
           href="{% url 'logistica_panel' %}">
           <span class="side-icon">🚚</span> Logistica
         </a>
         {% endif %}
-        {# TODO: habilitar cuando se implementen estas rutas
         {% if is_admin or is_eac %}
         <a class="side-link" href="/instalaciones/"><span class="side-icon">🛠</span> Servicios / Instalaciones</a>
         {% endif %}
@@ -79,9 +70,20 @@
         <a class="side-link" href="/servicios/"><span class="side-icon">🧰</span> Servicios tecnicos</a>
         {% endif %}
         {% if is_repartidor %}
+        <a class="side-link {% if request.resolver_match.url_name == 'mis_entregas' %}active{% endif %}"
+          href="{% url 'mis_entregas' %}">
+          <span class="side-icon">📍</span> Mis entregas
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'mi_camioneta' %}active{% endif %}"
+          href="{% url 'mi_camioneta' %}">
+          <span class="side-icon">🚐</span> Mi camioneta
+        </a>
+        <a class="side-link {% if request.resolver_match.url_name == 'mi_stock' %}active{% endif %}"
+          href="{% url 'mi_stock' %}">
+          <span class="side-icon">📦</span> Mi stock
+        </a>
         <a class="side-link" href="/servicios-asignados/"><span class="side-icon">🧾</span> Servicios asignados</a>
         {% endif %}
-        #}
         {% if is_admin %}
         <div class="side-section">Administracion</div>
         <a class="side-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"
@@ -96,14 +98,6 @@
           href="{% url 'camionetas_list' %}">
           <span class="side-icon">🚚</span> Camionetas
         </a>
-        {% endif %}
-        {% if is_repartidor or is_admin %}
-        <a class="side-link side-sublink {% if request.resolver_match.url_name == 'mi_camioneta' %}active{% endif %}"
-          href="{% url 'mi_camioneta' %}">
-          <span class="side-icon">🚐</span> Camionetas asignadas
-        </a>
-        {% endif %}
-        {% if is_admin %}
         <a class="side-link {% if request.resolver_match.url_name == 'productos_list' %}active{% endif %}"
           href="{% url 'productos_list' %}">
           <span class="side-icon">🧴</span> Productos
@@ -112,7 +106,7 @@
           href="{% url 'barrios_list' %}">
           <span class="side-icon">🗺️</span> Barrios
         </a>
-        {# TODO: <a class="side-link" href="/configuracion/"><span class="side-icon">⚙️</span> Configuracion</a> #}
+        <a class="side-link" href="/configuracion/"><span class="side-icon">⚙️</span> Configuracion</a>
         {% endif %}
       </nav>
       <div class="side-footer">
